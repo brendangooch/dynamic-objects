@@ -51,7 +51,7 @@ export class DynamicNumber implements iDynamic {
 
     public update(ms: number): void {
         if (this.unit.isOn) this.unit.update(ms);
-        if (this.unit.isComplete && this.diff > 0) this.previous = this.next;
+        if (this.unit.isComplete && this.previous !== this.next) this.previous = this.next;
     }
 
     // duration === 0 changes current number immediately
