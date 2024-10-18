@@ -1,17 +1,20 @@
 {
   "name": "@brendangooch/dynamic-objects",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "",
   "author": "B Gooch <brendangooch@gmail.com>",
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "pretest": "clear && npm run build",
-    "prepack": "npm run build",
-    "prebuild": "npm run clean",
-    "clean": "rm -rf lib",
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" NODE_NO_WARNINGS=1 jest",
-    "build": "tsc"
+    "build": "tsc -p tsconfig.prod.json",
+    "build-dev": "npm run prebuild && tsc",
+    "pretest": "clear && npm run remove-tmp && tsc --outdir tmp",
+    "posttest": "npm run remove-tmp",
+    "prebuild": "npm run remove-lib",
+    "prepack": "npm run build",
+    "remove-tmp": "rm -rf tmp",
+    "remove-lib": "rm -rf lib"
   },
   "private": false,
   "publishConfig": {
@@ -50,7 +53,8 @@
     "updateable"
   ],
   "dependencies": {
-    "@brendangooch/ease": "^1.1.0",
-    "@brendangooch/maths": "^1.1.0"
+    "@brendangooch/ease": "^1.2.1",
+    "@brendangooch/maths": "^3.0.0",
+    "@brendangooch/simple-game-loop": "^2.0.0"
   }
 }

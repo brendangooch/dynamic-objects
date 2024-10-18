@@ -1,14 +1,14 @@
 {
     "transform": {},
     "testRegex": "((\\.|/)(test|spec))\\.js$",
-    "verbose": true,
-    "bail": 1,
+    "verbose": false,
     "coverageProvider": "v8",
     "moduleFileExtensions": [
         "js"
     ],
     "slowTestThreshold": 5,
     "testPathIgnorePatterns": [
+        "<rootDir>/build/",
         "/node_modules/"
     ]
 }
