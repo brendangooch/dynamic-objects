@@ -4,21 +4,15 @@
 
 import { tEaseOption } from "@brendangooch/ease";
 import { iDynamic } from "./index.js";
-import { DynamicUnit } from "./dynamic-unit.js";
 import { Vector2D } from "@brendangooch/maths";
+import { BaseDynamicObjectWithUnit } from "./base-dynamic-object-with-unit.js";
 
-export class DynamicVector implements iDynamic {
+export class DynamicVector extends BaseDynamicObjectWithUnit implements iDynamic {
 
-    private unit: DynamicUnit = new DynamicUnit();
     private previous: Vector2D = new Vector2D();
     private next: Vector2D = new Vector2D();
     private current: Vector2D = new Vector2D();
     private difference: Vector2D = new Vector2D();
-    private isOn: boolean = false;
-
-    public get isActive(): boolean {
-        return false;
-    }
 
     public get x(): number {
         return 0;
@@ -28,15 +22,18 @@ export class DynamicVector implements iDynamic {
         return 0;
     }
 
-    public duration(ms: number): DynamicVector {
+    public override duration(ms: number): DynamicVector {
+        super.duration(ms);
         return this;
     }
 
-    public speed(pixelsPerSecond: number): DynamicVector {
+    public override speed(unitsPerMs: number): DynamicVector {
+        super.speed(unitsPerMs);
         return this;
     }
 
-    public ease(easeOption: tEaseOption): DynamicVector {
+    public override ease(easeOption: tEaseOption): DynamicVector {
+        super.ease(easeOption);
         return this;
     }
 
@@ -45,14 +42,10 @@ export class DynamicVector implements iDynamic {
     }
 
     public moveBy(x: number, y: number): boolean {
-        return false;
+        return this.moveTo(x + this.x, y + this.y);
     }
 
-    public turnOn(): void { }
-
-    public turnOff(): void { }
-
-    public update(ms: number): void { }
+    // public update(ms: number): void { }
 
     public load(json: string): boolean {
         return false;
@@ -61,6 +54,22 @@ export class DynamicVector implements iDynamic {
     public save(): string {
         return '';
     }
+
+    protected updateCurrent(): void { }
+    protected updateComplete(): void { }
+    protected get diff(): number { return 0; }
+
+    private canMove(x: number, y: number): boolean {
+        return false;
+    }
+
+    private doMove(x: number, y: number): boolean {
+        return true;
+    }
+
+    private instantMove(): void { }
+
+    private dynamicMove(): void { }
 
 }
 

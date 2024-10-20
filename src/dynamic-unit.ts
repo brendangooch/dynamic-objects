@@ -5,17 +5,17 @@
 import * as Ease from '@brendangooch/ease';
 import { iDynamicUnit } from "./index.js";
 import { clamp } from "@brendangooch/maths";
+import { BaseDynamicObject } from './base-dynamic-object.js';
 
 type tDuration = { current: number; next: number };
 
-export class DynamicUnit implements iDynamicUnit {
+export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
 
     private elapsed: number = 0;
     private cur: number = 0;
     private _duration: tDuration = { current: 0, next: 0 };
     private easeOption: Ease.tEaseOption = 'noEase';
     private easeFn: Ease.tEaseFunction = Ease.load('noEase');
-    private isOn: boolean = false;
 
     public get isActive(): boolean {
         return this.elapsed !== this._duration.current;
@@ -50,22 +50,6 @@ export class DynamicUnit implements iDynamicUnit {
         return false;
     }
 
-    public turnOn(): void {
-        this.isOn = true;
-    }
-
-    public turnOff(): void {
-        this.isOn = false;
-    }
-
-    public update(ms: number): void {
-        if (this.isOn && this.isActive) {
-            this.increment(ms);
-            this.updateCurrent();
-            if (!this.isActive) this.updateComplete();
-        }
-    }
-
     public load(json: string): boolean {
         const state = JSON.parse(json);
         if (
@@ -94,23 +78,23 @@ export class DynamicUnit implements iDynamicUnit {
         return (this._duration.current === 0) ? 0 : this.elapsed / this._duration.current;
     }
 
-    private increment(ms: number): void {
+    protected increment(ms: number): void {
         this.elapsed += ms;
         this.elapsed = Math.min(this.elapsed, this._duration.current);
     }
 
-    private updateCurrent(): void {
+    protected updateCurrent(): void {
         this.cur = clamp(this.easeFn(this.progress), 0, 1);
     }
 
-    private updateComplete(): void {
+    protected updateComplete(): void {
         this._duration.next = 0;
         this.cur = 1;
         this.loadEase('noEase');
         this.turnOff();
     }
 
-    public loadEase(easeOption: Ease.tEaseOption): void {
+    private loadEase(easeOption: Ease.tEaseOption): void {
         this.easeOption = easeOption;
         this.easeFn = Ease.load(easeOption);
     }

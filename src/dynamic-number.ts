@@ -4,49 +4,35 @@
 
 import { tEaseOption } from "@brendangooch/ease";
 import { iDynamic } from "./index.js";
-import { DynamicUnit } from "./dynamic-unit.js";
+import { BaseDynamicObjectWithUnit } from "./base-dynamic-object-with-unit.js";
 
-export class DynamicNumber implements iDynamic {
+export class DynamicNumber extends BaseDynamicObjectWithUnit implements iDynamic {
 
-    private unit: DynamicUnit = new DynamicUnit(); // extract
     private previous: number = 0;
     private next: number = 0;
-    private cur: number = 0; // extract
-    private dur: number = 0; // extract
-    private spd: number = 0; // extract
-    private isOn: boolean = false; // extract
+    private cur: number = 0;
 
     public constructor(initial: number = 0) {
+        super();
         this.setAll(initial);
-    }
-
-    // extract
-    public get isActive(): boolean {
-        return this.unit.isActive;
     }
 
     public get current(): number {
         return this.cur;
     }
 
-    public duration(ms: number): DynamicNumber {
-        if (!this.isActive && ms > 0) {
-            this.dur = ms;
-        }
+    public override duration(ms: number): DynamicNumber {
+        super.duration(ms);
         return this;
     }
 
-    public speed(unitsPerMs: number): DynamicNumber {
-        if (!this.isActive && unitsPerMs > 0) {
-            this.spd = unitsPerMs;
-        }
+    public override speed(unitsPerMs: number): DynamicNumber {
+        super.speed(unitsPerMs);
         return this;
     }
 
-    public ease(easeOption: tEaseOption): DynamicNumber {
-        if (!this.isActive) {
-            this.unit.ease(easeOption);
-        }
+    public override ease(easeOption: tEaseOption): DynamicNumber {
+        super.ease(easeOption);
         return this;
     }
 
@@ -59,26 +45,9 @@ export class DynamicNumber implements iDynamic {
         return this.changeTo(n + this.current);
     }
 
-    public turnOn(): void {
-        this.isOn = true;
-    }
-
-    public turnOff(): void {
-        this.isOn = false;
-    }
-
-    public update(ms: number): void {
-        if (this.isOn && this.isActive) {
-            this.unit.update(ms);
-            this.updateCurrent();
-            if (!this.isActive) this.updateComplete();
-        }
-    }
 
     public load(json: string): boolean {
-
         const state = JSON.parse(json);
-
         if (state.unit === undefined) return false;
         if (state.previous === undefined) return false;
         if (state.next === undefined) return false;
@@ -86,7 +55,6 @@ export class DynamicNumber implements iDynamic {
         if (state.duration === undefined) return false;
         if (state.speed === undefined) return false;
         if (state.isOn === undefined) return false;
-
         this.unit.load(state.unit);
         this.previous === state.previous;
         this.next === state.next;
@@ -94,9 +62,7 @@ export class DynamicNumber implements iDynamic {
         this.dur === state.duration;
         this.spd === state.speed;
         this.isOn === state.isOn;
-
         return true;
-
     }
 
     public save(): string {
@@ -111,7 +77,7 @@ export class DynamicNumber implements iDynamic {
         });
     }
 
-    private get diff(): number {
+    protected get diff(): number {
         return this.next - this.previous;
     }
 
@@ -119,21 +85,15 @@ export class DynamicNumber implements iDynamic {
         this.cur = this.previous = this.next = n;
     }
 
-    private updateCurrent(): void {
+    protected updateCurrent(): void {
         this.cur = this.previous + (this.diff * this.unit.current);
     }
 
-    private updateComplete(): void {
+    protected updateComplete(): void {
         this.setAll(this.next);
         this.spd = 0;
         this.dur = 0;
         this.turnOff();
-    }
-
-    // only update duration if speed property has been set (not 0)
-    // diff must be positive or divide by 0 error
-    private updateDuration(): void {
-        if (this.spd !== 0 && this.diff > 0) this.dur = Math.abs(this.diff / this.spd);
     }
 
     private canChange(n: number): boolean {

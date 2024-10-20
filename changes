@@ -3,20 +3,6 @@ BUGS:
 
 to do:
 
-    re-write number tests (behaviour not methods)
-    re-write number
-    commit
-
-    extract common functionality into
-        BaseDynamicClass
-        BaseDynamicClassWithUnit extends BaseDynamicClass
-        ie 
-            DynamicUnit extends BaseDynamicClass
-            DynamicNumber extends BaseDynamicClassWithUnit
-            DynamicVector extends BaseDynamicClassWithUnit
-            DynamicBezier extends BaseDynamicClassWithUnit
-            
-
     re-write vector tests (behaviour not methods)
     re-write vector
     commit

@@ -4,12 +4,11 @@
 
 import { tEaseOption } from "@brendangooch/ease";
 import { iDynamic } from "./index.js";
+import { BaseDynamicObjectWithUnit } from "./base-dynamic-object-with-unit.js";
 
-export class DynamicBezier implements iDynamic {
+export class DynamicBezier extends BaseDynamicObjectWithUnit implements iDynamic {
 
-    public get isActive(): boolean {
-        return false;
-    }
+    //
 
     public get x(): number {
         return 0;
@@ -19,15 +18,18 @@ export class DynamicBezier implements iDynamic {
         return 0;
     }
 
-    public duration(ms: number): DynamicBezier {
+    public override duration(ms: number): DynamicBezier {
+        super.duration(ms);
         return this;
     }
 
-    public speed(pixelsPerSecond: number): DynamicBezier {
+    public override speed(unitsPerMs: number): DynamicBezier {
+        super.speed(unitsPerMs);
         return this;
     }
 
-    public ease(easeOption: tEaseOption): DynamicBezier {
+    public override ease(easeOption: tEaseOption): DynamicBezier {
+        super.ease(easeOption);
         return this;
     }
 
@@ -35,25 +37,15 @@ export class DynamicBezier implements iDynamic {
         return this;
     }
 
-    public moveTo(x: number, y: number): Promise<boolean> {
-        return new Promise((res) => { });
+    public moveTo(x: number, y: number): boolean {
+        return false;
     }
 
-    public moveBy(x: number, y: number): Promise<boolean> {
-        return new Promise((res) => { });
+    public moveBy(x: number, y: number): boolean {
+        return this.moveTo(x + this.x, y + this.y);
     }
 
-    public turnOn(): void {
-
-    }
-
-    public turnOff(): void {
-
-    }
-
-    public update(ms: number): void {
-
-    }
+    // public update(ms: number): void {}
 
     public load(json: string): boolean {
         return false;
@@ -63,6 +55,21 @@ export class DynamicBezier implements iDynamic {
         return '';
     }
 
+    protected updateCurrent(): void { }
+    protected updateComplete(): void { }
+    protected get diff(): number { return 0; }
+
+    private canMove(x: number, y: number): boolean {
+        return false;
+    }
+
+    private doMove(x: number, y: number): boolean {
+        return true;
+    }
+
+    private instantMove(): void { }
+
+    private dynamicMove(): void { }
 
 }
 
