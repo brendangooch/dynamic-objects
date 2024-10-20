@@ -31,6 +31,7 @@ function testAll(): void {
 
         // public ease(easeOption: tEaseOption): DynamicUnit
         testEaseCanOnlyBeSetIfNotActive();
+        testEaseIsSetBackToNoneOnceDurationHasElapsed();
 
         // public run(): boolean
         testDoesNotRunIfDurationHasNotBeenSet();
@@ -188,6 +189,17 @@ function testEaseCanOnlyBeSetIfNotActive(): void {
         unit.update(200);
         unit.update(200);
         unit.update(200);
+    });
+}
+
+function testEaseIsSetBackToNoneOnceDurationHasElapsed(): void {
+    test('current ease is reset back to none once duration has elapsed', () => {
+        unit.duration(1000).ease('easeInOutCubic').run();
+        unit.update(1000);
+        unit.duration(1000).run();
+        unit.update(200);
+        expect(unit.current).not.toBe(Math.pow(0.2, 2));
+        expect(unit.current).toBe(0.2);
     });
 }
 

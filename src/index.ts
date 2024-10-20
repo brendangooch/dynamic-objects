@@ -21,15 +21,6 @@ export interface iDynamicUnit extends iDynamic {
     run(): boolean;
 }
 
-export interface iDynamicNumber extends iDynamic {
-    get current(): number
-    duration(ms: number): DynamicNumber;
-    speed(units: number): DynamicNumber;
-    ease(easeOption: tEaseOption): DynamicNumber;
-    changeTo(n: number): boolean;
-    changeBy(n: number): boolean;
-}
-
 // export { DynamicUnit };
 // export { BaseDynamicUnit } from './unit/decorators/base-dynamic-unit.js'
 // export { InvertedDynamicUnit } from './inverted-dynamic-unit.js'

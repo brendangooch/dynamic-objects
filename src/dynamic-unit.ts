@@ -10,22 +10,20 @@ type tDuration = { current: number; next: number };
 
 export class DynamicUnit implements iDynamicUnit {
 
-    private _elapsed: number = 0;
+    private elapsed: number = 0;
+    private cur: number = 0;
     private _duration: tDuration = { current: 0, next: 0 };
-    private _easeOption: Ease.tEaseOption = 'noEase';
-    private _easeFn: Ease.tEaseFunction = Ease.load('noEase');
-    private _isOn: boolean = false;
+    private easeOption: Ease.tEaseOption = 'noEase';
+    private easeFn: Ease.tEaseFunction = Ease.load('noEase');
+    private isOn: boolean = false;
 
     public get isActive(): boolean {
-        return this._elapsed !== this._duration.current;
+        return this.elapsed !== this._duration.current;
     }
 
-    // a lot of the time, the unit will not be "running"
-    // no need to call easeFn and calculate progress on every call, only when "running"
+    // cache current rather than calculate on each call
     public get current(): number {
-        if (this.notStarted) return 0;
-        if (this.isComplete) return 1;
-        return clamp(this._easeFn(this.progress), 0, 1);
+        return this.cur;
     }
 
     public duration(ms: number): DynamicUnit {
@@ -46,23 +44,24 @@ export class DynamicUnit implements iDynamicUnit {
     public run(): boolean {
         if (!this.isActive && this._duration.next > 0) {
             this._duration.current = this._duration.next;
-            this._elapsed = 0;
+            this.elapsed = 0;
             this.turnOn();
         }
         return false;
     }
 
     public turnOn(): void {
-        this._isOn = true;
+        this.isOn = true;
     }
 
     public turnOff(): void {
-        this._isOn = false;
+        this.isOn = false;
     }
 
     public update(ms: number): void {
-        if (this._isOn && this.isActive) {
+        if (this.isOn && this.isActive) {
             this.increment(ms);
+            this.updateCurrent();
             if (!this.isActive) this.updateComplete();
         }
     }
@@ -75,50 +74,45 @@ export class DynamicUnit implements iDynamicUnit {
             state.easeOption === undefined ||
             state.isOn === undefined
         ) { return false };
-        this._elapsed = state.elapsed;
+        this.elapsed = state.elapsed;
         this._duration = state.duration;
         this.loadEase(state.easeOption);
-        this._isOn = state.isOn;
+        this.isOn = state.isOn;
         return true;
     }
 
     public save(): string {
         return JSON.stringify({
-            elapsed: this._elapsed,
+            elapsed: this.elapsed,
             duration: this._duration,
-            easeOption: this._easeOption,
-            isOn: this._isOn
+            easeOption: this.easeOption,
+            isOn: this.isOn
         });
     }
 
     private get progress(): number {
-        return (this._duration.current === 0) ? 0 : this._elapsed / this._duration.current;
-    }
-
-    // if elapsed === 0 then an update cycle hasn't started
-    private get notStarted(): boolean {
-        return this._elapsed === 0;
-    }
-
-    // if !notStarted && elapsed === duration then an update cycle has completed
-    private get isComplete(): boolean {
-        return !this.notStarted && this._elapsed === this._duration.current;
+        return (this._duration.current === 0) ? 0 : this.elapsed / this._duration.current;
     }
 
     private increment(ms: number): void {
-        this._elapsed += ms;
-        this._elapsed = Math.min(this._elapsed, this._duration.current);
+        this.elapsed += ms;
+        this.elapsed = Math.min(this.elapsed, this._duration.current);
+    }
+
+    private updateCurrent(): void {
+        this.cur = clamp(this.easeFn(this.progress), 0, 1);
     }
 
     private updateComplete(): void {
         this._duration.next = 0;
+        this.cur = 1;
         this.loadEase('noEase');
         this.turnOff();
     }
 
     public loadEase(easeOption: Ease.tEaseOption): void {
-        this._easeOption = easeOption;
-        this._easeFn = Ease.load(easeOption);
+        this.easeOption = easeOption;
+        this.easeFn = Ease.load(easeOption);
     }
 
 }

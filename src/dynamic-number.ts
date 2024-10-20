@@ -3,62 +3,158 @@
  */
 
 import { tEaseOption } from "@brendangooch/ease";
-import { iDynamicNumber } from "./index.js";
+import { iDynamic } from "./index.js";
 import { DynamicUnit } from "./dynamic-unit.js";
 
-export class DynamicNumber implements iDynamicNumber {
+export class DynamicNumber implements iDynamic {
 
-    private unit: DynamicUnit = new DynamicUnit();
+    private unit: DynamicUnit = new DynamicUnit(); // extract
     private previous: number = 0;
     private next: number = 0;
-    private isOn: boolean = false;
+    private cur: number = 0; // extract
+    private dur: number = 0; // extract
+    private spd: number = 0; // extract
+    private isOn: boolean = false; // extract
 
+    public constructor(initial: number = 0) {
+        this.setAll(initial);
+    }
+
+    // extract
     public get isActive(): boolean {
-        return false;
+        return this.unit.isActive;
     }
 
     public get current(): number {
-        return 0;
+        return this.cur;
     }
 
     public duration(ms: number): DynamicNumber {
+        if (!this.isActive && ms > 0) {
+            this.dur = ms;
+        }
         return this;
     }
 
-    public speed(unitsPerSecond: number): DynamicNumber {
+    public speed(unitsPerMs: number): DynamicNumber {
+        if (!this.isActive && unitsPerMs > 0) {
+            this.spd = unitsPerMs;
+        }
         return this;
     }
 
     public ease(easeOption: tEaseOption): DynamicNumber {
+        if (!this.isActive) {
+            this.unit.ease(easeOption);
+        }
         return this;
     }
 
     public changeTo(n: number): boolean {
+        if (this.canChange(n)) return this.doChange(n);
         return false;
     }
 
     public changeBy(n: number): boolean {
-        return false;
+        return this.changeTo(n + this.current);
     }
 
     public turnOn(): void {
-
+        this.isOn = true;
     }
 
     public turnOff(): void {
-
+        this.isOn = false;
     }
 
     public update(ms: number): void {
-
+        if (this.isOn && this.isActive) {
+            this.unit.update(ms);
+            this.updateCurrent();
+            if (!this.isActive) this.updateComplete();
+        }
     }
 
     public load(json: string): boolean {
-        return false;
+
+        const state = JSON.parse(json);
+
+        if (state.unit === undefined) return false;
+        if (state.previous === undefined) return false;
+        if (state.next === undefined) return false;
+        if (state.current === undefined) return false;
+        if (state.duration === undefined) return false;
+        if (state.speed === undefined) return false;
+        if (state.isOn === undefined) return false;
+
+        this.unit.load(state.unit);
+        this.previous === state.previous;
+        this.next === state.next;
+        this.cur === state.current;
+        this.dur === state.duration;
+        this.spd === state.speed;
+        this.isOn === state.isOn;
+
+        return true;
+
     }
 
     public save(): string {
-        return '';
+        return JSON.stringify({
+            unit: this.unit.save(),
+            previous: this.previous,
+            next: this.next,
+            current: this.cur,
+            duration: this.dur,
+            speed: this.spd,
+            isOn: this.isOn
+        });
+    }
+
+    private get diff(): number {
+        return this.next - this.previous;
+    }
+
+    private setAll(n: number): void {
+        this.cur = this.previous = this.next = n;
+    }
+
+    private updateCurrent(): void {
+        this.cur = this.previous + (this.diff * this.unit.current);
+    }
+
+    private updateComplete(): void {
+        this.setAll(this.next);
+        this.spd = 0;
+        this.dur = 0;
+        this.turnOff();
+    }
+
+    // only update duration if speed property has been set (not 0)
+    // diff must be positive or divide by 0 error
+    private updateDuration(): void {
+        if (this.spd !== 0 && this.diff > 0) this.dur = Math.abs(this.diff / this.spd);
+    }
+
+    private canChange(n: number): boolean {
+        return !this.isActive && n !== this.cur;
+    }
+
+    private doChange(n: number): boolean {
+        this.next = n;
+        this.updateDuration();
+        if (this.dur > 0) this.dynamicChange();
+        else this.instantChange();
+        return true;
+    }
+
+    private instantChange(): void {
+        this.setAll(this.next);
+    }
+
+    private dynamicChange(): void {
+        this.turnOn();
+        this.unit.duration(this.dur).run();
     }
 
 };
