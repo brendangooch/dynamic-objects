@@ -1,0 +1,80 @@
+BUGS:
+    ...
+
+to do:
+
+
+    re-write dynamic unit tests (behaviour not methods)
+    re-write dynamic unit
+    commit
+    re-write number tests (behaviour not methods)
+    re-write number
+    commit
+    re-write vector tests (behaviour not methods)
+    re-write vector
+    commit
+    re-write bezier tests (behaviour not methods)
+    re-write bezier
+    commit
+    write position tests (behaviour not methods)
+    write position
+    commit
+    add behaviours:
+        base dynamic unit
+        inverted + test
+        rounded + test
+        floored + test
+    commit
+    export all classes from index.ts
+    test visually (re-factor test files)
+    commit & re-merge (fingers crossed)
+    publish
+
+
+v2.0.0 - completely refactored
+    
+    DynamicUnit vastly simplified
+        implemented Decorator pattern for additional functionality
+            ie inverted return 1 -> 0
+
+    DynamicNumber
+        refactored to reflect changes to DynamicUnit
+        + additional methods
+
+    DynamicPosition - removed (replaced)
+    added DynamicPath - to move in a straight path
+    added DynamicCurvedPath - to move in a curved path
+
+    updated with latest config templates
+    TESTED ALL FUNCTIONALITY VISUALLY + ALL JEST TESTS PASS
+
+
+
+v3.0.0 (future plans)
+    
+    add:
+        DynamicInteger
+        DynamicString - for game console
+        RepeatingDynamicUnit - for blink/flicker effect
+
+    look for a better way to persist objects without exposing internal properties - Memento pattern?    
+    
+
+
+other:
+
+    RepeatingDynamicUnit 
+        ideally implements iDynamicUnit
+        Repeater provides basic functionality to repeat a unit or series of units
+            continuous
+            n times
+            for n duration
+        would be awesome if this can also have ease applied to speed up / slow down repeating units
+            creates a  speed up / slow down effect
+                ideal for flashing on/off
+
+        takes an array of dynamic units
+            re-factor DynamicUnit to include setDuration(), setEase() & start() methods
+                equivalent of run(duration, ease)
+                this way, decorated units can be passed to repeater, which can set the duration of each unit
+        clamp the get current() return value (0, 1) - otherwise performance is seriously unpredictable

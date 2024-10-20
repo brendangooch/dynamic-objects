@@ -5,7 +5,7 @@
 import { tEaseOption } from "@brendangooch/ease";
 import { iDynamic } from "./index.js";
 
-export class DynamicPath implements iDynamic {
+export class DynamicBezier implements iDynamic {
 
     public get isActive(): boolean {
         return false;
@@ -19,35 +19,41 @@ export class DynamicPath implements iDynamic {
         return 0;
     }
 
-    public moveTo(x: number, y: number): DynamicPath {
+    public duration(ms: number): DynamicBezier {
         return this;
     }
 
-    public moveBy(x: number, y: number): DynamicPath {
+    public speed(pixelsPerSecond: number): DynamicBezier {
         return this;
     }
 
-    public setDuration(ms: number): DynamicPath {
+    public ease(easeOption: tEaseOption): DynamicBezier {
         return this;
     }
 
-    public setSpeed(pixels: number): DynamicPath {
+    public addControlPoint(distance: number, angle: number): DynamicBezier {
         return this;
     }
 
-    public setEase(easeOption: tEaseOption): DynamicPath {
-        return this;
+    public moveTo(x: number, y: number): Promise<boolean> {
+        return new Promise((res) => { });
     }
 
-    public run(): boolean {
-        return false;
+    public moveBy(x: number, y: number): Promise<boolean> {
+        return new Promise((res) => { });
     }
 
-    public turnOn(): void { }
+    public turnOn(): void {
 
-    public turnOff(): void { }
+    }
 
-    public update(ms: number): void { }
+    public turnOff(): void {
+
+    }
+
+    public update(ms: number): void {
+
+    }
 
     public load(json: string): boolean {
         return false;
@@ -57,25 +63,23 @@ export class DynamicPath implements iDynamic {
         return '';
     }
 
+
 }
 
 // import { tEaseOption } from "@brendangooch/ease";
-// import { DynamicUnit } from "../unit/dynamic-unit.js";
-// import { Vector2D } from "@brendangooch/maths";
-// import { iDynamicPath } from "../index.js";
+// import { DynamicUnit, iDynamicCurvedPath } from "../index.js";
+// import { QuadraticBezierCurve } from "@brendangooch/maths";
 
-// export class DynamicPath implements iDynamicPath {
+// export class DynamicCurvedPath implements iDynamicCurvedPath {
 
 //     private unit: DynamicUnit;
-//     private previous = new Vector2D();
-//     private next = new Vector2D();
-//     private current = new Vector2D();
-//     private difference = new Vector2D();
+//     private bezier: QuadraticBezierCurve;
 //     private isOn: boolean = false;
 
 //     public constructor(x: number = 0, y: number = 0) {
 //         this.unit = new DynamicUnit();
-//         this.setAll(x, y);
+//         this.bezier = new QuadraticBezierCurve();
+//         this.bezier.setAll(x, y);
 //     }
 
 //     get isActive(): boolean {
@@ -83,11 +87,11 @@ export class DynamicPath implements iDynamic {
 //     }
 
 //     public get x(): number {
-//         return this.current.x;
+//         return this.bezier.x(this.unit.current);
 //     }
 
 //     public get y(): number {
-//         return this.current.y;
+//         return this.bezier.y(this.unit.current);
 //     }
 
 //     public turnOn(): void {
@@ -101,10 +105,7 @@ export class DynamicPath implements iDynamic {
 //     public save(): string {
 //         return JSON.stringify({
 //             unit: this.unit.save(),
-//             previous: this.previous.save(),
-//             next: this.next.save(),
-//             current: this.current.save(),
-//             difference: this.difference.save(),
+//             bezier: this.bezier.save(),
 //             isOn: this.isOn
 //         });
 //     }
@@ -112,66 +113,61 @@ export class DynamicPath implements iDynamic {
 //     public load(json: string): void {
 //         const state = JSON.parse(json);
 //         if (state.unit === undefined) throw new Error('missing "unit" property');
-//         if (state.previous === undefined) throw new Error('missing "previous" property');
-//         if (state.next === undefined) throw new Error('missing "next" property');
-//         if (state.current === undefined) throw new Error('missing "current" property');
-//         if (state.difference === undefined) throw new Error('missing "difference" property');
+//         if (state.bezier === undefined) throw new Error('missing "bezier" property');
 //         if (state.isOn === undefined) throw new Error('missing "isOn" property');
 //         this.unit.load(state.unit);
-//         this.previous.load(state.previous);
-//         this.next.load(state.next);
-//         this.current.load(state.current);
-//         this.difference.load(state.difference);
+//         this.bezier.load(state.bezier);
 //         this.isOn = state.isOn;
 //     }
 
 //     public update(ms: number): void {
 //         if (this.isOn && this.isActive) {
 //             this.unit.update(ms);
-//             this.updateCurrent();
 //             if (!this.unit.isActive) this.updateComplete();
 //         }
 //     }
 
+//     // straight path
 //     public moveTo(x: number, y: number, duration: number = 0, easeOption: tEaseOption = 'noEase'): void {
 //         if (this.canMove(x, y, duration)) this.doMove(x, y, duration, easeOption);
 //     }
 
-//     private setAll(x: number, y: number): void {
-//         this.previous.setXY(x, y);
-//         this.next.setXY(x, y);
-//         this.current.setXY(x, y);
-//         this.updateDifference();
-//     }
-
-//     private updateDifference(): void {
-//         this.difference = this.next.subtract(this.previous)
-//     }
-
-//     private updateCurrent(): void {
-//         this.current = this.previous.add(this.difference.multiply(this.unit.current));
+//     // curved path
+//     public curveTo(x: number, y: number, distance: number, angle: number, duration: number = 0, easeOption: tEaseOption = 'noEase'): void {
+//         if (this.canMove(x, y, duration)) this.doCurve(x, y, distance, angle, duration, easeOption);
 //     }
 
 //     private updateComplete(): void {
-//         this.setAll(this.next.x, this.next.y);
+//         this.bezier.setAll(this.bezier.x(1), this.bezier.y(1));
 //         this.turnOff();
 //     }
 
 //     private canMove(x: number, y: number, duration: number): boolean {
-//         return !this.isActive && duration >= 0 && (x !== this.current.x || y !== this.current.y);
+//         return !this.isActive && duration >= 0 && (x !== this.bezier.x(1) || y !== this.bezier.y(1));
 //     }
 
 //     private doMove(x: number, y: number, duration: number, easeOption: tEaseOption): void {
 //         (duration === 0) ? this.instantMove(x, y) : this.dynamicMove(x, y, duration, easeOption);
 //     }
 
+//     private doCurve(x: number, y: number, distance: number, angle: number, duration: number, easeOption: tEaseOption): void {
+//         (duration === 0) ? this.instantMove(x, y) : this.dynamicCurve(x, y, distance, angle, duration, easeOption);
+//     }
+
 //     private instantMove(x: number, y: number): void {
-//         this.setAll(x, y);
+//         this.bezier.setAll(x, y);
 //     }
 
 //     private dynamicMove(x: number, y: number, duration: number, easeOption: tEaseOption): void {
-//         this.next.setXY(x, y);
-//         this.updateDifference();
+//         this.bezier.setEnd(x, y);
+//         this.bezier.makeStraight();
+//         this.turnOn();
+//         this.unit.run(duration, easeOption);
+//     }
+
+//     private dynamicCurve(x: number, y: number, distance: number, angle: number, duration: number, easeOption: tEaseOption): void {
+//         this.bezier.setEnd(x, y);
+//         this.bezier.setControlByDistanceAndAngleFromStart(distance, angle);
 //         this.turnOn();
 //         this.unit.run(duration, easeOption);
 //     }

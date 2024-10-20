@@ -2,415 +2,457 @@
  * 
  */
 
+import { DynamicUnit } from "./dynamic-unit.js";
+
+let unit: DynamicUnit
+beforeEach(() => {
+    unit = new DynamicUnit();
+});
+
 testAll();
 function testAll(): void {
     describe('DynamicUnit', () => {
-        test('dummy', () => { });
+
+        // public get isActive(): boolean
+        testStartsInactive();
+        testDoesNotBecomeActiveOnceDurationIsSet();
+        testBecomesActiveOnceDurationIsSetAndRunIsCalled();
+        testBecomesNotActiveOnceDurationHasElapsed();
+        testCanBeActiveWhetherTurnedOnOrOff();
+
+        // public get current(): number
+        testInitialCurrentValueIs0();
+        testCurrentReturns1OnceDurationHasElapsed();
+        testCurrentIsTheSameValueWhetherUnitIsOnOrOff();
+
+        // public duration(ms: number): DynamicUnit
+        testDurationCanOnlyBeSetIfNotActive();
+        testDurationMustBeGreaterThan0();
+
+        // public ease(easeOption: tEaseOption): DynamicUnit
+        testEaseCanOnlyBeSetIfNotActive();
+
+        // public run(): boolean
+        testDoesNotRunIfDurationHasNotBeenSet();
+        testDoesNothingIfAlreadyActive();
+        testDoesRunIfDurationHasBeenSetAndIsNotActive();
+
+        // public turnOn(): void
+        // public turnOff(): void
+        testTurningOnAndOffStopsAndStartsUpdate();
+
+        // public update(ms: number): void
+        testDoesNotUpdateIfNotActive();
+        testUpdatesIfActiveAndTurnedOn();
+
+        // public load(json: string): boolean
+        // public save(): string
+        testCanBeSavedWhetherTurnedOnOrOff();
+        testBehavesTheSameAfterSaveAndLoad();
+        testLoadReturnsTrueOnValidLoad();
+        testLoadReturnsFalseIfElapsedPropertyMissing();
+        testLoadReturnsFalseIfDurationPropertyMissing();
+        testLoadReturnsFalseIfEaseOptionPropertyMissing();
+        testLoadReturnsFalseIfInOnPropertyMissing();
+
+        testReturnsExpectedCurrentValueDuringFullDuration();
+        testReturnsExpectedCurrentValueDuringFullDurationWithEaseApplied();
+
+    });
+}
+
+
+function testStartsInactive(): void {
+    test('starts inactive', () => {
+        expect(unit.isActive).not.toBeTruthy();
+    });
+}
+
+function testDoesNotBecomeActiveOnceDurationIsSet(): void {
+    test('does not becomes active once duration is set', () => {
+        unit.duration(10);
+        expect(unit.isActive).not.toBeTruthy();
+    });
+}
+
+function testBecomesActiveOnceDurationIsSetAndRunIsCalled(): void {
+    test('becomes active once duration is set and run() is called', () => {
+        unit.duration(10).run();
+        expect(unit.isActive).toBeTruthy();
+    });
+}
+
+function testBecomesNotActiveOnceDurationHasElapsed(): void {
+    test('becomes inactive once duration has elapsed', () => {
+        unit.duration(1000).run();
+        expect(unit.isActive).toBeTruthy();
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        expect(unit.isActive).not.toBeTruthy();
+    });
+}
+
+function testCanBeActiveWhetherTurnedOnOrOff(): void {
+    test('can be active whether turned on or off', () => {
+        unit.duration(10).run();
+        unit.turnOff();
+        expect(unit.isActive).toBeTruthy();
+        unit.turnOn();
+        expect(unit.isActive).toBeTruthy();
+    });
+}
+
+
+function testInitialCurrentValueIs0(): void {
+    test('initial current value is 0', () => {
+        expect(unit.current).toBe(0);
+    });
+}
+
+function testCurrentReturns1OnceDurationHasElapsed(): void {
+    test('current returns 1 once duration has elapsed', () => {
+        unit.duration(1000).run();
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        expect(unit.current).toBe(1);
+    });
+}
+
+function testCurrentIsTheSameValueWhetherUnitIsOnOrOff(): void {
+    test('current is the same value whether unit is on or off', () => {
+        unit.turnOff();
+        expect(unit.current).toBe(0);
+        unit.turnOn();
+        expect(unit.current).toBe(0);
+        unit.duration(1000).run();
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.turnOff();
+        expect(unit.current).toBe(1);
+        unit.turnOn();
+        expect(unit.current).toBe(1);
+    });
+}
+
+
+function testDurationCanOnlyBeSetIfNotActive(): void {
+    test('duration can only be set if not active', () => {
+        unit.duration(1000).run();
+        expect(unit.isActive).toBeTruthy();
+        unit.duration(2000);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        expect(unit.isActive).not.toBeTruthy();
+    });
+}
+
+function testDurationMustBeGreaterThan0(): void {
+    test('duration must be greater than 0', () => {
+        unit.duration(0).run();
+        expect(unit.isActive).not.toBeTruthy();
+        unit.duration(-1).run();
+        expect(unit.isActive).not.toBeTruthy();
+    });
+}
+
+
+function testEaseCanOnlyBeSetIfNotActive(): void {
+    test('ease can only be set if not active', () => {
+        unit.duration(1000).run();
+        expect(unit.isActive).toBeTruthy();
+        unit.ease('easeInQuad');
+        unit.update(200);
+        expect(unit.current).toBe(0.2);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        expect(unit.isActive).not.toBeTruthy();
+        unit.duration(1000).ease('easeInQuad').run();
+        expect(unit.isActive).toBeTruthy();
+        unit.update(200);
+        expect(unit.current).toBe(Math.pow(0.2, 2));
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+    });
+}
+
+
+function testDoesNotRunIfDurationHasNotBeenSet(): void {
+    test('does not run if duration has not been set', () => {
+        unit.run();
+        expect(unit.isActive).not.toBeTruthy();
+    });
+}
+
+function testDoesNothingIfAlreadyActive(): void {
+    test('does nothing if already active', () => {
+        unit.duration(1000).run();
+        expect(unit.isActive).toBeTruthy();
+        unit.duration(500).ease('easeInExpo').run();
+        expect(unit.isActive).toBeTruthy();
+        unit.update(200);
+        expect(unit.current).toBe(0.2);
+    });
+}
+
+function testDoesRunIfDurationHasBeenSetAndIsNotActive(): void {
+    test('does run if duration has been set and is not active', () => {
+        expect(unit.isActive).not.toBeTruthy();
+        unit.duration(1000).run();
+        expect(unit.isActive).toBeTruthy();
+    });
+}
+
+
+function testTurningOnAndOffStopsAndStartsUpdate(): void {
+    test('turning off and on stops and starts update', () => {
+        unit.duration(1000).run();
+        unit.update(200);
+        expect(unit.current).toBe(0.2);
+        unit.turnOff();
+        unit.update(200);
+        expect(unit.current).toBe(0.2);
+        unit.turnOn();
+        unit.update(200);
+        expect(unit.current).toBe(0.4);
+    });
+}
+
+
+function testDoesNotUpdateIfNotActive(): void {
+    test('does not update if not active', () => {
+        expect(unit.current).toBe(0);
+        expect(unit.isActive).not.toBeTruthy();
+        unit.update(200);
+        expect(unit.current).toBe(0);
+        expect(unit.isActive).not.toBeTruthy();
+    });
+}
+
+function testUpdatesIfActiveAndTurnedOn(): void {
+    test('updates if active and turned on', () => {
+        unit.duration(1000).run();
+        expect(unit.isActive).toBeTruthy();
+        expect(unit.current).toBe(0);
+        unit.update(200);
+        expect(unit.current).toBe(0.2);
+        unit.turnOff();
+        unit.update(200);
+        expect(unit.current).toBe(0.2);
+        unit.turnOn();
+        unit.update(200);
+        expect(unit.current).toBe(0.4);
+    });
+}
+
+
+function testCanBeSavedWhetherTurnedOnOrOff(): void {
+    test('can be saved whether turned on or off', () => {
+
+        unit.duration(1000).run();
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.update(200);
+        unit.load(unit.save());
+
+        unit.duration(1000).run();
+
+        unit.update(200);
+        expect(unit.isActive).toBeTruthy();
+        expect(unit.current).toBe(0.2);
+
+        unit.turnOff(); // <--
+        unit.load(unit.save());
+        expect(unit.isActive).toBeTruthy();
+        expect(unit.current).toBe(0.2);
+
+        unit.turnOn(); // <--
+        unit.update(200);
+        unit.load(unit.save());
+        expect(unit.isActive).toBeTruthy();
+        expect(unit.current).toBe(0.4);
+
+    });
+}
+
+function testBehavesTheSameAfterSaveAndLoad(): void {
+    test('behaves the same after save and load', () => {
+
+        unit.load(unit.save()); // <--
+        unit.duration(1000).run();
+
+        unit.load(unit.save()); // <--
+        unit.update(200);
+
+        unit.load(unit.save()); // <--
+        expect(unit.isActive).toBeTruthy();
+        expect(unit.current).toBe(0.2);
+        unit.update(200);
+
+        unit.load(unit.save()); // <--
+        expect(unit.isActive).toBeTruthy();
+        expect(unit.current).toBe(0.4);
+        unit.update(200);
+
+        unit.load(unit.save()); // <--
+        expect(unit.isActive).toBeTruthy();
+        expect(unit.current).toBe(0.6);
+        unit.update(200);
+
+        unit.load(unit.save()); // <--
+        expect(unit.isActive).toBeTruthy();
+        expect(unit.current).toBe(0.8);
+        unit.update(200);
+
+        unit.load(unit.save()); // <--
+        expect(unit.isActive).not.toBeTruthy();
+        expect(unit.current).toBe(1);
+
+        unit.duration(1000).run();
+
+        unit.load(unit.save()); // <--
+        unit.update(200);
+        unit.load(unit.save()); // <--
+        expect(unit.isActive).toBeTruthy();
+        expect(unit.current).toBe(0.2);
+
+    });
+}
+
+function testLoadReturnsTrueOnValidLoad(): void {
+    test('load returns true on valid load', () => {
+        expect(
+            unit.load(
+                JSON.stringify({
+                    elapsed: 100,
+                    duration: 1000,
+                    easeOption: 'noEase',
+                    isOn: true
+                })
+            )
+        ).toBeTruthy();
+    });
+}
+
+function testLoadReturnsFalseIfElapsedPropertyMissing(): void {
+    test('load returns false if "elapsed" property missing', () => {
+        expect(
+            unit.load(
+                JSON.stringify({
+                    // elapsed: 100,
+                    duration: 1000,
+                    easeOption: 'noEase',
+                    isOn: true
+                })
+            )
+        ).not.toBeTruthy();
+    });
+}
+
+function testLoadReturnsFalseIfDurationPropertyMissing(): void {
+    test('load returns false if "duration" property missing', () => {
+        expect(
+            unit.load(
+                JSON.stringify({
+                    elapsed: 100,
+                    // duration: 1000,
+                    easeOption: 'noEase',
+                    isOn: true
+                })
+            )
+        ).not.toBeTruthy();
+    });
+}
+
+function testLoadReturnsFalseIfEaseOptionPropertyMissing(): void {
+    test('load returns false if "easeOption" property missing', () => {
+        expect(
+            unit.load(
+                JSON.stringify({
+                    elapsed: 100,
+                    duration: 1000,
+                    // easeOption: 'noEase',
+                    isOn: true
+                })
+            )
+        ).not.toBeTruthy();
+    });
+}
+
+function testLoadReturnsFalseIfInOnPropertyMissing(): void {
+    test('load returns false if "isOn" property missing', () => {
+        expect(
+            unit.load(
+                JSON.stringify({
+                    elapsed: 100,
+                    duration: 1000,
+                    easeOption: 'noEase',
+                    // isOn: true
+                })
+            )
+        ).not.toBeTruthy();
     });
 }
 
 
 
-// import { DynamicUnit } from "./dynamic-unit.js";
+function testReturnsExpectedCurrentValueDuringFullDuration(): void {
+    test('returns expected current value during full duration', () => {
+        unit.duration(1000).run();
+        expect(unit.isActive).toBeTruthy();
+        expect(unit.current).toBe(0);
+        unit.update(200);
+        expect(unit.current).toBe(0.2);
+        unit.update(200);
+        expect(unit.current).toBe(0.4);
+        unit.update(200);
+        expect(unit.current).toBe(0.6);
+        unit.update(200);
+        expect(unit.current).toBe(0.8);
+        unit.update(200);
+        expect(unit.isActive).not.toBeTruthy();
+        expect(unit.current).toBe(1);
+        unit.update(200);
+        expect(unit.isActive).not.toBeTruthy();
+        expect(unit.current).toBe(1);
+    });
+}
 
-
-
-// let unit: DynamicUnit;
-// beforeEach(() => {
-//     unit = new DynamicUnit();
-// });
-
-// describe('DynamicUnit', () => {
-//     testAll();
-// });
-
-// function testAll(): void {
-//     describe('DynamicUnit', () => {
-//         testGetIsActive();
-//         testGetCurrent();
-//         testTurnOnOff();
-//         testLoadAndSave();
-//         testUpdate();
-//         testRun();
-//     });
-// }
-
-// // public get isActive(): boolean
-// function testGetIsActive(): void {
-//     describe('get isActive()', () => {
-
-//         test('false on instantiation', () => {
-//             expect(unit.isActive).not.toBeTruthy();
-//         });
-
-//         test('unit is active if elapsed !== duration', () => {
-//             unit.run(1000);
-//             expect(unit.isActive).toBeTruthy();
-//             unit.update(200);
-//             expect(unit.isActive).toBeTruthy();
-//             unit.update(200);
-//             expect(unit.isActive).toBeTruthy();
-//             unit.update(200);
-//             expect(unit.isActive).toBeTruthy();
-//             unit.update(200);
-//             expect(unit.isActive).toBeTruthy();
-//             unit.update(200);
-//             expect(unit.isActive).not.toBeTruthy();
-//         });
-
-//         test('unit is active regardless of whether it is on or off', () => {
-//             unit.run(1000);
-//             unit.update(200);
-//             unit.turnOff();
-//             expect(unit.isActive).toBeTruthy();
-//         });
-
-//     });
-// }
-
-// // public get current(): number
-// function testGetCurrent(): void {
-//     describe('get current()', () => {
-//         testGetCurrentReturns0OnInstantiation();
-//         testGetCurrentReturnsExpecttedValuesWithNoEase();
-//         testGetCurrentReturnsExpecttedValuesWithEase();
-
-//     });
-// }
-
-// function testGetCurrentReturns0OnInstantiation(): void {
-//     test('returns 0 on instantiation', () => {
-//         expect(unit.current).toBe(0);
-//     });
-// }
-
-// function testGetCurrentReturnsExpecttedValuesWithNoEase(): void {
-//     describe('returns expected values over 1000 ms with no ease', () => {
-
-//         test('at 0%', () => {
-//             unit.run(1000, 'noEase');
-//             expect(unit.current).toBe(0);
-//         });
-
-//         test('at 25%', () => {
-//             unit.run(1000, 'noEase');
-//             unit.update(250);
-//             expect(unit.current).toBeCloseTo(0.25);
-//         });
-
-//         test('at 50%', () => {
-//             unit.run(1000, 'noEase');
-//             unit.update(250);
-//             unit.update(250);
-//             expect(unit.current).toBeCloseTo(0.5);
-//         });
-
-//         test('at 75%', () => {
-//             unit.run(1000, 'noEase');
-//             unit.update(250);
-//             unit.update(250);
-//             unit.update(250);
-//             expect(unit.current).toBeCloseTo(0.75);
-//         });
-
-//         test('at 100%', () => {
-//             unit.run(1000, 'noEase');
-//             unit.update(250);
-//             unit.update(250);
-//             unit.update(250);
-//             unit.update(250);
-//             expect(unit.current).toBeCloseTo(1);
-//         });
-
-//         test('cannot go over 100%', () => {
-//             unit.run(1000, 'noEase');
-//             unit.update(250);
-//             unit.update(250);
-//             unit.update(250);
-//             unit.update(250);
-//             expect(unit.current).toBeCloseTo(1);
-//             unit.update(100);
-//             expect(unit.current).toBe(1);
-//             unit.update(100);
-//             expect(unit.current).toBe(1);
-//         });
-
-//     });
-// }
-
-// function testGetCurrentReturnsExpecttedValuesWithEase(): void {
-//     describe('returns expected values over 1000 ms with ease in quad', () => {
-
-//         test('at 0%', () => {
-//             unit.run(1000, 'easeInQuad');
-//             expect(unit.current).toBe(0);
-//         });
-
-//         test('at 25%', () => {
-//             unit.run(1000, 'easeInQuad');
-//             unit.update(250);
-//             expect(unit.current).toBeCloseTo(Math.pow(0.25, 2));
-//         });
-
-//         test('at 50%', () => {
-//             unit.run(1000, 'easeInQuad');
-//             unit.update(250);
-//             unit.update(250);
-//             expect(unit.current).toBeCloseTo(Math.pow(0.5, 2));
-//         });
-
-//         test('at 75%', () => {
-//             unit.run(1000, 'easeInQuad');
-//             unit.update(250);
-//             unit.update(250);
-//             unit.update(250);
-//             expect(unit.current).toBeCloseTo(Math.pow(0.75, 2));
-//         });
-
-//         test('at 100%', () => {
-//             unit.run(1000, 'easeInQuad');
-//             unit.update(250);
-//             unit.update(250);
-//             unit.update(250);
-//             unit.update(250);
-//             expect(unit.current).toBeCloseTo(1);
-//         });
-
-//         test('cannot go over 100%', () => {
-//             unit.run(1000, 'easeInQuad');
-//             unit.update(250);
-//             unit.update(250);
-//             unit.update(250);
-//             unit.update(250);
-//             expect(unit.current).toBeCloseTo(1);
-//             unit.update(100);
-//             expect(unit.current).toBe(1);
-//             unit.update(100);
-//             expect(unit.current).toBe(1);
-//         });
-
-//     });
-// }
-
-
-
-// // public turnOn(): void
-// // public turnOff(): void
-// function testTurnOnOff(): void {
-//     describe('turnOn() / turnOff()', () => {
-//         test('turns update() method on and off', () => {
-//             unit.run(1000);
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.2);
-//             const beforeState = JSON.parse(unit.save());
-//             expect(beforeState.isOn).toBeTruthy();
-//             unit.turnOff(); // <--
-//             const afterState = JSON.parse(unit.save());
-//             expect(afterState.isOn).not.toBeTruthy();
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.2);
-//             unit.turnOn(); // <--
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.4);
-//         });
-//     });
-// }
-
-// // public save(): string
-// // public load(json: string): void
-// function testLoadAndSave(): void {
-//     describe('save()/load(...)', () => {
-//         testLoadAndSaveThrowsErrorIfAnyPropertyIsMissingOnReload();
-//         testLoadAndSaveLoadsAndSavesAUnitCorrectly();
-//         testLoadThrowsErrorIfInvalidJSONReceived();
-//     });
-// }
-
-// function testLoadAndSaveThrowsErrorIfAnyPropertyIsMissingOnReload(): void {
-//     describe('throws errors if ANY property is missing on reload', () => {
-
-//         test('nothing missing', () => {
-//             expect(() => unit.load(JSON.stringify({
-//                 elapsed: 500,
-//                 duration: 1000,
-//                 easeOption: 'easeInQuint',
-//                 isOn: true
-//             }))).not.toThrow();
-//         });
-
-//         test('missing elapsed', () => {
-//             expect(() => unit.load(JSON.stringify({
-//                 // elapsed: 500,
-//                 duration: 1000,
-//                 easeOption: 'easeInQuint',
-//                 isOn: true
-//             }))).toThrow();
-//         });
-
-//         test('missing duration', () => {
-//             expect(() => unit.load(JSON.stringify({
-//                 elapsed: 500,
-//                 // duration: 1000,
-//                 easeOption: 'easeInQuint',
-//                 isOn: true
-//             }))).toThrow();
-//         });
-
-//         test('missing easeOption', () => {
-//             expect(() => unit.load(JSON.stringify({
-//                 elapsed: 500,
-//                 duration: 1000,
-//                 // easeOption: 'easeInQuint',
-//                 isOn: true
-//             }))).toThrow();
-//         });
-
-//         test('missing isOn', () => {
-//             expect(() => unit.load(JSON.stringify({
-//                 elapsed: 500,
-//                 duration: 1000,
-//                 easeOption: 'easeInQuint'
-//                 // isOn: true
-//             }))).toThrow();
-//         });
-
-//     });
-
-// }
-
-// function testLoadAndSaveLoadsAndSavesAUnitCorrectly(): void {
-//     describe('loads and saves a unit, maintaining properties correctly', () => {
-
-//         test('has the same current value (duration and elapsed the same)', () => {
-//             unit.run(1000);
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.2);
-//             unit.load(unit.save()); // <--
-//             expect(unit.current).toBeCloseTo(0.2);
-//         });
-
-//         test('has the same ease', () => {
-//             unit.run(1000, 'easeInCubic');
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(Math.pow(0.2, 3));
-//             unit.load(unit.save()); // <--
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(Math.pow(0.4, 3));
-//         });
-
-//         test('unit is still on/off', () => {
-//             unit.run(1000);
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.2);
-//             unit.turnOff();
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.2);
-//             unit.load(unit.save()); // <--
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.2);
-//             unit.turnOn();
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.4);
-//             unit.load(unit.save()); // <--
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.6);
-
-//         });
-
-//     });
-// }
-
-// function testLoadThrowsErrorIfInvalidJSONReceived(): void {
-//     expect(() => unit.load('{')).toThrow();
-// }
-
-
-// // public update(ms: number): void
-// function testUpdate(): void {
-//     describe('update(...)', () => {
-//         testUpdateOnlyUpdatesIfUnitIsOnAndActive();
-//         testUnitTurnsOffOnceUnitNoLongerActive();
-//     });
-// }
-
-// function testUpdateOnlyUpdatesIfUnitIsOnAndActive(): void {
-//     test('only updates if unit is on AND active (not complete)', () => {
-//         expect(unit.current).toBe(0);
-//         unit.update(200);
-//         expect(unit.current).toBe(0);
-//         unit.run(1000);
-//         unit.update(200);
-//         expect(unit.current).toBeCloseTo(0.2);
-//         unit.turnOff();
-//         unit.update(200);
-//         expect(unit.current).toBeCloseTo(0.2);
-//         unit.turnOn();
-//         unit.update(200);
-//         expect(unit.current).toBeCloseTo(0.4);
-//         unit.update(200);
-//         expect(unit.current).toBeCloseTo(0.6);
-//         unit.update(200);
-//         expect(unit.current).toBeCloseTo(0.8);
-//         unit.update(200);
-//         expect(unit.current).toBeCloseTo(1);
-//         unit.update(200);
-//         expect(unit.current).toBeCloseTo(1);
-//     });
-// }
-
-// function testUnitTurnsOffOnceUnitNoLongerActive(): void {
-//     test('unit turns itself off once no longer active (elapsed >= duration)', () => {
-//         unit.run(1000);
-//         unit.update(200);
-//         unit.update(200);
-//         unit.update(200);
-//         unit.update(200);
-//         const beforeState = JSON.parse(unit.save());
-//         expect(beforeState.isOn).toBeTruthy();
-//         unit.update(201);
-//         const afterState = JSON.parse(unit.save());
-//         expect(afterState.isOn).not.toBeTruthy();
-//     });
-// }
-
-
-// // public run(duration: number, easeOption: Ease.tEaseOption = 'noEase'): void { }
-// function testRun(): void {
-//     describe('run(...)', () => {
-
-//         test('turns unit on, ready to update', () => {
-//             const beforeState = JSON.parse(unit.save());
-//             expect(beforeState.isOn).not.toBeTruthy();
-//             unit.run(1000);
-//             const afterState = JSON.parse(unit.save());
-//             expect(afterState.isOn).toBeTruthy();
-//             expect(unit.isActive).toBeTruthy();
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.2);
-//         });
-
-//         test('does nothing if unit is already active', () => {
-//             unit.run(1000);
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.2);
-//             const beforeState = JSON.parse(unit.save());
-//             unit.run(2000, 'easeInElastic');
-//             const afterState = JSON.parse(unit.save());
-//             expect(afterState.elapsed).toBe(beforeState.elapsed);
-//             expect(afterState.duration).toBe(beforeState.duration);
-//             expect(afterState.easeOption).toBe(beforeState.easeOption);
-//             expect(afterState.isOn).toBe(beforeState.isOn);
-//             unit.update(200);
-//             expect(unit.current).toBeCloseTo(0.4);
-
-//         });
-
-//         test('does nothing if duration <= 0', () => {
-//             unit.run(-1000);
-//             expect(unit.isActive).not.toBeTruthy();
-//             unit.update(200);
-//             expect(unit.current).toBe(0);
-//         });
-
-//     });
-// }
+function testReturnsExpectedCurrentValueDuringFullDurationWithEaseApplied(): void {
+    test('returns expected current value during full duration with ease applied', () => {
+        unit.duration(1000).ease('easeInCubic').run();
+        expect(unit.isActive).toBeTruthy();
+        expect(unit.current).toBe(0);
+        unit.update(200);
+        expect(unit.current).toBeCloseTo(Math.pow(0.2, 3));
+        unit.update(200);
+        expect(unit.current).toBeCloseTo(Math.pow(0.4, 3));
+        unit.update(200);
+        expect(unit.current).toBeCloseTo(Math.pow(0.6, 3));
+        unit.update(200);
+        expect(unit.current).toBeCloseTo(Math.pow(0.8, 3));
+        unit.update(200);
+        expect(unit.isActive).not.toBeTruthy();
+        expect(unit.current).toBe(1);
+        unit.update(200);
+        expect(unit.isActive).not.toBeTruthy();
+        expect(unit.current).toBe(1);
+    });
+}

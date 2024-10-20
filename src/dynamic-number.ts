@@ -3,9 +3,15 @@
  */
 
 import { tEaseOption } from "@brendangooch/ease";
-import { iDynamic } from "./index.js";
+import { iDynamicNumber } from "./index.js";
+import { DynamicUnit } from "./dynamic-unit.js";
 
-export class DynamicNumber implements iDynamic {
+export class DynamicNumber implements iDynamicNumber {
+
+    private unit: DynamicUnit = new DynamicUnit();
+    private previous: number = 0;
+    private next: number = 0;
+    private isOn: boolean = false;
 
     public get isActive(): boolean {
         return false;
@@ -15,27 +21,23 @@ export class DynamicNumber implements iDynamic {
         return 0;
     }
 
-    public changeTo(x: number, y: number): DynamicNumber {
+    public duration(ms: number): DynamicNumber {
         return this;
     }
 
-    public changeBy(x: number, y: number): DynamicNumber {
+    public speed(unitsPerSecond: number): DynamicNumber {
         return this;
     }
 
-    public setDuration(ms: number): DynamicNumber {
+    public ease(easeOption: tEaseOption): DynamicNumber {
         return this;
     }
 
-    public setSpeed(units: number): DynamicNumber {
-        return this;
+    public changeTo(n: number): boolean {
+        return false;
     }
 
-    public setEase(easeOption: tEaseOption): DynamicNumber {
-        return this;
-    }
-
-    public run(): boolean {
+    public changeBy(n: number): boolean {
         return false;
     }
 
