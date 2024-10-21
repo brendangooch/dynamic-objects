@@ -45,7 +45,7 @@ export class DynamicNumber extends BaseDynamicObjectWithUnit implements iDynamic
         return this.changeTo(n + this.current);
     }
 
-
+    // extract some
     public load(json: string): boolean {
         const state = JSON.parse(json);
         if (state.unit === undefined) return false;
@@ -65,6 +65,7 @@ export class DynamicNumber extends BaseDynamicObjectWithUnit implements iDynamic
         return true;
     }
 
+    // extract some
     public save(): string {
         return JSON.stringify({
             unit: this.unit.save(),
@@ -89,6 +90,7 @@ export class DynamicNumber extends BaseDynamicObjectWithUnit implements iDynamic
         this.cur = this.previous + (this.diff * this.unit.current);
     }
 
+    // extract
     protected updateComplete(): void {
         this.setAll(this.next);
         this.spd = 0;

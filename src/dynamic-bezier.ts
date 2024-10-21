@@ -5,17 +5,26 @@
 import { tEaseOption } from "@brendangooch/ease";
 import { iDynamic } from "./index.js";
 import { BaseDynamicObjectWithUnit } from "./base-dynamic-object-with-unit.js";
+import { QuadraticBezierCurve } from "@brendangooch/maths";
 
 export class DynamicBezier extends BaseDynamicObjectWithUnit implements iDynamic {
 
-    //
 
-    public get x(): number {
-        return 0;
+    private bezier = new QuadraticBezierCurve();
+
+    public constructor(x: number = 0, y: number = 0) {
+        super();
+        // this.bezier.setAll(x, y); ?
     }
 
+    // ?
+    public get x(): number {
+        return 0; // ?
+    }
+
+    // ?
     public get y(): number {
-        return 0;
+        return 0; // ?
     }
 
     public override duration(ms: number): DynamicBezier {
@@ -34,10 +43,12 @@ export class DynamicBezier extends BaseDynamicObjectWithUnit implements iDynamic
     }
 
     public addControlPoint(distance: number, angle: number): DynamicBezier {
+        if (!this.isActive) this.bezier.setControlByDistanceAndAngleFromStart(distance, angle);
         return this;
     }
 
     public moveTo(x: number, y: number): boolean {
+        if (this.canMove(x, y)) return this.doMove(x, y);
         return false;
     }
 
@@ -45,31 +56,55 @@ export class DynamicBezier extends BaseDynamicObjectWithUnit implements iDynamic
         return this.moveTo(x + this.x, y + this.y);
     }
 
-    // public update(ms: number): void {}
-
     public load(json: string): boolean {
-        return false;
-    }
-
-    public save(): string {
-        return '';
-    }
-
-    protected updateCurrent(): void { }
-    protected updateComplete(): void { }
-    protected get diff(): number { return 0; }
-
-    private canMove(x: number, y: number): boolean {
-        return false;
-    }
-
-    private doMove(x: number, y: number): boolean {
+        const state = JSON.parse(json);
+        if (state.bezier === undefined) return false;
+        this.bezier.load(state.bezier);
         return true;
     }
 
-    private instantMove(): void { }
+    public save(): string {
+        return JSON.stringify({
+            bezier: this.bezier.save()
+        });
+    }
 
-    private dynamicMove(): void { }
+    protected updateCurrent(): void {
+        // ?
+    }
+
+    protected updateComplete(): void {
+        this.bezier.setAll(this.bezier.x(1), this.bezier.y(1)); // ?
+        this.spd = 0;
+        this.dur = 0;
+        this.turnOff();
+    }
+
+    protected get diff(): number {
+        // ?
+        return 0;
+    }
+
+    private canMove(x: number, y: number): boolean {
+        return !this.isActive && (x !== this.x || y !== this.y);
+    }
+
+    private doMove(x: number, y: number): boolean {
+        this.bezier.setEnd(x, y);
+        this.updateDuration();
+        if (this.dur > 0) this.dynamicMove();
+        else this.instantMove();
+        return true;
+    }
+
+    private instantMove(): void {
+        this.bezier.setAll(this.bezier.x(1), this.bezier.y(1));
+    }
+
+    private dynamicMove(): void {
+        this.turnOn();
+        this.unit.duration(this.dur).run();
+    }
 
 }
 
