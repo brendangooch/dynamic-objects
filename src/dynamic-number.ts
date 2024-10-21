@@ -1,38 +1,53 @@
 /**
- * most of the functionality is conveniently inherited from the DynamicUnit property
+ * a number that changes its value over time
  */
 
 import { tEaseOption } from "@brendangooch/ease";
 import { iDynamic } from "./index.js";
-import { BaseDynamicObjectWithUnit } from "./base-dynamic-object-with-unit.js";
+import { DynamicUnit } from "./dynamic-unit.js";
+import { AbstractDynamicObject } from "./abstract-dynamic-object.js";
 
-export class DynamicNumber extends BaseDynamicObjectWithUnit implements iDynamic {
+export class DynamicNumber extends AbstractDynamicObject implements iDynamic {
 
+    private unit: DynamicUnit = new DynamicUnit();
     private previous: number = 0;
     private next: number = 0;
-    private cur: number = 0;
+    private difference: number = 0;
+    private _current: number = 0;
+    private _duration: number = 0;
+    private _speed: number = 0;
 
     public constructor(initial: number = 0) {
         super();
         this.setAll(initial);
     }
 
+    public get isActive(): boolean {
+        return this.unit.isActive;
+    }
+
     public get current(): number {
-        return this.cur;
+        return this._current;
     }
 
-    public override duration(ms: number): DynamicNumber {
-        super.duration(ms);
+    public duration(ms: number): DynamicNumber {
+        if (!this.isActive && ms > 0) {
+            this._duration = ms;
+        }
         return this;
     }
 
-    public override speed(unitsPerMs: number): DynamicNumber {
-        super.speed(unitsPerMs);
+    public speed(unitsPerMs: number): DynamicNumber {
+        if (!this.isActive && unitsPerMs > 0) {
+            this._speed = unitsPerMs;
+        }
         return this;
     }
 
-    public override ease(easeOption: tEaseOption): DynamicNumber {
-        super.ease(easeOption);
+    public ease(easeOption: tEaseOption): DynamicNumber {
+        if (!this.isActive) {
+            this.unit.ease(easeOption);
+        }
         return this;
     }
 
@@ -45,12 +60,12 @@ export class DynamicNumber extends BaseDynamicObjectWithUnit implements iDynamic
         return this.changeTo(n + this.current);
     }
 
-    // extract some
     public load(json: string): boolean {
         const state = JSON.parse(json);
         if (state.unit === undefined) return false;
         if (state.previous === undefined) return false;
         if (state.next === undefined) return false;
+        if (state.difference === undefined) return false;
         if (state.current === undefined) return false;
         if (state.duration === undefined) return false;
         if (state.speed === undefined) return false;
@@ -58,165 +73,79 @@ export class DynamicNumber extends BaseDynamicObjectWithUnit implements iDynamic
         this.unit.load(state.unit);
         this.previous === state.previous;
         this.next === state.next;
-        this.cur === state.current;
-        this.dur === state.duration;
-        this.spd === state.speed;
+        this.difference === state.difference;
+        this._current === state.current;
+        this._duration === state.duration;
+        this._speed === state.speed;
         this.isOn === state.isOn;
         return true;
     }
 
-    // extract some
     public save(): string {
         return JSON.stringify({
             unit: this.unit.save(),
             previous: this.previous,
             next: this.next,
-            current: this.cur,
-            duration: this.dur,
-            speed: this.spd,
+            difference: this.difference,
+            current: this._current,
+            duration: this._duration,
+            speed: this._speed,
             isOn: this.isOn
         });
     }
 
-    protected get diff(): number {
-        return this.next - this.previous;
+    protected setAll(n: number): void {
+        this._current = this.previous = this.next = n;
+        this.updateDifference();
     }
 
-    private setAll(n: number): void {
-        this.cur = this.previous = this.next = n;
+    protected setAllToNext(): void {
+        this.setAll(this.next);
+    }
+
+    protected increment(ms: number): void {
+        this.unit.update(ms);
     }
 
     protected updateCurrent(): void {
-        this.cur = this.previous + (this.diff * this.unit.current);
+        this._current = this.previous + (this.difference * this.unit.current);
     }
 
-    // extract
+    protected updateDifference(): void {
+        this.difference = this.next - this.previous;
+    }
+
     protected updateComplete(): void {
-        this.setAll(this.next);
-        this.spd = 0;
-        this.dur = 0;
+        this.setAllToNext();
+        this._speed = 0;
+        this._duration = 0;
         this.turnOff();
     }
 
-    private canChange(n: number): boolean {
-        return !this.isActive && n !== this.cur;
+    protected updateDuration(): void {
+        if (this._speed !== 0 && this.difference > 0) this._duration = Math.abs(this.difference / this._speed);
     }
 
-    private doChange(n: number): boolean {
+    protected canChange(n: number): boolean {
+        return !this.isActive && n !== this._current;
+    }
+
+    protected doChange(n: number): boolean {
         this.next = n;
+        this.updateDifference();
         this.updateDuration();
-        if (this.dur > 0) this.dynamicChange();
+        if (this._duration > 0) this.dynamicChange();
         else this.instantChange();
         return true;
     }
 
-    private instantChange(): void {
-        this.setAll(this.next);
+    protected instantChange(): void {
+        this.setAllToNext();
     }
 
-    private dynamicChange(): void {
+    protected dynamicChange(): void {
         this.turnOn();
-        this.unit.duration(this.dur).run();
+        this.unit.duration(this._duration).run();
     }
 
 };
-
-
-
-// import * as Ease from '@brendangooch/ease';
-// import { DynamicUnit } from '../unit/dynamic-unit.js';
-// import { iDynamicNumber } from '../index.js';
-
-// export class DynamicNumber implements iDynamicNumber {
-
-//     private unit: DynamicUnit;
-//     private previous: number = 0;
-//     private next: number = 0;
-//     private isOn: boolean = false;
-
-//     public constructor(initial: number = 0) {
-//         this.unit = new DynamicUnit();
-//         this.setBoth(initial);
-//     }
-
-//     public get isActive(): boolean {
-//         // return this.previous !== this.next;
-//         return this.unit.isActive;
-//     }
-
-//     public get current(): number {
-//         return (!this.isActive) ? this.previous : this.previous + (this.diff * this.unit.current);
-//     }
-
-//     public save(): string {
-//         return JSON.stringify({
-//             unit: this.unit.save(),
-//             previous: this.previous,
-//             next: this.next,
-//             isOn: this.isOn
-//         });
-//     }
-
-//     public load(json: string): void {
-//         const state = JSON.parse(json);
-//         if (state.unit === undefined) throw new Error('missing "unit" property');
-//         if (state.previous === undefined) throw new Error('missing "previous" property');
-//         if (state.next === undefined) throw new Error('missing "next" property');
-//         if (state.isOn === undefined) throw new Error('missing "isOn" property');
-//         this.unit.load(state.unit);
-//         this.previous = state.previous;
-//         this.next = state.next;
-//         this.isOn = state.isOn;
-//     }
-
-//     public update(ms: number): void {
-//         if (this.isOn && this.isActive) {
-//             this.unit.update(ms);
-//             if (!this.isActive) this.updateComplete();
-//         }
-//     }
-
-//     public turnOn(): void {
-//         this.isOn = true;
-//     }
-
-//     public turnOff(): void {
-//         this.isOn = false;
-//     }
-
-//     public change(to: number, duration: number = 0, easeOption: Ease.tEaseOption = 'noEase'): void {
-//         if (this.canChange(to, duration)) this.doChange(to, duration, easeOption);
-//     }
-
-//     private canChange(to: number, duration: number): boolean {
-//         return !this.isActive && duration >= 0 && to !== this.current;
-//     }
-
-//     private doChange(to: number, duration: number, easeOption: Ease.tEaseOption): void {
-//         (duration === 0) ? this.instantChange(to) : this.dynamicChange(to, duration, easeOption);
-//     }
-
-//     private instantChange(to: number): void {
-//         this.setBoth(to);
-//     }
-
-//     private dynamicChange(to: number, duration: number, easeOption: Ease.tEaseOption): void {
-//         this.next = to;
-//         this.turnOn();
-//         this.unit.run(duration, easeOption);
-//     }
-
-//     private get diff(): number {
-//         return this.next - this.previous;
-//     }
-
-//     private updateComplete(): void {
-//         this.setBoth(this.next);
-//         this.turnOff();
-//     }
-
-//     private setBoth(value: number): void {
-//         this.previous = this.next = value;
-//     }
-
-// }

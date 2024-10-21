@@ -2,7 +2,7 @@
  * common functionality shared by all dynamic objects
  */
 
-export abstract class BaseDynamicObject {
+export abstract class AbstractDynamicObject {
 
     protected isOn: boolean = false;
 

@@ -2,49 +2,56 @@
  * abstract DynamicUnit class extended by all DynamicUnit decorators
  */
 
+import * as Ease from '@brendangooch/ease';
+import { DynamicUnit } from "./dynamic-unit.js";
+import { iDynamicUnit } from "./index.js";
 
+export abstract class BaseDynamicUnit implements iDynamicUnit {
 
-// import * as Ease from '@brendangooch/ease';
-// import { iDynamicUnit } from '../../index.js';
+    protected unit: DynamicUnit;
 
-// export abstract class BaseDynamicUnit implements iDynamicUnit {
+    public constructor(unit: DynamicUnit) {
+        this.unit = unit;
+    }
 
-//     protected unit: iDynamicUnit;
+    public get isActive(): boolean {
+        return this.unit.isActive;
+    }
 
-//     public constructor(unit: iDynamicUnit) {
-//         this.unit = unit;
-//     }
+    public get current(): number {
+        return this.unit.current;
+    }
 
-//     public get isActive(): boolean {
-//         return this.unit.isActive;
-//     }
+    public duration(ms: number): DynamicUnit {
+        return this.unit.duration(ms);
+    }
 
-//     public get current(): number {
-//         return this.unit.current;
-//     }
+    public ease(easeOption: Ease.tEaseOption): DynamicUnit {
+        return this.unit.ease(easeOption);
+    }
 
-//     public turnOn(): void {
-//         this.unit.turnOn();
-//     }
+    public run(): boolean {
+        return this.unit.run();
+    }
 
-//     public turnOff(): void {
-//         this.unit.turnOff();
-//     }
+    public turnOn(): void {
+        this.unit.turnOn();
+    }
 
-//     public save(): string {
-//         return this.unit.save();
-//     }
+    public turnOff(): void {
+        this.unit.turnOff();
+    }
 
-//     public load(json: string): void {
-//         this.unit.load(json);
-//     }
+    public update(ms: number): void {
+        this.unit.update(ms);
+    }
 
-//     public update(ms: number): void {
-//         this.unit.update(ms);
-//     }
+    public load(json: string): boolean {
+        return this.unit.load(json);
+    }
 
-//     public run(duration: number, easeOption: Ease.tEaseOption = 'noEase'): void {
-//         this.unit.run(duration, easeOption);
-//     }
+    public save(): string {
+        return this.unit.save();
+    }
 
-// }
+}

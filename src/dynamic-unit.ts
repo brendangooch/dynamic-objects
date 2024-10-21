@@ -5,14 +5,14 @@
 import * as Ease from '@brendangooch/ease';
 import { iDynamicUnit } from "./index.js";
 import { clamp } from "@brendangooch/maths";
-import { BaseDynamicObject } from './base-dynamic-object.js';
+import { AbstractDynamicObject } from './abstract-dynamic-object.js';
 
 type tDuration = { current: number; next: number };
 
-export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
+export class DynamicUnit extends AbstractDynamicObject implements iDynamicUnit {
 
     private elapsed: number = 0;
-    private cur: number = 0;
+    private _current: number = 0;
     private _duration: tDuration = { current: 0, next: 0 };
     private easeOption: Ease.tEaseOption = 'noEase';
     private easeFn: Ease.tEaseFunction = Ease.load('noEase');
@@ -23,7 +23,7 @@ export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
 
     // cache current rather than calculate on each call
     public get current(): number {
-        return this.cur;
+        return this._current;
     }
 
     public duration(ms: number): DynamicUnit {
@@ -52,12 +52,10 @@ export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
 
     public load(json: string): boolean {
         const state = JSON.parse(json);
-        if (
-            state.elapsed === undefined ||
-            state.duration === undefined ||
-            state.easeOption === undefined ||
-            state.isOn === undefined
-        ) { return false };
+        if (state.elapsed === undefined) return false;
+        if (state.duration === undefined) return false;
+        if (state.easeOption === undefined) return false;
+        if (state.isOn === undefined) return false;
         this.elapsed = state.elapsed;
         this._duration = state.duration;
         this.loadEase(state.easeOption);
@@ -84,12 +82,12 @@ export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
     }
 
     protected updateCurrent(): void {
-        this.cur = clamp(this.easeFn(this.progress), 0, 1);
+        this._current = clamp(this.easeFn(this.progress), 0, 1);
     }
 
     protected updateComplete(): void {
         this._duration.next = 0;
-        this.cur = 1;
+        this._current = 1;
         this.loadEase('noEase');
         this.turnOff();
     }

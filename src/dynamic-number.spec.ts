@@ -69,6 +69,7 @@ function testAll(): void {
         testReturnsFalseIfUnitPropertyMissing();
         testReturnsFalseIfPreviousPropertyMissing();
         testReturnsFalseIfNextPropertyMissing();
+        testReturnsFalseIfDifferencePropertyMissing();
         testReturnsFalseIfCurrentPropertyMissing();
         testReturnsFalseIfDurationPropertyMissing();
         testReturnsFalseIfSpeedPropertyMissing();
@@ -542,6 +543,7 @@ function testReturnsTrueOnValidLoad(): void {
                     unit: unit.save(),
                     previous: 1000,
                     next: 1500,
+                    difference: 500,
                     current: 1250,
                     duration: 1000,
                     speed: 0,
@@ -562,6 +564,7 @@ function testReturnsFalseIfUnitPropertyMissing(): void {
                     // unit: unit.save(),
                     previous: 1000,
                     next: 1500,
+                    difference: 500,
                     current: 1250,
                     duration: 1000,
                     speed: 0,
@@ -582,6 +585,7 @@ function testReturnsFalseIfPreviousPropertyMissing(): void {
                     unit: unit.save(),
                     // previous: 1000,
                     next: 1500,
+                    difference: 500,
                     current: 1250,
                     duration: 1000,
                     speed: 0,
@@ -602,6 +606,28 @@ function testReturnsFalseIfNextPropertyMissing(): void {
                     unit: unit.save(),
                     previous: 1000,
                     // next: 1500,
+                    difference: 500,
+                    current: 1250,
+                    duration: 1000,
+                    speed: 0,
+                    isOn: true
+                })
+            )
+        ).not.toBeTruthy();
+    });
+}
+
+function testReturnsFalseIfDifferencePropertyMissing(): void {
+    test('load returns false if "difference" property missing', () => {
+        const unit = new DynamicUnit();
+        const number = new DynamicNumber();
+        expect(
+            number.load(
+                JSON.stringify({
+                    unit: unit.save(),
+                    previous: 1000,
+                    next: 1500,
+                    // difference: 500,
                     current: 1250,
                     duration: 1000,
                     speed: 0,
@@ -622,6 +648,7 @@ function testReturnsFalseIfCurrentPropertyMissing(): void {
                     unit: unit.save(),
                     previous: 1000,
                     next: 1500,
+                    difference: 500,
                     // current: 1250,
                     duration: 1000,
                     speed: 0,
@@ -642,6 +669,7 @@ function testReturnsFalseIfDurationPropertyMissing(): void {
                     unit: unit.save(),
                     previous: 1000,
                     next: 1500,
+                    difference: 500,
                     current: 1250,
                     // duration: 1000,
                     speed: 0,
@@ -662,6 +690,7 @@ function testReturnsFalseIfSpeedPropertyMissing(): void {
                     unit: unit.save(),
                     previous: 1000,
                     next: 1500,
+                    difference: 500,
                     current: 1250,
                     duration: 1000,
                     // speed: 0,
@@ -682,6 +711,7 @@ function testReturnsFalseIfIsOnPropertyMissing(): void {
                     unit: unit.save(),
                     previous: 1000,
                     next: 1500,
+                    difference: 500,
                     current: 1250,
                     duration: 1000,
                     speed: 0,

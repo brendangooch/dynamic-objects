@@ -1,49 +1,63 @@
 /**
- *
+ * a number that changes its value over time
  */
 
 import { tEaseOption } from "@brendangooch/ease";
 import { iDynamic } from "./index.js";
+import { DynamicUnit } from "./dynamic-unit.js";
+import { AbstractDynamicObject } from "./abstract-dynamic-object.js";
 import { Vector2D } from "@brendangooch/maths";
-import { BaseDynamicObjectWithUnit } from "./base-dynamic-object-with-unit.js";
 
-export class DynamicVector extends BaseDynamicObjectWithUnit implements iDynamic {
+export class DynamicVector extends AbstractDynamicObject implements iDynamic {
 
+    private unit: DynamicUnit = new DynamicUnit();
     private previous: Vector2D = new Vector2D();
     private next: Vector2D = new Vector2D();
-    private current: Vector2D = new Vector2D();
     private difference: Vector2D = new Vector2D();
+    private _current: Vector2D = new Vector2D();
+    private _duration: number = 0;
+    private _speed: number = 0;
 
     public constructor(x: number = 0, y: number = 0) {
         super();
         this.setAll(new Vector2D(x, y));
     }
 
+    public get isActive(): boolean {
+        return this.unit.isActive;
+    }
+
     public get x(): number {
-        return this.current.x;
+        return this._current.x;
     }
 
     public get y(): number {
-        return this.current.y;
+        return this._current.y;
     }
 
-    public override duration(ms: number): DynamicVector {
-        super.duration(ms);
+    public duration(ms: number): DynamicVector {
+        if (!this.isActive && ms > 0) {
+            this._duration = ms;
+        }
         return this;
     }
 
-    public override speed(unitsPerMs: number): DynamicVector {
-        super.speed(unitsPerMs);
+    public speed(unitsPerMs: number): DynamicVector {
+        if (!this.isActive && unitsPerMs > 0) {
+            this._speed = unitsPerMs;
+        }
         return this;
     }
 
-    public override ease(easeOption: tEaseOption): DynamicVector {
-        super.ease(easeOption);
+    public ease(easeOption: tEaseOption): DynamicVector {
+        if (!this.isActive) {
+            this.unit.ease(easeOption);
+        }
         return this;
     }
 
     public moveTo(x: number, y: number): boolean {
-        if (this.canMove(x, y)) return this.doMove(x, y);
+        if (this.canChange(new Vector2D(x, y))) return this.doChange(new Vector2D(x, y));
         return false;
     }
 
@@ -51,90 +65,94 @@ export class DynamicVector extends BaseDynamicObjectWithUnit implements iDynamic
         return this.moveTo(x + this.x, y + this.y);
     }
 
-    // extract some
     public load(json: string): boolean {
         const state = JSON.parse(json);
         if (state.unit === undefined) return false;
         if (state.previous === undefined) return false;
         if (state.next === undefined) return false;
-        if (state.current === undefined) return false;
         if (state.difference === undefined) return false;
+        if (state.current === undefined) return false;
         if (state.duration === undefined) return false;
         if (state.speed === undefined) return false;
         if (state.isOn === undefined) return false;
         this.unit.load(state.unit);
         this.previous.load(state.previous);
         this.next.load(state.next);
-        this.current.load(state.current);
         this.difference.load(state.difference);
-        this.dur = state.duration;
-        this.spd = state.speed;
-        this.isOn = state.isOn;
+        this._current.load(state.current);
+        this._duration === state.duration;
+        this._speed === state.speed;
+        this.isOn === state.isOn;
         return true;
     }
 
-    // extract some
     public save(): string {
         return JSON.stringify({
             unit: this.unit.save(),
             previous: this.previous.save(),
             next: this.next.save(),
-            current: this.current.save(),
             difference: this.difference.save(),
-            duration: this.dur,
-            speed: this.spd,
+            current: this._current.save(),
+            duration: this._duration,
+            speed: this._speed,
             isOn: this.isOn
         });
     }
 
-    // make protected, add abstract in parent
-    private setAll(v: Vector2D): void {
-        this.previous.copy(v);
+    protected setAll(v: Vector2D): void {
         this.next.copy(v);
-        this.current.copy(v);
+        this.previous.copy(v);
+        this._current.copy(v);
         this.updateDifference();
     }
 
-    private updateDifference(): void {
-        this.difference = this.next.subtract(this.previous);
+    protected setAllToNext(): void {
+        this.setAll(this.next);
+    }
+
+    protected increment(ms: number): void {
+        this.unit.update(ms);
     }
 
     protected updateCurrent(): void {
-        this.current = this.previous.add(this.difference.multiply(this.unit.current));
+        this._current = this.previous.add(this.difference.multiply(this.unit.current))
     }
 
-    // extract
+    protected updateDifference(): void {
+        this.difference = this.next.subtract(this.previous);
+    }
+
     protected updateComplete(): void {
-        this.setAll(this.next);
-        this.spd = 0;
-        this.dur = 0;
+        this.setAllToNext();
+        this._speed = 0;
+        this._duration = 0;
         this.turnOff();
     }
 
-    protected get diff(): number {
-        return this.difference.length;
+    protected updateDuration(): void {
+        if (this._speed !== 0 && this.difference.length > 0) this._duration = Math.abs(this.difference.length / this._speed);
     }
 
-    private canMove(x: number, y: number): boolean {
-        return !this.isActive && (x !== this.current.x || y !== this.current.y);
+    protected canChange(v: Vector2D): boolean {
+        return !this.isActive && (v.x !== this.x || v.y !== this.y);
     }
 
-    private doMove(x: number, y: number): boolean {
-        this.next.setXY(x, y);
+    protected doChange(v: Vector2D): boolean {
+        this.next.copy(v);
         this.updateDifference();
         this.updateDuration();
-        if (this.dur > 0) this.dynamicMove();
-        else this.instantMove();
+        if (this._duration > 0) this.dynamicChange();
+        else this.instantChange();
         return true;
     }
 
-    private instantMove(): void {
-        this.setAll(this.next);
+    protected instantChange(): void {
+        this.setAllToNext();
     }
 
-    private dynamicMove(): void {
+    protected dynamicChange(): void {
         this.turnOn();
-        this.unit.duration(this.dur).run();
+        this.unit.duration(this._duration).run();
     }
 
-}
+};
