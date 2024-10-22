@@ -1,12 +1,5 @@
 BUGS:
-    ...
-
-to do:
-
-    export all classes from index.ts
-    test visually (re-factor test files)
-    commit & re-merge & push
-    publish
+    (none)
 
 
 v2.0.0 - completely refactored
@@ -14,9 +7,12 @@ v2.0.0 - completely refactored
     updated with latest config templates
 
     DynamicUnit vastly simplified
-        implemented Decorator pattern for additional functionality (ie inverted returns 1 -> 0)
+        implemented Decorator pattern for additional functionality (ie inverted unit returns 1 -> 0)
 
     refactored other classes to reflect changes to DynamicUnit
+
+    created separate DynamicVector and DynamicBezier classes
+    DynamicPosition now uses those classes internally
 
     added speed() method to number, vector, bezier, position so client can set speed OR duration
     added changeBy()/moveBy() methods to number, vector, bezier, position as a convenience to client

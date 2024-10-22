@@ -5,8 +5,6 @@
 import { tEaseOption } from '@brendangooch/ease';
 import { iUpdateable } from '@brendangooch/simple-game-loop';
 import { DynamicUnit } from './dynamic-unit.js';
-import { DynamicNumber } from './dynamic-number.js';
-import { DynamicVector } from './dynamic-vector.js';
 
 export interface iDynamic extends iUpdateable {
     get isActive(): boolean;
@@ -21,18 +19,13 @@ export interface iDynamicUnit extends iDynamic {
     run(): boolean;
 }
 
-// export { DynamicUnit };
-// export { BaseDynamicUnit } from './unit/decorators/base-dynamic-unit.js'
-// export { InvertedDynamicUnit } from './inverted-dynamic-unit.js'
-// export { RoundedDynamicUnit } from './unit/decorators/rounded-down-dynamic-unit.js'
-// export { FlooredDynamicUnit } from './unit/decorators/rounded-up-dynamic-unit.js'
-// export { DynamicNumber };
-// export { DynamicVector };
-// export { DynamicBezier };
-// export { DynamicPosition };
-
-
-
-
-
-
+export { AbstractDynamicObject } from './abstract-dynamic-object.js';
+export { BaseDynamicUnit } from './base-dynamic-unit.js';
+export { DynamicUnit };
+export { InvertedDynamicUnit } from './inverted-dynamic-unit.js';
+export { RoundedDynamicUnit } from './rounded-dynamic-unit.js';
+export { FlooredDynamicUnit } from './floored-dynamic-unit.js';
+export { DynamicNumber } from './dynamic-number.js';
+export { DynamicVector } from './dynamic-vector.js';
+export { DynamicBezier } from './dynamic-bezier.js';
+export { DynamicPosition } from './dynamic-position.js';

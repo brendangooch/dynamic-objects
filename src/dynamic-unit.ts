@@ -4,7 +4,7 @@
 
 import * as Ease from '@brendangooch/ease';
 import { iDynamicUnit } from "./index.js";
-import { clamp } from "@brendangooch/maths";
+// import { clamp } from "@brendangooch/maths";
 import { AbstractDynamicObject } from './abstract-dynamic-object.js';
 
 type tDuration = { current: number; next: number };
