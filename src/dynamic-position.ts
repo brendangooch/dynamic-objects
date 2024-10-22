@@ -62,6 +62,7 @@ export class DynamicPosition implements iDynamic {
     public moveTo(x: number, y: number): boolean {
         if (!this.isActive) {
             if (!this.isVector) this.switchStrategy();
+            this.bezier = new DynamicBezier(x, y); // reloading resets duration/speed/ease
             return this.strategy.moveTo(x, y);
         }
         return false;
@@ -76,6 +77,7 @@ export class DynamicPosition implements iDynamic {
         if (!this.isActive) {
             if (this.isVector) this.switchStrategy();
             this.bezier.control(distance, angle);
+            this.vector = new DynamicVector(x, y); // reloading resets duration/speed/ease
             return this.strategy.moveTo(x, y);
         }
         return false;
@@ -133,145 +135,3 @@ export class DynamicPosition implements iDynamic {
     }
 
 }
-
-// import { tEaseOption } from "@brendangooch/ease";
-// import { iDynamic } from "./index.js";
-// import { DynamicVector } from "./dynamic-vector.js";
-// import { DynamicBezier } from "./dynamic-bezier.js";
-
-// export class DynamicPosition implements iDynamic {
-
-//     private vector: DynamicVector;
-//     private bezier: DynamicBezier;
-//     private strategy: DynamicVector | DynamicBezier;
-//     private isVector: boolean;
-//     private _duration: number = 0;
-//     private _speed: number = 0;
-//     private _ease: tEaseOption = 'noEase';
-
-//     // default strategy is vector
-//     public constructor(x: number = 0, y: number = 0) {
-//         this.vector = new DynamicVector(x, y);
-//         this.bezier = new DynamicBezier(x, y);
-//         this.strategy = this.vector;
-//         this.isVector = true;
-//     }
-
-//     public get isActive(): boolean {
-//         return this.strategy.isActive;
-//     }
-
-//     public get x(): number {
-//         return this.strategy.x;
-//     }
-
-//     public get y(): number {
-//         return this.strategy.y;
-//     }
-
-//     public duration(ms: number): DynamicPosition {
-//         if (!this.isActive) {
-//             this._duration = ms;
-//             this._speed = 0;
-//         }
-//         return this;
-//     }
-
-//     public speed(unitsPerMs: number): DynamicPosition {
-//         if (!this.isActive) {
-//             this._speed = unitsPerMs;
-//             this._duration = 0;
-//         }
-//         return this;
-//     }
-
-//     public ease(easeOption: tEaseOption): DynamicPosition {
-//         if (!this.isActive) {
-//             this._ease = easeOption;
-//         }
-//         return this;
-//     }
-
-//     // switch strategy to vector (if not already)
-//     public moveTo(x: number, y: number): boolean {
-//         if (!this.isActive) {
-//             if (!this.isVector) {
-//                 this.vector = new DynamicVector(this.x, this.y);
-//                 if (this._duration > 0) this.vector.duration(this._duration);
-//                 if (this._speed > 0) this.vector.duration(this._speed);
-//                 this.vector.ease(this._ease);
-//                 this.strategy = this.vector;
-//                 this.isVector = true;
-//             }
-//             this.reset();
-//             return this.strategy.moveTo(x, y);
-//         }
-//         return false;
-//     }
-
-//     // switch strategy to bezier (if not already)
-//     // makes no sense to call curveTo() without setting speed or duration
-//     public curveTo(x: number, y: number, distance: number, angle: number): boolean {
-//         if (!this.isActive) {
-//             if (this._duration === 0 && this._speed === 0) return false;
-//             if (this.isVector) {
-//                 this.bezier = new DynamicBezier(this.x, this.y);
-//                 if (this._duration > 0) this.bezier.duration(this._duration);
-//                 if (this._speed > 0) this.bezier.speed(this._speed);
-//                 this.bezier.ease(this._ease);
-//                 this.bezier.distance(distance).angle(angle);
-//                 this.strategy = this.bezier;
-//                 this.isVector = false;
-//             }
-//             this.reset();
-//             return this.strategy.moveTo(x, y);
-//         }
-//         return false;
-//     }
-
-//     public moveBy(x: number, y: number): boolean {
-//         return this.moveTo(this.x + x, this.y + y);
-//     }
-
-//     public curveBy(x: number, y: number, distance: number, angle: number): boolean {
-//         return this.curveTo(this.x + x, this.y + y, distance, angle);
-//     }
-
-//     public turnOn(): void {
-//         this.strategy.turnOn();
-//     }
-
-//     public turnOff(): void {
-//         this.strategy.turnOff();
-//     }
-
-//     public update(ms: number): void {
-//         this.strategy.update(ms);
-//     }
-
-//     public load(json: string): boolean {
-//         const state = JSON.parse(json);
-//         if (state.strategy === undefined) return false;
-//         if (state.isVector === undefined) return false;
-//         if (state.duration === undefined) return false;
-//         if (state.speed === undefined) return false;
-//         if (state.ease === undefined) return false;
-
-//         //
-
-//         return true;
-//     }
-
-//     public save(): string {
-//         return JSON.stringify({
-//             //
-//         });
-//     }
-
-//     private reset(): void {
-//         this._duration = 0;
-//         this._speed = 0;
-//         this._ease = 'noEase';
-//     }
-
-// }

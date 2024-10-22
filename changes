@@ -3,11 +3,6 @@ BUGS:
 
 to do:
 
-    
-    write position tests (behaviour not methods)
-    write position
-    commit
-    
     export all classes from index.ts
     test visually (re-factor test files)
     commit & re-merge & push

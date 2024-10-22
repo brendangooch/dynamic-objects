@@ -11,8 +11,6 @@ testAll();
 function testAll(): void {
     describe('DynamicBezier', () => {
 
-        test('dummy', () => { });
-
         // public constructor(x: number = 0, y: number = 0)
         testInitialValuesAre00IfPositionNotSetOnInstantiation();
         testInitialPositionIsPositionSetOnInstantiation();
