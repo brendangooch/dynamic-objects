@@ -3,26 +3,13 @@ BUGS:
 
 to do:
 
-    re-write bezier tests (behaviour not methods)
-    re-write bezier
-    commit
     
-    delete BaseObjectWithUnit class
-
     write position tests (behaviour not methods)
     write position
     commit
     
-    add decorators:
-        base dynamic unit
-        inverted + test
-        rounded + test
-        floored + test
-    commit
-
     export all classes from index.ts
     test visually (re-factor test files)
-    
     commit & re-merge & push
     publish
 

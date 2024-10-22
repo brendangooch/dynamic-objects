@@ -81,8 +81,11 @@ export class DynamicUnit extends AbstractDynamicObject implements iDynamicUnit {
         this.elapsed = Math.min(this.elapsed, this._duration.current);
     }
 
+    // clamp prevents in/out and bounce ease effects
+    // client is responsible for clamping current value
     protected updateCurrent(): void {
-        this._current = clamp(this.easeFn(this.progress), 0, 1);
+        // this._current = clamp(this.easeFn(this.progress), 0, 1);
+        this._current = this.easeFn(this.progress);
     }
 
     protected updateComplete(): void {

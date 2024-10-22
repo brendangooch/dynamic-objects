@@ -5,950 +5,1052 @@
 import { QuadraticBezierCurve, Vector2D } from "@brendangooch/maths";
 import { DynamicBezier } from "./dynamic-bezier.js";
 import { DynamicUnit } from "./dynamic-unit.js";
+import * as Ease from '@brendangooch/ease';
 
 testAll();
 function testAll(): void {
     describe('DynamicBezier', () => {
 
-        // public get isActive(): boolean
-        testStartsInactive();
-        testDoesNotBecomeActiveOnceDurationIsSet();
-        testDoesNotBecomeActiveOnceSpeedIsSet();
-        testDoesNotBecomeActiveOnceControlIsSet();
-        testDoesNotBecomeActiveOnceControlDistanceIsSet();
-        testDoesNotBecomeActiveOnceControlAngleIsSet();
-        testBecomesActiveOnceValidDurationIsSetAndMoveToCalled();
-        testBecomesActiveOnceValidDurationIsSetAndMoveByIsCalled();
-        testBecomesActiveOnceValidSpeedIsSetAndMoveToIsCalled();
-        testBecomesActiveOnceValidSpeedIsSetAndMoveByIsCalled();
-        testBecomesInactiveOnceDurationHasElapsed();
-        testCanBeActiveWhetherOnOrOff();
+        test('dummy', () => { });
 
-        // public get x() / get y(): number
-        testInitialCurrentXYValuesAre0IfNotSetOnInstantiation();
-        testInitialCurrentXYValuesAreValuesSetOnInstantiation();
-        testXYAreTheSameWhetherUnitIsOnOrOff();
+        // public constructor(x: number = 0, y: number = 0)
+        testInitialValuesAre00IfPositionNotSetOnInstantiation();
+        testInitialPositionIsPositionSetOnInstantiation();
+
+        // public get isActive(): boolean
+        textSettingDurationDoesNotMakeBezierActive();
+        textSettingSpeedDoesNotMakeBezierActive();
+        textSettingEaseDoesNotMakeBezierActive();
+        textSettingControlDoesNotMakeBezierActive();
+        textSettingDurationAndCallingMoveToMakesBezierActive();
+        textSettingDurationAndCallingMoveByMakesBezierActive();
+        textSettingSpeedAndCallingMoveToMakesBezierActive();
+        textSettingSpeedAndCallingMoveByMakesBezierActive();
+        textBezierCanBeActiveAndTurnedOff();
 
         // public duration(ms: number): DynamicBezier
-        testDurationCanOnlyBeSetIfNotActive();
-        testDurationMustBeGreaterThan0ToHaveAnEffect();
+        testDurationCannotBeSetIfBezierIsActive();
+        testDurationHasNoEffectIfSetTo0();
+        testDurationHasNoEffectIfLessThan0();
 
-        // public speed(units: number): DynamicBezier
-        testSpeedCanOnlyBeSetIfNotActive();
-        testSpeedMustBeGreaterThan0ToHaveAnEffect();
+        // public speed(unitsPerMs: number): DynamicBezier
+        testSpeedCannotBeSetIfBezierIsActive();
+        testSpeedHasNoEffectIfSetTo0();
+        testSpeedHasNoEffectIfLessThan0();
 
         // public ease(easeOption: tEaseOption): DynamicBezier
-        testEaseCanOnlyBeSetIfNotActive();
-        testEaseIsResetAfterDurationHasElapsed();
+        testEaseCannotBeSetIfBezierIsActive();
 
-        // public control(x: number, y: number): DynamicBezier
-        testControlCanOnlyBeSetIfNotActive();
-        testControlReplacesDistanceAndAngle();
-        testInstantMoveResetsControlSetting();
-
-        // public distance(distance: number): DynamicBezier
-        testDistanceCanOnlyBeSetIfNotActive();
-        testDistanceReplacesControlVector();
-        testInstantMoveResetsDistanceSetting();
-
-        // public angle(angle: number): DynamicBezier
-        testAngleCanOnlyBeSetIfNotActive();
-        testAngleReplacesControlVector();
-        testInstantMoveResetsAngleSetting();
+        // public control(distance: number, angle: number): DynamicBezier
+        testControlCannotBeSetIfBezierIsActive();
 
         // public moveTo(x: number, y: number): boolean
-        testMoveToPositionCanOnlyBeChangedIfNotActive();
-        testMoveToDoesNothingIfSetToCurentXYValues();
-        testMoveToCANChangeIfXisDifferentAndYIsTheSame();
-        testMoveToCANChangeIfYisDifferentAndXIsTheSame();
-        testIfDurationIsNotSetMoveToChangesCurrentXYValuesImmediately();
-        testIfDurationIsSetMoveToMakesVectorActiveAndChangesXYValuesDynamicallyOverTime();
+        textMoveToHasNoEffectIfBezierIsActive();
+        textMoveToHasNoEffectIfXAndYParamsAreCurrentValues();
+        textMoveToDoesChangePositionIfXOrYAreDifferentToCurrentValues();
+        textMoveToMovesCurrentPositionInstantlyIfNoDurationOrSpeedSet();
+        textMoveToMakesBezierActiveIfDurationIsSet();
+        textMoveToMakesBezierActiveIfSpeedIsSet();
 
         // public moveBy(x: number, y: number): boolean
-        testMoveByPositionCanOnlyBeChangedIfNotActive();
-        testMoveByDoesNothingIfXAndYAre0();
-        testMoveByCanChangeXIfXIsNot0AndYIs0();
-        testMoveByCanChangeYIfYIsNot0AndXIs0();
-        testIfDurationIsNotSetMoveByChangesCurrentXYValuesImmediately();
-        testIfDurationIsSetMoveByMakesBezierActiveAndChangesXYValuesOverTime();
-        testMoveByChangesXYValuesByCorrectAmount();
-
-        // public turnOn(): void
-        // public turnOff(): void
-        testTurningOffAndOnStopsAndStartsUpdate();
-
-        // public update(ms: number): void
-        testDoesNotUpdateIfNotActive();
-        testDoesNotUpdateIfNotTurnedOn();
-        testUpdatesIfActiveAndTurnedOnAndDurationGreaterThan0();
+        textMoveByHasNoEffectIfBezierIsActive();
+        textMoveByHasNoEffectIfXAndYParamsAreCurrentValues();
+        textMoveByDoesChangePositionIfXOrYAreDifferentToCurrentValues();
+        textMoveByMovesCurrentPositionInstantlyIfNoDurationOrSpeedSet();
+        textMoveByMakesBezierActiveIfDurationIsSet();
+        textMoveByMakesBezierActiveIfSpeedIsSet();
+        textMoveByMovesCurrentPositionByCorrectAmount();
+        textMoveByWorksWithNegativeNumbers();
 
         // public load(json: string): boolean
         // public save(): string
-        testCanBeSavedWhetherTurnedOnOrOff();
-        testBehavesTheSameAfterSaveAndLoad();
         testLoadReturnsTrueOnValidLoad();
-        testLoadReturnsFalseIfUnitMissing();
-        testLoadReturnsFalseIfPreviousMissing();
-        testLoadReturnsFalseIfNextMissing();
-        testLoadReturnsFalseIfDifferenceMissing();
-        testLoadReturnsFalseIfCurrentMissing();
-        testLoadReturnsFalseIfControlMissing();
-        testLoadReturnsFalseIfDistanceMissing();
-        testLoadReturnsFalseIfAngleMissing();
-        testLoadReturnsFalseIfBezierMissing();
-        testLoadReturnsFalseIfDurationMissing();
-        testLoadReturnsFalseIfSpeedMissing();
-        testLoadReturnsFalseIfIsOnPropertyMissing();
+        testBehavesTheSameOnSaveAndLoad();
+        testReturnsFalseIfMissingUnitProperty();
+        testReturnsFalseIfMissingCurrentProperty();
+        testReturnsFalseIfMissingDistanceBetweenProperty();
+        testReturnsFalseIfMissingBezierProperty();
+        testReturnsFalseIfMissingNextProperty();
+        testReturnsFalseIfMissingControlProperty();
+        testReturnsFalseIfMissingDurationProperty();
+        testReturnsFalseIfMissingSpeedProperty();
+        testReturnsFalseIfMissingIsOnProperty();
 
         // general behaviour
-        testWorksWithNegativeValues();
-        testPathIsStraightIfControlPointNotSet();
-        testPathIsCurvedIfControlPointIsSet();
-        testDistanceAndControlMustBothBeSetToAffectControlPoint();
-        testReturnsExpectedCurrentValuesDuringFullDurationWhenControlPointAdded();
-        testReturnsExpectedCurrentValuesDuringFullDurationWhenControlPointDistanceAngleAdded();
-        testReturnsExpectedCurrentValuesDuringFullDurationWhenControlPointNotAdded();
-        testReturnsExpectedCurrentValuesDuringFullDurationWhenSpeedIsSet();
-        testReturnsExpectedCurrentValuesDuringFullDurationWithEaseApplied();
+        testTurningUnitOnAndOffStopsAndStartsUpdate();
+        testDefaultPathIsAStraightLine();
+        testPathIsCurvedIfControlIsCalled();
+        testControlPointIsResetAfterFullUpdateCycle();
+        testReturnsExpectedValuesDuringFullUpdateCycleWithNoEaseAndNoControlPoint();
+        testReturnsExpectedValuesDuringFullUpdateCycleWithEaseAndNoControlPoint();
+        testReturnsExpectedValuesDuringFullUpdateCycleWithNoEaseAndControlPoint();
+        testReturnsExpectedValuesDuringFullUpdateCycleWithEaseAndControlPoint();
+        testReturnsExpectedValuesDuringFullUpdateCycleWithEaseAndControlPointAndSpeedSetting();
 
     });
 
 }
 
 
-function testStartsInactive(): void {
-    test('starts inactive', () => {
-        const bezier = new DynamicBezier();
-        expect(bezier.isActive).not.toBeTruthy();
+function testInitialValuesAre00IfPositionNotSetOnInstantiation(): void {
+    test('initial values are 0, 0 if position not set on instantiation', () => {
+        const b = new DynamicBezier();
+        expectXYToBe(b, 0, 0);
     });
 }
 
-function testDoesNotBecomeActiveOnceDurationIsSet(): void {
-    test('does not become active once duration is set', () => {
-        const bezier = new DynamicBezier();
-        bezier.duration(1000);
-        expect(bezier.isActive).not.toBeTruthy();
-    });
-}
-
-function testDoesNotBecomeActiveOnceSpeedIsSet(): void {
-    test('does not become active once speed is set', () => {
-        const bezier = new DynamicBezier();
-        bezier.speed(2);
-        expect(bezier.isActive).not.toBeTruthy();
-    });
-}
-
-function testDoesNotBecomeActiveOnceControlIsSet(): void {
-    test('does not become active once control is set', () => {
-        const bezier = new DynamicBezier();
-        bezier.control(100, 100);
-        expect(bezier.isActive).not.toBeTruthy();
-    });
-}
-
-function testDoesNotBecomeActiveOnceControlDistanceIsSet(): void {
-    test('does not become active once control distance is set', () => {
-        const bezier = new DynamicBezier();
-        bezier.distance(500);
-        expect(bezier.isActive).not.toBeTruthy();
-    });
-}
-
-function testDoesNotBecomeActiveOnceControlAngleIsSet(): void {
-    test('does not become active once control angle is set', () => {
-        const bezier = new DynamicBezier();
-        bezier.angle(-Math.PI / 2);
-        expect(bezier.isActive).not.toBeTruthy();
+function testInitialPositionIsPositionSetOnInstantiation(): void {
+    test('initial position is position set on instantiation', () => {
+        const b = new DynamicBezier(500, 600);
+        expectXYToBe(b, 500, 600);
     });
 }
 
 
-function testBecomesActiveOnceValidDurationIsSetAndMoveToCalled(): void {
-    test('becomes active once valid duration is set and moveTo() is called', () => {
-        const bezier = new DynamicBezier();
-        bezier.duration(1000).moveTo(1000, 1000);
-        expect(bezier.isActive).toBeTruthy();
+function textSettingDurationDoesNotMakeBezierActive(): void {
+    test('setting duration does not make bezier active', () => {
+        const b = new DynamicBezier();
+        b.duration(1000);
+        expectNotActive(b);
     });
 }
 
-function testBecomesActiveOnceValidDurationIsSetAndMoveByIsCalled(): void {
-    test('becomes active once valid duration is set and moveBy() is called', () => {
-        const bezier = new DynamicBezier();
-        bezier.duration(1000).moveBy(1000, 1000);
-        expect(bezier.isActive).toBeTruthy();
+function textSettingSpeedDoesNotMakeBezierActive(): void {
+    test('setting speed does not make bezier active', () => {
+        const b = new DynamicBezier();
+        b.speed(1);
+        expectNotActive(b);
     });
 }
 
-function testBecomesActiveOnceValidSpeedIsSetAndMoveToIsCalled(): void {
-    test('becomes active once valid speed is set and moveTo() is called', () => {
-        const bezier = new DynamicBezier();
-        bezier.speed(2).moveTo(100, 200);
-        expect(bezier.isActive).toBeTruthy();
+function textSettingEaseDoesNotMakeBezierActive(): void {
+    test('setting ease does not make bezier active', () => {
+        const b = new DynamicBezier();
+        b.ease('easeInBack');
+        expectNotActive(b);
     });
 }
 
-function testBecomesActiveOnceValidSpeedIsSetAndMoveByIsCalled(): void {
-    test('becomes active once valid speed is set and moveBy() is called', () => {
-        const bezier = new DynamicBezier();
-        bezier.speed(2).moveBy(100, 200);
-        expect(bezier.isActive).toBeTruthy();
+function textSettingControlDoesNotMakeBezierActive(): void {
+    test('setting control does not make bezier active', () => {
+        const b = new DynamicBezier();
+        b.control(1000, Math.PI / 2);
+        expectNotActive(b);
     });
 }
 
-function testBecomesInactiveOnceDurationHasElapsed(): void {
-    test('becomes inactive once duration has elapsed', () => {
-        const bezier = new DynamicBezier();
-        bezier.duration(1000).moveTo(500, 500);
-        expect(bezier.isActive).toBeTruthy();
-        bezier.update(200);
-        bezier.update(200);
-        bezier.update(200);
-        bezier.update(200);
-        bezier.update(200);
-        expect(bezier.isActive).not.toBeTruthy();
+function textSettingDurationAndCallingMoveToMakesBezierActive(): void {
+    test('setting duration and calling moveTo makes bezier active', () => {
+        const b = new DynamicBezier();
+        b.duration(1000).moveTo(1000, 2000);
+        expectActive(b);
     });
 }
 
-function testCanBeActiveWhetherOnOrOff(): void {
-    test('can be active whether on or off', () => {
-        const bezier = new DynamicBezier();
-        bezier.duration(1000).moveTo(500, 500);
-        bezier.turnOn(); // <-- (already on, emphasising point)
-        expect(bezier.isActive).toBeTruthy();
-        bezier.turnOff();
-        expect(bezier.isActive).toBeTruthy();
+function textSettingDurationAndCallingMoveByMakesBezierActive(): void {
+    test('setting duration and calling moveBy makes bezier active', () => {
+        const b = new DynamicBezier();
+        b.duration(1000).moveBy(1000, 2000);
+        expectActive(b);
     });
 }
 
-
-function testInitialCurrentXYValuesAre0IfNotSetOnInstantiation(): void {
-    test('initial current x y values are 0 if not set on instantiation', () => {
-        const bezier = new DynamicBezier();
-        expect(bezier.x).toBe(0);
-        expect(bezier.y).toBe(0);
+function textSettingSpeedAndCallingMoveToMakesBezierActive(): void {
+    test('setting speed and calling moveTo makes bezier active', () => {
+        const b = new DynamicBezier();
+        b.speed(1).moveTo(500, 600);
+        expectActive(b);
     });
 }
 
-function testInitialCurrentXYValuesAreValuesSetOnInstantiation(): void {
-    test('initial current x y values are values set on instantiation', () => {
-        const bezier = new DynamicBezier(100, 500);
-        expect(bezier.x).toBe(100);
-        expect(bezier.y).toBe(500);
+function textSettingSpeedAndCallingMoveByMakesBezierActive(): void {
+    test('setting speed and calling moveBy makes bezier active', () => {
+        const b = new DynamicBezier();
+        b.speed(1).moveBy(500, 600);
+        expectActive(b);
     });
 }
 
-function testXYAreTheSameWhetherUnitIsOnOrOff(): void {
-    test('x y are the same value whether unit is on or off', () => {
-        const bezier = new DynamicBezier(250, 1000);
-        bezier.duration(1000).moveTo(500, 1000);
-        bezier.update(200);
-        const x = bezier.x;
-        const y = bezier.y;
-        bezier.turnOff();
-        expect(bezier.x).toBe(x);
-        expect(bezier.y).toBe(y);
+function textBezierCanBeActiveAndTurnedOff(): void {
+    test('bezier can be active and turned off', () => {
+        const b = new DynamicBezier();
+        b.duration(1000).moveTo(100, 200);
+        expectActive(b);
+        b.turnOff();
+        expectActive(b);
     });
 }
 
 
-function testDurationCanOnlyBeSetIfNotActive(): void {
-    test('duration can only be set if not active', () => {
-        const bezier = new DynamicBezier();
-        expect(bezier.isActive).not.toBeTruthy();
-        bezier.duration(1000).moveTo(100, 100);
-        expect(bezier.isActive).toBeTruthy();
-        bezier.duration(2000); // <-- X
-        bezier.update(200);
-        bezier.update(200);
-        bezier.update(200);
-        bezier.update(200);
-        bezier.update(200);
-        expect(bezier.isActive).not.toBeTruthy();
+function testDurationCannotBeSetIfBezierIsActive(): void {
+    test('duration cannot be set if bezier is active', () => {
+        const b = new DynamicBezier();
+        expectNotActive(b);
+        b.duration(1000).moveTo(200, 700);
+        expectActive(b);
+        b.duration(2000);
+        b.update(200);
+        b.update(200);
+        b.update(200);
+        b.update(200);
+        b.update(200);
+        expectNotActive(b);
     });
 }
 
-function testDurationMustBeGreaterThan0ToHaveAnEffect(): void {
-    test('duration must be greater than 0 to have an effect', () => {
-        const bezier = new DynamicBezier();
-        bezier.duration(0).moveTo(100, 200);
-        bezier.update(200);
-        expect(bezier.x).toBe(100);
-        expect(bezier.y).toBe(200);
-        bezier.duration(-1).moveTo(200, 100);
-        bezier.update(200);
-        expect(bezier.x).toBe(200);
-        expect(bezier.y).toBe(100);
+function testDurationHasNoEffectIfSetTo0(): void {
+    test('duration has no effect if set to 0', () => {
+        const b = new DynamicBezier();
+        b.duration(0).moveTo(300, 400);
+        expectNotActive(b);
+        expectXYToBe(b, 300, 400);
     });
 }
 
-
-function testSpeedCanOnlyBeSetIfNotActive(): void {
-    test('speed can only be set if not active', () => {
-        const bezier = new DynamicBezier();
-        expect(bezier.isActive).not.toBeTruthy();
-        //
-
-    });
-}
-
-function testSpeedMustBeGreaterThan0ToHaveAnEffect(): void {
-    test('speed must be greater than 0 to have an effect', () => {
-        const bezier = new DynamicBezier();
+function testDurationHasNoEffectIfLessThan0(): void {
+    test('duration has no effect if less than 0', () => {
+        const b = new DynamicBezier();
+        b.duration(-100).moveTo(300, 400);
+        expectNotActive(b);
+        expectXYToBe(b, 300, 400);
     });
 }
 
 
-function testEaseCanOnlyBeSetIfNotActive(): void {
-    test('ease can only be set if not active', () => {
-        const bezier = new DynamicBezier();
-        expect(bezier.isActive).not.toBeTruthy();
+function testSpeedCannotBeSetIfBezierIsActive(): void {
+    test('speed cannot be set if bezier is active', () => {
+        const b = new DynamicBezier();
+        expectNotActive(b);
+        b.speed(2).moveTo(600, 800); // distance 1000; duration 1000 / 2 = 500
+        expectActive(b);
+        b.speed(1);
+        b.update(100);
+        b.update(100);
+        b.update(100);
+        b.update(100);
+        b.update(100);
+        expectNotActive(b);
     });
 }
 
-function testEaseIsResetAfterDurationHasElapsed(): void {
-    test('ease is reset after duration has elapsed', () => {
-        const bezier = new DynamicBezier();
+function testSpeedHasNoEffectIfSetTo0(): void {
+    test('speed has no effect if set to 0', () => {
+        const b = new DynamicBezier();
+        b.speed(0).moveTo(300, 400);
+        expectNotActive(b);
+        expectXYToBe(b, 300, 400);
     });
 }
 
-
-function testControlCanOnlyBeSetIfNotActive(): void {
-    test('control() can only be set if not active', () => {
-        const bezier = new DynamicBezier();
-        expect(bezier.isActive).not.toBeTruthy();
-    });
-}
-
-function testControlReplacesDistanceAndAngle(): void {
-    test('control() replaces control distance and angle', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-function testInstantMoveResetsControlSetting(): void {
-    test('an instant move resets control setting', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-
-function testDistanceCanOnlyBeSetIfNotActive(): void {
-    test('control distance can only be set if not active', () => {
-        const bezier = new DynamicBezier();
-        expect(bezier.isActive).not.toBeTruthy();
-    });
-}
-
-function testDistanceReplacesControlVector(): void {
-    test('calling distance() replaces the control() setting', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-function testInstantMoveResetsDistanceSetting(): void {
-    test('an instant move resets control distance setting', () => {
-        const bezier = new DynamicBezier();
+function testSpeedHasNoEffectIfLessThan0(): void {
+    test('speed has no effect if less than 0', () => {
+        const b = new DynamicBezier();
+        b.speed(-1).moveTo(300, 400);
+        expectNotActive(b);
+        expectXYToBe(b, 300, 400);
     });
 }
 
 
-function testAngleCanOnlyBeSetIfNotActive(): void {
-    test('control angle can only be set if not active', () => {
-        const bezier = new DynamicBezier();
-        expect(bezier.isActive).not.toBeTruthy();
-    });
-}
-
-function testAngleReplacesControlVector(): void {
-    test('calling angle() replaces the control() setting', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-function testInstantMoveResetsAngleSetting(): void {
-    test('an instant move resets control angle setting', () => {
-        const bezier = new DynamicBezier();
+function testEaseCannotBeSetIfBezierIsActive(): void {
+    test('ease cannot be set if bezier is active', () => {
+        const b = new DynamicBezier();
+        expectNotActive(b);
+        b.duration(1000).moveTo(500, 600);
+        expectActive(b);
+        b.ease('easeInBounce');
+        b.update(200);
+        expectXYToBeCloseTo(b, 100, 120);
     });
 }
 
 
-function testMoveToPositionCanOnlyBeChangedIfNotActive(): void {
-    test('moveTo() position can only be changed if not active', () => {
-        const bezier = new DynamicBezier();
-        expect(bezier.isActive).not.toBeTruthy();
-    });
-}
-
-function testMoveToDoesNothingIfSetToCurentXYValues(): void {
-    test('moveTo() does nothing if set to current x/y values', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-function testMoveToCANChangeIfXisDifferentAndYIsTheSame(): void {
-    test('moveTo() CAN change if x is different and y is the same', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-function testMoveToCANChangeIfYisDifferentAndXIsTheSame(): void {
-    test('moveTo() CAN change if y is different and x is the same', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-function testIfDurationIsNotSetMoveToChangesCurrentXYValuesImmediately(): void {
-    test('if duration is not set, moveTo() changes current x/y values immediately', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-function testIfDurationIsSetMoveToMakesVectorActiveAndChangesXYValuesDynamicallyOverTime(): void {
-    test('if duration is set, moveTo() makes vector active and changes x/y values dynamically over time', () => {
-        const bezier = new DynamicBezier();
+function testControlCannotBeSetIfBezierIsActive(): void {
+    test('control cannot be set if bezier is active', () => {
+        const b = new DynamicBezier();
+        expectNotActive(b);
+        b.duration(1000).moveTo(500, 600);
+        expectActive(b);
+        b.control(1000, -Math.PI * 0.5);
+        b.update(200);
+        expectXYToBeCloseTo(b, 100, 120);
     });
 }
 
 
-function testMoveByPositionCanOnlyBeChangedIfNotActive(): void {
-    test('moveBy() position can only be changed if not active', () => {
-        const bezier = new DynamicBezier();
-        expect(bezier.isActive).not.toBeTruthy();
+function textMoveToHasNoEffectIfBezierIsActive(): void {
+    test('moveTo has no effect if bezier is active', () => {
+        const b = new DynamicBezier(100, 200);
+        b.duration(1000).moveTo(300, 400);
+        expectActive(b);
+        expectFalse(b.moveTo(500, 600));
     });
 }
 
-function testMoveByDoesNothingIfXAndYAre0(): void {
-    test('moveBy() does nothing if x & y are 0', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-function testMoveByCanChangeXIfXIsNot0AndYIs0(): void {
-    test('moveBy() CAN change x if x is not 0 and y is 0', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-function testMoveByCanChangeYIfYIsNot0AndXIs0(): void {
-    test('moveBy() CAN change y if y is not 0 and x is 0', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-function testIfDurationIsNotSetMoveByChangesCurrentXYValuesImmediately(): void {
-    test('if duration is not set, moveBy()  changes current x/y values immediately', () => {
-        const bezier = new DynamicBezier();
-    });
-}
-
-function testIfDurationIsSetMoveByMakesBezierActiveAndChangesXYValuesOverTime(): void {
-    test('if duration is set, moveBy() makes vector active and changes x/y values dynamically over time', () => {
-        const bezier = new DynamicBezier();
+function textMoveToHasNoEffectIfXAndYParamsAreCurrentValues(): void {
+    test('moveTo has no effect if x and y params are current values', () => {
+        const b = new DynamicBezier(10, 20);
+        expectFalse(b.moveTo(10, 20));
 
     });
 }
 
-function testMoveByChangesXYValuesByCorrectAmount(): void {
-    test('moveBy() changes x y values by correct amount', () => {
-        const bezier = new DynamicBezier();
+function textMoveToDoesChangePositionIfXOrYAreDifferentToCurrentValues(): void {
+    test('moveTo does change position if x OR y are different to current values', () => {
+        const b = new DynamicBezier(10, 20);
+        expectTrue(b.moveTo(20, 20));
+        expectTrue(b.moveTo(20, 30));
+    });
+}
+
+function textMoveToMovesCurrentPositionInstantlyIfNoDurationOrSpeedSet(): void {
+    test('moveTo moves current position instantly if no duration or speed set', () => {
+        const b = new DynamicBezier();
+        expectTrue(b.moveTo(100, 200))
+        expectXYToBe(b, 100, 200);
+    });
+}
+
+function textMoveToMakesBezierActiveIfDurationIsSet(): void {
+    test('moveTo makes bezier active if duration is set', () => {
+        const b = new DynamicBezier();
+        expectTrue(b.duration(1000).moveTo(500, 700))
+        expectActive(b);
+    });
+}
+
+function textMoveToMakesBezierActiveIfSpeedIsSet(): void {
+    test('moveTo makes bezier active if speed is set', () => {
+        const b = new DynamicBezier();
+        expectTrue(b.speed(2).moveTo(500, 700))
+        expectActive(b);
     });
 }
 
 
-function testTurningOffAndOnStopsAndStartsUpdate(): void {
-    test('turning off and on stops and starts update', () => {
-        const bezier = new DynamicBezier();
+function textMoveByHasNoEffectIfBezierIsActive(): void {
+    test('moveBy has no effect if bezier is active', () => {
+        const b = new DynamicBezier();
+        b.duration(1000).moveTo(200, 300);
+        expectActive(b);
+        expectFalse(b.moveBy(100, 200));
     });
 }
 
-
-function testDoesNotUpdateIfNotActive(): void {
-    test('does not update if not active', () => {
-        const bezier = new DynamicBezier();
+function textMoveByHasNoEffectIfXAndYParamsAreCurrentValues(): void {
+    test('moveBy has no effect if x and y params are 0', () => {
+        const b = new DynamicBezier();
+        expectFalse(b.moveBy(0, 0));
+        expectNotActive(b);
     });
 }
 
-function testDoesNotUpdateIfNotTurnedOn(): void {
-    test('does not update if turned off', () => {
-        const bezier = new DynamicBezier();
+function textMoveByDoesChangePositionIfXOrYAreDifferentToCurrentValues(): void {
+    test('moveBy does change position if x OR y are not 0', () => {
+        const b = new DynamicBezier();
+        expectTrue(b.moveBy(10, 0));
+        expectTrue(b.moveBy(0, 10));
     });
 }
 
-function testUpdatesIfActiveAndTurnedOnAndDurationGreaterThan0(): void {
-    test('updates if active and turned on and duration is greater than 0', () => {
-        const bezier = new DynamicBezier();
+function textMoveByMovesCurrentPositionInstantlyIfNoDurationOrSpeedSet(): void {
+    test('moveBy moves current position instantly if no duration or speed set', () => {
+        const b = new DynamicBezier(10, 15);
+        b.moveBy(10, 10);
+        expectNotActive(b);
+        expectXYToBe(b, 20, 25);
     });
 }
 
-
-
-function testCanBeSavedWhetherTurnedOnOrOff(): void {
-    test('can be saved whether turned on or off', () => {
-        const bezier = new DynamicBezier();
+function textMoveByMakesBezierActiveIfDurationIsSet(): void {
+    test('moveBy makes bezier active if duration is set', () => {
+        const b = new DynamicBezier();
+        b.duration(1000).moveBy(100, 200);
+        expectActive(b);
     });
 }
 
-function testBehavesTheSameAfterSaveAndLoad(): void {
-    test('behaves the same after save and load', () => {
-        const bezier = new DynamicBezier();
+function textMoveByMakesBezierActiveIfSpeedIsSet(): void {
+    test('moveBy makes bezier active if speed is set', () => {
+        const b = new DynamicBezier();
+        b.speed(2).moveBy(100, 200);
+        expectActive(b);
     });
 }
+
+function textMoveByMovesCurrentPositionByCorrectAmount(): void {
+    test('moveBy moves current position by correct amount', () => {
+        const b = new DynamicBezier(10, 20);
+        b.moveBy(10, 20);
+        expectXYToBe(b, 20, 40);
+    });
+}
+
+function textMoveByWorksWithNegativeNumbers(): void {
+    test('moveBy works with negative numbers', () => {
+        const b = new DynamicBezier(100, 200);
+        b.moveBy(-200, -400);
+        expectXYToBe(b, -100, -200);
+    });
+}
+
 
 function testLoadReturnsTrueOnValidLoad(): void {
-    test('load returns true on valid load', () => {
+    test('load() returns true on valid load', () => {
         const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const difference = new Vector2D();
         const current = new Vector2D();
-        const control = new Vector2D();
         const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    difference: difference.save(),
-                    current: current.save(),
-                    duration: 1000,
-                    speed: 0,
-                    isOn: true,
-                    control: control.save(),
-                    distance: 0,
-                    angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).toBeTruthy();
+        const next = new Vector2D();
+        const control = { distance: 0, angle: 0 };
+        const b = new DynamicBezier();
+        expectTrue(b.load(
+            JSON.stringify({
+                unit: unit.save(),
+                current: current.save(),
+                distanceBetween: 0,
+                bezier: bezier.save(),
+                next: next.save(),
+                control: control,
+                duration: 0,
+                speed: 0,
+                isOn: false
+            })
+        ));
     });
 }
 
-function testLoadReturnsFalseIfUnitMissing(): void {
-    test('load returns false if "unit" property missing', () => {
+function testBehavesTheSameOnSaveAndLoad(): void {
+    test('behaves the same on save and load', () => {
+
+        const speed = 1;
+        const cDistance = 800;
+        const cAngle = -Math.PI / 4;
+        const easeOption: Ease.tEaseOption = 'easeOutCubic';
+        const easeFn = Ease.load(easeOption);
+        const start = new Vector2D(100, 200);
+        const end = new Vector2D(1600, 1800);
+        const distanceBetween = end.distanceTo(start);
+        const bezier = new QuadraticBezierCurve();
+        bezier.setStart(start.x, start.y);
+        bezier.setEnd(end.x, end.y);
+        bezier.setControlByDistanceAndAngleFromStart(cDistance, cAngle);
+        let elapsed = 0;
+        let progress = 0;
+        const current = new Vector2D();
+        const numSteps = 5;
+        const duration = distanceBetween / speed;
+        const step = duration / numSteps;
+
+        const b = new DynamicBezier(start.x, start.y);
+        b.speed(speed).ease(easeOption).control(cDistance, cAngle).moveTo(end.x, end.y);
+        b.load(b.save());
+        expectActive(b);
+
+        for (let i = 0; i < numSteps; i++) {
+            b.update(step);
+            b.load(b.save());
+            elapsed += step;
+            progress = easeFn(elapsed / duration);
+            current.setX(bezier.x(progress));
+            current.setY(bezier.y(progress));
+            expectXYToBeCloseTo(b, current.x, current.y);
+        }
+
+    });
+}
+
+function testReturnsFalseIfMissingUnitProperty(): void {
+    test('load() returns false if missing "unit" property', () => {
         // const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const difference = new Vector2D();
         const current = new Vector2D();
-        const control = new Vector2D();
         const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    // unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    difference: difference.save(),
-                    current: current.save(),
-                    duration: 1000,
-                    speed: 0,
-                    isOn: true,
-                    control: control.save(),
-                    distance: 0,
-                    angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
+        const next = new Vector2D();
+        const control = { distance: 0, angle: 0 };
+        const b = new DynamicBezier();
+        expectFalse(b.load(
+            JSON.stringify({
+                // unit: unit.save(),
+                current: current.save(),
+                distanceBetween: 0,
+                bezier: bezier.save(),
+                next: next.save(),
+                control: control,
+                duration: 0,
+                speed: 0,
+                isOn: false
+            })
+        ));
     });
 }
 
-function testLoadReturnsFalseIfPreviousMissing(): void {
-    test('load returns false if "previous" property missing', () => {
+function testReturnsFalseIfMissingCurrentProperty(): void {
+    test('load() returns false if missing "current" property', () => {
         const unit = new DynamicUnit();
-        // const previous = new Vector2D();
-        const next = new Vector2D();
-        const difference = new Vector2D();
-        const current = new Vector2D();
-        const control = new Vector2D();
-        const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    // previous: previous.save(),
-                    next: next.save(),
-                    difference: difference.save(),
-                    current: current.save(),
-                    duration: 1000,
-                    speed: 0,
-                    isOn: true,
-                    control: control.save(),
-                    distance: 0,
-                    angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
-    });
-}
-
-function testLoadReturnsFalseIfNextMissing(): void {
-    test('load returns false if "next" property missing', () => {
-        const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        // const next = new Vector2D();
-        const difference = new Vector2D();
-        const current = new Vector2D();
-        const control = new Vector2D();
-        const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    // next: next.save(),
-                    difference: difference.save(),
-                    current: current.save(),
-                    duration: 1000,
-                    speed: 0,
-                    isOn: true,
-                    control: control.save(),
-                    distance: 0,
-                    angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
-    });
-}
-
-function testLoadReturnsFalseIfDifferenceMissing(): void {
-    test('load returns false if "difference" property missing', () => {
-        const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        // const difference = new Vector2D();
-        const current = new Vector2D();
-        const control = new Vector2D();
-        const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    // difference: difference.save(),
-                    current: current.save(),
-                    duration: 1000,
-                    speed: 0,
-                    isOn: true,
-                    control: control.save(),
-                    distance: 0,
-                    angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
-    });
-}
-
-function testLoadReturnsFalseIfCurrentMissing(): void {
-    test('load returns false if "current" property missing', () => {
-        const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const difference = new Vector2D();
         // const current = new Vector2D();
-        const control = new Vector2D();
         const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    difference: difference.save(),
-                    // current: current.save(),
-                    duration: 1000,
-                    speed: 0,
-                    isOn: true,
-                    control: control.save(),
-                    distance: 0,
-                    angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
+        const next = new Vector2D();
+        const control = { distance: 0, angle: 0 };
+        const b = new DynamicBezier();
+        expectFalse(b.load(
+            JSON.stringify({
+                unit: unit.save(),
+                // current: current.save(),
+                distanceBetween: 0,
+                bezier: bezier.save(),
+                next: next.save(),
+                control: control,
+                duration: 0,
+                speed: 0,
+                isOn: false
+            })
+        ));
     });
 }
 
-function testLoadReturnsFalseIfControlMissing(): void {
-    test('load returns false if "control" property missing', () => {
+function testReturnsFalseIfMissingDistanceBetweenProperty(): void {
+    test('load() returns false if missing "distanceBetween" property', () => {
         const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const difference = new Vector2D();
         const current = new Vector2D();
-        // const control = new Vector2D();
         const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    difference: difference.save(),
-                    current: current.save(),
-                    duration: 1000,
-                    speed: 0,
-                    isOn: true,
-                    // control: control.save(),
-                    distance: 0,
-                    angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
+        const next = new Vector2D();
+        const control = { distance: 0, angle: 0 };
+        const b = new DynamicBezier();
+        expectFalse(b.load(
+            JSON.stringify({
+                unit: unit.save(),
+                current: current.save(),
+                // distanceBetween: 0,
+                bezier: bezier.save(),
+                next: next.save(),
+                control: control,
+                duration: 0,
+                speed: 0,
+                isOn: false
+            })
+        ));
     });
 }
 
-function testLoadReturnsFalseIfDistanceMissing(): void {
-    test('load returns false if "distance" property missing', () => {
+function testReturnsFalseIfMissingBezierProperty(): void {
+    test('load() returns false if missing "bezier" property', () => {
         const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const difference = new Vector2D();
         const current = new Vector2D();
-        const control = new Vector2D();
-        const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    difference: difference.save(),
-                    current: current.save(),
-                    duration: 1000,
-                    speed: 0,
-                    isOn: true,
-                    control: control.save(),
-                    // distance: 0,
-                    angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
-    });
-}
-
-function testLoadReturnsFalseIfAngleMissing(): void {
-    test('load returns false if "angle" property missing', () => {
-        const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const difference = new Vector2D();
-        const current = new Vector2D();
-        const control = new Vector2D();
-        const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    difference: difference.save(),
-                    current: current.save(),
-                    duration: 1000,
-                    speed: 0,
-                    isOn: true,
-                    control: control.save(),
-                    distance: 0,
-                    // angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
-    });
-}
-
-function testLoadReturnsFalseIfBezierMissing(): void {
-    test('load returns false if "bezier" property missing', () => {
-        const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const difference = new Vector2D();
-        const current = new Vector2D();
-        const control = new Vector2D();
         // const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    difference: difference.save(),
-                    current: current.save(),
-                    duration: 1000,
-                    speed: 0,
-                    isOn: true,
-                    control: control.save(),
-                    distance: 0,
-                    angle: 0,
-                    // bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
-    });
-}
-
-function testLoadReturnsFalseIfDurationMissing(): void {
-    test('load returns false if "duration" property missing', () => {
-        const unit = new DynamicUnit();
-        const previous = new Vector2D();
         const next = new Vector2D();
-        const difference = new Vector2D();
-        const current = new Vector2D();
-        const control = new Vector2D();
-        const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    difference: difference.save(),
-                    current: current.save(),
-                    // duration: 1000,
-                    speed: 0,
-                    isOn: true,
-                    control: control.save(),
-                    distance: 0,
-                    angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
+        const control = { distance: 0, angle: 0 };
+        const b = new DynamicBezier();
+        expectFalse(b.load(
+            JSON.stringify({
+                unit: unit.save(),
+                current: current.save(),
+                distanceBetween: 0,
+                // bezier: bezier.save(),
+                next: next.save(),
+                control: control,
+                duration: 0,
+                speed: 0,
+                isOn: false
+            })
+        ));
     });
 }
 
-function testLoadReturnsFalseIfSpeedMissing(): void {
-    test('load returns false if "speed" property missing', () => {
+function testReturnsFalseIfMissingNextProperty(): void {
+    test('load() returns false if missing "next" property', () => {
         const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const difference = new Vector2D();
         const current = new Vector2D();
-        const control = new Vector2D();
         const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    difference: difference.save(),
-                    current: current.save(),
-                    duration: 1000,
-                    // speed: 0,
-                    isOn: true,
-                    control: control.save(),
-                    distance: 0,
-                    angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
+        // const next = new Vector2D();
+        const control = { distance: 0, angle: 0 };
+        const b = new DynamicBezier();
+        expectFalse(b.load(
+            JSON.stringify({
+                unit: unit.save(),
+                current: current.save(),
+                distanceBetween: 0,
+                bezier: bezier.save(),
+                // next: next.save(),
+                control: control,
+                duration: 0,
+                speed: 0,
+                isOn: false
+            })
+        ));
     });
 }
 
-function testLoadReturnsFalseIfIsOnPropertyMissing(): void {
-    test('load returns false if "isOn" property missing', () => {
+function testReturnsFalseIfMissingControlProperty(): void {
+    test('load() returns false if missing "control" property', () => {
         const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const difference = new Vector2D();
         const current = new Vector2D();
-        const control = new Vector2D();
         const bezier = new QuadraticBezierCurve();
-        const dBezier = new DynamicBezier();
-        expect(
-            dBezier.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    difference: difference.save(),
-                    current: current.save(),
-                    duration: 1000,
-                    speed: 0,
-                    // isOn: true,
-                    control: control.save(),
-                    distance: 0,
-                    angle: 0,
-                    bezier: bezier.save()
-                })
-            )
-        ).not.toBeTruthy();
+        const next = new Vector2D();
+        // const control = { distance: 0, angle: 0 };
+        const b = new DynamicBezier();
+        expectFalse(b.load(
+            JSON.stringify({
+                unit: unit.save(),
+                current: current.save(),
+                distanceBetween: 0,
+                bezier: bezier.save(),
+                next: next.save(),
+                // control: control,
+                duration: 0,
+                speed: 0,
+                isOn: false
+            })
+        ));
+    });
+}
+
+function testReturnsFalseIfMissingDurationProperty(): void {
+    test('load() returns false if missing "duration" property', () => {
+        const unit = new DynamicUnit();
+        const current = new Vector2D();
+        const bezier = new QuadraticBezierCurve();
+        const next = new Vector2D();
+        const control = { distance: 0, angle: 0 };
+        const b = new DynamicBezier();
+        expectFalse(b.load(
+            JSON.stringify({
+                unit: unit.save(),
+                current: current.save(),
+                distanceBetween: 0,
+                bezier: bezier.save(),
+                next: next.save(),
+                control: control,
+                // duration: 0,
+                speed: 0,
+                isOn: false
+            })
+        ));
+    });
+}
+
+function testReturnsFalseIfMissingSpeedProperty(): void {
+    test('load() returns false if missing "speed" property', () => {
+        const unit = new DynamicUnit();
+        const current = new Vector2D();
+        const bezier = new QuadraticBezierCurve();
+        const next = new Vector2D();
+        const control = { distance: 0, angle: 0 };
+        const b = new DynamicBezier();
+        expectFalse(b.load(
+            JSON.stringify({
+                unit: unit.save(),
+                current: current.save(),
+                distanceBetween: 0,
+                bezier: bezier.save(),
+                next: next.save(),
+                control: control,
+                duration: 0,
+                // speed: 0,
+                isOn: false
+            })
+        ));
+    });
+}
+
+function testReturnsFalseIfMissingIsOnProperty(): void {
+    test('load() returns false if missing "isOn" property', () => {
+        const unit = new DynamicUnit();
+        const current = new Vector2D();
+        const bezier = new QuadraticBezierCurve();
+        const next = new Vector2D();
+        const control = { distance: 0, angle: 0 };
+        const b = new DynamicBezier();
+        expectFalse(b.load(
+            JSON.stringify({
+                unit: unit.save(),
+                current: current.save(),
+                distanceBetween: 0,
+                bezier: bezier.save(),
+                next: next.save(),
+                control: control,
+                duration: 0,
+                speed: 0,
+                // isOn: false
+            })
+        ));
+    });
+}
+
+function testTurningUnitOnAndOffStopsAndStartsUpdate(): void {
+    test('turning unit off and on stops and start update', () => {
+        const b = new DynamicBezier();
+        b.duration(1000).moveBy(500, 600);
+        b.update(200);
+        expectXYToBeCloseTo(b, 100, 120);
+        b.turnOff();
+        b.update(200);
+        expectXYToBeCloseTo(b, 100, 120);
+        b.turnOn();
+        b.update(200);
+        expectXYToBeCloseTo(b, 200, 240);
+
+    });
+}
+
+function testDefaultPathIsAStraightLine(): void {
+    test('default path is a straight line', () => {
+
+        const duration = 1000;
+        const start = new Vector2D(100, 200);
+        const end = new Vector2D(600, 800);
+        const diff = end.subtract(start);
+        const bezier = new QuadraticBezierCurve();
+        // bezier.setStart(start.x, start.y);
+        // bezier.setEnd(end.x, end.y);
+        // bezier.makeStraight();
+        let elapsed = 0;
+        let progress = 0;
+        let current = new Vector2D();
+        const numSteps = 5;
+        const step = duration / numSteps;
+
+        const b = new DynamicBezier(start.x, start.y);
+        b.duration(duration).moveTo(end.x, end.y);
+        expectActive(b);
+
+        for (let i = 0; i < numSteps; i++) {
+            b.update(step);
+            elapsed += step;
+            progress = elapsed / duration;
+            current = start.add(diff.multiply(progress));
+            expectXYToBeCloseTo(b, current.x, current.y);
+        }
+
+    });
+}
+
+function testPathIsCurvedIfControlIsCalled(): void {
+    test('path is curved if control() is called', () => {
+
+        const duration = 500;
+        const cDistance = 800;
+        const cAngle = -Math.PI / 4;
+        const easeOption: Ease.tEaseOption = 'noEase';
+        const easeFn = Ease.load(easeOption);
+        const start = new Vector2D(100, 200);
+        const end = new Vector2D(1600, 1800);
+        const bezier = new QuadraticBezierCurve();
+        bezier.setStart(start.x, start.y);
+        bezier.setEnd(end.x, end.y);
+        bezier.setControlByDistanceAndAngleFromStart(cDistance, cAngle);
+        let elapsed = 0;
+        let progress = 0;
+        const current = new Vector2D();
+        const numSteps = 5;
+        const step = duration / numSteps;
+
+        const b = new DynamicBezier(start.x, start.y);
+        b.duration(duration).control(cDistance, cAngle).moveTo(end.x, end.y);
+        expectActive(b);
+
+        for (let i = 0; i < numSteps; i++) {
+            b.update(step);
+            elapsed += step;
+            progress = easeFn(elapsed / duration);
+            current.setX(bezier.x(progress));
+            current.setY(bezier.y(progress));
+            expectXYToBeCloseTo(b, current.x, current.y);
+        }
+
+    });
+}
+
+function testControlPointIsResetAfterFullUpdateCycle(): void {
+    test('control point is reset after full update cycle', () => {
+
+        const duration = 500;
+        const cDistance = 800;
+        const cAngle = -Math.PI / 4;
+        const easeOption: Ease.tEaseOption = 'noEase';
+        const easeFn = Ease.load(easeOption);
+        const start = new Vector2D(100, 200);
+        const end = new Vector2D(1600, 1800);
+        const bezier = new QuadraticBezierCurve();
+        bezier.setStart(start.x, start.y);
+        bezier.setEnd(end.x, end.y);
+        bezier.setControlByDistanceAndAngleFromStart(cDistance, cAngle);
+        let elapsed = 0;
+        let progress = 0;
+        const current = new Vector2D();
+        const numSteps = 5;
+        const step = duration / numSteps;
+
+        const b = new DynamicBezier(start.x, start.y);
+        b.duration(duration).control(cDistance, cAngle).moveTo(end.x, end.y);
+        expectActive(b);
+
+        for (let i = 0; i < numSteps; i++) {
+            b.update(step);
+            elapsed += step;
+            progress = easeFn(elapsed / duration);
+            current.setX(bezier.x(progress));
+            current.setY(bezier.y(progress));
+            expectXYToBeCloseTo(b, current.x, current.y);
+        }
+
+        expectNotActive(b);
+
+        // repeat with no control point set
+        bezier.makeStraight();
+        elapsed = 0;
+        b.moveTo(start.x, start.y);
+        expectTrue(b.duration(duration).moveTo(end.x, end.y));
+        expectActive(b);
+
+        for (let i = 0; i < numSteps; i++) {
+            b.update(step);
+            elapsed += step;
+            progress = easeFn(elapsed / duration);
+            current.setX(bezier.x(progress));
+            current.setY(bezier.y(progress));
+            expectXYToBeCloseTo(b, current.x, current.y);
+        }
+
+    });
+}
+
+function testReturnsExpectedValuesDuringFullUpdateCycleWithNoEaseAndNoControlPoint(): void {
+    test('returns expected values during full update cycle with no ease and no control point', () => {
+
+        const duration = 1000;
+        // const cDistance = 800;
+        // const cAngle = -Math.PI / 4;
+        const easeOption: Ease.tEaseOption = 'noEase';
+        const easeFn = Ease.load(easeOption);
+        const start = new Vector2D(100, 200);
+        const end = new Vector2D(1600, 1800);
+        // const distanceBetween = end.distanceTo(start);
+        const bezier = new QuadraticBezierCurve();
+        bezier.setStart(start.x, start.y);
+        bezier.setEnd(end.x, end.y);
+        bezier.makeStraight();
+        // bezier.setControlByDistanceAndAngleFromStart(cDistance, cAngle);
+        let elapsed = 0;
+        let progress = 0;
+        const current = new Vector2D();
+        const numSteps = 5;
+
+        const step = duration / numSteps;
+
+        const b = new DynamicBezier(start.x, start.y);
+        b.duration(duration).moveTo(end.x, end.y);
+        expectActive(b);
+
+        for (let i = 0; i < numSteps; i++) {
+            b.update(step);
+            elapsed += step;
+            progress = easeFn(elapsed / duration);
+            current.setX(bezier.x(progress));
+            current.setY(bezier.y(progress));
+            expectXYToBeCloseTo(b, current.x, current.y);
+        }
+
+    });
+}
+
+function testReturnsExpectedValuesDuringFullUpdateCycleWithEaseAndNoControlPoint(): void {
+    test('returns expected values during full update cycle with ease and no control point', () => {
+
+        const duration = 1000;
+        // const cDistance = 800;
+        // const cAngle = -Math.PI / 4;
+        const easeOption: Ease.tEaseOption = 'easeInCubic';
+        const easeFn = Ease.load(easeOption);
+        const start = new Vector2D(100, 200);
+        const end = new Vector2D(1600, 1800);
+        // const distanceBetween = end.distanceTo(start);
+        const bezier = new QuadraticBezierCurve();
+        bezier.setStart(start.x, start.y);
+        bezier.setEnd(end.x, end.y);
+        bezier.makeStraight();
+        // bezier.setControlByDistanceAndAngleFromStart(cDistance, cAngle);
+        let elapsed = 0;
+        let progress = 0;
+        const current = new Vector2D();
+        const numSteps = 5;
+
+        const step = duration / numSteps;
+
+        const b = new DynamicBezier(start.x, start.y);
+        b.duration(duration).ease(easeOption).moveTo(end.x, end.y);
+        expectActive(b);
+
+        for (let i = 0; i < numSteps; i++) {
+            b.update(step);
+            elapsed += step;
+            progress = easeFn(elapsed / duration);
+            current.setX(bezier.x(progress));
+            current.setY(bezier.y(progress));
+            expectXYToBeCloseTo(b, current.x, current.y);
+        }
+
+    });
+}
+
+function testReturnsExpectedValuesDuringFullUpdateCycleWithNoEaseAndControlPoint(): void {
+    test('returns expected values during full update cycle with no ease and control point', () => {
+
+        const duration = 1000;
+        const cDistance = 800;
+        const cAngle = -Math.PI / 4;
+        const easeOption: Ease.tEaseOption = 'noEase';
+        const easeFn = Ease.load(easeOption);
+        const start = new Vector2D(100, 200);
+        const end = new Vector2D(1600, 1800);
+        // const distanceBetween = end.distanceTo(start);
+        const bezier = new QuadraticBezierCurve();
+        bezier.setStart(start.x, start.y);
+        bezier.setEnd(end.x, end.y);
+        // bezier.makeStraight();
+        bezier.setControlByDistanceAndAngleFromStart(cDistance, cAngle);
+        let elapsed = 0;
+        let progress = 0;
+        const current = new Vector2D();
+        const numSteps = 5;
+
+        const step = duration / numSteps;
+
+        const b = new DynamicBezier(start.x, start.y);
+        b.duration(duration).control(cDistance, cAngle).moveTo(end.x, end.y);
+        expectActive(b);
+
+        for (let i = 0; i < numSteps; i++) {
+            b.update(step);
+            elapsed += step;
+            progress = easeFn(elapsed / duration);
+            current.setX(bezier.x(progress));
+            current.setY(bezier.y(progress));
+            expectXYToBeCloseTo(b, current.x, current.y);
+        }
+
+    });
+}
+
+function testReturnsExpectedValuesDuringFullUpdateCycleWithEaseAndControlPoint(): void {
+    test('returns expected values during full update cycle with ease and control point', () => {
+
+        const duration = 1000;
+        const cDistance = 800;
+        const cAngle = -Math.PI / 4;
+        const easeOption: Ease.tEaseOption = 'easeInOutElastic';
+        const easeFn = Ease.load(easeOption);
+        const start = new Vector2D(100, 200);
+        const end = new Vector2D(1600, 1800);
+        const bezier = new QuadraticBezierCurve();
+        bezier.setStart(start.x, start.y);
+        bezier.setEnd(end.x, end.y);
+        // bezier.makeStraight();
+        bezier.setControlByDistanceAndAngleFromStart(cDistance, cAngle);
+        let elapsed = 0;
+        let progress = 0;
+        const current = new Vector2D();
+        const numSteps = 5;
+
+        const step = duration / numSteps;
+
+        const b = new DynamicBezier(start.x, start.y);
+        b.duration(duration).ease(easeOption).control(cDistance, cAngle).moveTo(end.x, end.y);
+        expectActive(b);
+
+        for (let i = 0; i < numSteps; i++) {
+            b.update(step);
+            elapsed += step;
+            progress = easeFn(elapsed / duration);
+            current.setX(bezier.x(progress));
+            current.setY(bezier.y(progress));
+            expectXYToBeCloseTo(b, current.x, current.y);
+        }
+
+    });
+}
+
+function testReturnsExpectedValuesDuringFullUpdateCycleWithEaseAndControlPointAndSpeedSetting(): void {
+    test('returns expected values during full update cycle with ease and control point and speed set', () => {
+
+        const speed = 1;
+        const cDistance = 800;
+        const cAngle = -Math.PI / 4;
+        const easeOption: Ease.tEaseOption = 'easeInOutBack';
+        const easeFn = Ease.load(easeOption);
+        const start = new Vector2D(100, 200);
+        const end = new Vector2D(1600, 1800);
+        const distanceBetween = end.distanceTo(start);
+        const bezier = new QuadraticBezierCurve();
+        bezier.setStart(start.x, start.y);
+        bezier.setEnd(end.x, end.y);
+        bezier.setControlByDistanceAndAngleFromStart(cDistance, cAngle);
+        let elapsed = 0;
+        let progress = 0;
+        const current = new Vector2D();
+        const numSteps = 5;
+        const duration = distanceBetween / speed;
+        const step = duration / numSteps;
+
+        const b = new DynamicBezier(start.x, start.y);
+        b.speed(speed).ease(easeOption).control(cDistance, cAngle).moveTo(end.x, end.y);
+        expectActive(b);
+
+        for (let i = 0; i < numSteps; i++) {
+            b.update(step);
+            elapsed += step;
+            progress = easeFn(elapsed / duration);
+            current.setX(bezier.x(progress));
+            current.setY(bezier.y(progress));
+            expectXYToBeCloseTo(b, current.x, current.y);
+        }
+
     });
 }
 
 
-function testWorksWithNegativeValues(): void {
-    test('works as expected with negative values', () => {
-        const bezier = new DynamicBezier();
-    });
+
+
+/**
+ * Utilities
+ */
+
+function expectActive(b: DynamicBezier): void {
+    expect(b.isActive).toBeTruthy();
 }
 
-function testPathIsStraightIfControlPointNotSet(): void {
-    test('path is straight if control point not set', () => {
-        const bezier = new DynamicBezier();
-    });
+function expectNotActive(b: DynamicBezier): void {
+    expect(b.isActive).not.toBeTruthy();
 }
 
-function testPathIsCurvedIfControlPointIsSet(): void {
-    test('path is straight if control point not set', () => {
-        const bezier = new DynamicBezier();
-    });
+function expectXToBe(b: DynamicBezier, x: number): void {
+    expect(b.x).toBe(x);
 }
 
-function testDistanceAndControlMustBothBeSetToAffectControlPoint(): void {
-    test('control distance AND angle must both be set to affect control point', () => {
-        const bezier = new DynamicBezier();
-    });
+function expectYToBe(b: DynamicBezier, y: number): void {
+    expect(b.y).toBe(y);
 }
 
-function testReturnsExpectedCurrentValuesDuringFullDurationWhenControlPointAdded(): void {
-    test('returns expected current values during full duration when control point set', () => {
-        const bezier = new DynamicBezier();
-    });
+function expectXYToBe(b: DynamicBezier, x: number, y: number): void {
+    expectXToBe(b, x);
+    expectYToBe(b, y);
 }
 
-function testReturnsExpectedCurrentValuesDuringFullDurationWhenControlPointDistanceAngleAdded(): void {
-    test('returns expected current values during full duration when control point distance and angle set', () => {
-        const bezier = new DynamicBezier();
-    });
+function expectXToBeCloseTo(b: DynamicBezier, x: number): void {
+    expect(b.x).toBeCloseTo(x);
 }
 
-function testReturnsExpectedCurrentValuesDuringFullDurationWhenControlPointNotAdded(): void {
-    test('returns expected current values during full duration when control point not added', () => {
-        const bezier = new DynamicBezier();
-    });
+function expectYToBeCloseTo(b: DynamicBezier, y: number): void {
+    expect(b.y).toBeCloseTo(y);
 }
 
-function testReturnsExpectedCurrentValuesDuringFullDurationWhenSpeedIsSet(): void {
-    test('returns expected current values during full duration when speed is set', () => {
-        const bezier = new DynamicBezier();
-    });
+function expectXYToBeCloseTo(b: DynamicBezier, x: number, y: number): void {
+    expectXToBeCloseTo(b, x);
+    expectYToBeCloseTo(b, y);
 }
 
-function testReturnsExpectedCurrentValuesDuringFullDurationWithEaseApplied(): void {
-    test('returns expected current values during full duration with ease applied', () => {
-        const bezier = new DynamicBezier();
-    });
+function expectTrue(expression: boolean): void {
+    expect(expression).toBeTruthy();
+}
+
+function expectFalse(expression: boolean): void {
+    expect(expression).not.toBeTruthy();
 }

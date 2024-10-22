@@ -115,7 +115,7 @@ export class DynamicVector extends AbstractDynamicObject implements iDynamic {
     }
 
     protected updateCurrent(): void {
-        this._current = this.previous.add(this.difference.multiply(this.unit.current))
+        this._current = this.previous.add(this.difference.multiply(this.unit.current));
     }
 
     protected updateDifference(): void {
