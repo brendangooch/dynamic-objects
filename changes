@@ -21,17 +21,23 @@ v2.0.0 - completely refactored
 
 
 
-v3.0.0+ (future plans)
+v3.0.0
+    ...
+
+
+
+(future plans)
     
     add:
-        DynamicInteger
         DynamicString - for game console
-        RepeatingDynamicUnit - for blink/flicker effect
+        DynamicSequence - for blink/flicker effect
+        DynamicColor
 
     look for a better way to persist objects without exposing internal properties - Memento pattern?    
     
     there is a more elegant solution using an abstract base class and the template method pattern
         implement in future versions
+
 
 
 other:
