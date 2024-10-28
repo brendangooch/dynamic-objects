@@ -7,7 +7,7 @@ import { tEaseOption } from "@brendangooch/ease";
 import { BaseDynamicObject } from "./base-dynamic-object.js";
 import { DynamicNumberExtended } from "./dynamic-number-extended.js";
 
-export default class DynamicString extends BaseDynamicObject {
+export class DynamicString extends BaseDynamicObject {
 
     public static MAX_CHARS: number = 1000;
 
@@ -33,9 +33,6 @@ export default class DynamicString extends BaseDynamicObject {
         return this;
     }
 
-    // no string provided does nothing
-    // only changes if not active
-    // changes instantly if no duration
     public changeTo(next: string): number {
         if (!this.isActive && next !== '') {
             if (this._duration > 0) {
