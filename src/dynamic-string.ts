@@ -34,15 +34,7 @@ export class DynamicString extends BaseDynamicObject {
     }
 
     public changeTo(next: string): number {
-        if (!this.isActive && next !== '') {
-            if (this._duration > 0) {
-                this.currentValue = '';
-                this.string = next;
-                this.turnOn();
-                return this.index.duration(this._duration).ease(this._ease).changeTo(this.string.length);
-            }
-            else this.currentValue = next;
-        }
+        if (this.canChange(next)) return this.doChange(next);
         return 0;
     }
 
@@ -80,6 +72,27 @@ export class DynamicString extends BaseDynamicObject {
     protected updateComplete(): void {
         this.reset();
         this.turnOff();
+    }
+
+    private canChange(next: string): boolean {
+        return !this.isActive && next !== '';
+    }
+
+    private doChange(next: string): number {
+        this.string = next;
+        if (this._duration > 0) this.dynamicChange();
+        else this.instantChange();
+        return this._duration;
+    }
+
+    private instantChange(): void {
+        this.currentValue = this.string;
+    }
+
+    private dynamicChange(): void {
+        this.currentValue = '';
+        this.index.duration(this._duration).ease(this._ease).changeTo(this.string.length);
+        this.turnOn();
     }
 
     private reset(): void {

@@ -6,7 +6,6 @@
 import { Vector2D } from "@brendangooch/maths";
 import { BaseDynamicObject } from "./base-dynamic-object.js";
 import { DynamicUnit } from "./dynamic-unit.js";
-import { tEaseOption } from "@brendangooch/ease";
 
 export abstract class BaseDynamicObjectWithUnit extends BaseDynamicObject {
 

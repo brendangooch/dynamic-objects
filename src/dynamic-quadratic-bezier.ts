@@ -4,7 +4,7 @@
 
 import { tEaseOption } from "@brendangooch/ease";
 import { DynamicVector } from "./dynamic-vector.js";
-import { QuadraticBezierCurve, Vector2D } from "@brendangooch/maths";
+import { QuadraticBezierCurve } from "@brendangooch/maths";
 
 export class DynamicQuadraticBezier extends DynamicVector {
 

@@ -24,12 +24,12 @@ export interface iDynamicUnit extends iDynamic {
 
 // export { AbstractDynamicObject } from './abstract-dynamic-object.js';
 // export { BaseDynamicUnit } from './base-dynamic-unit.js';
-// export { DynamicUnit };
+export { DynamicUnit };
 // export { InvertedDynamicUnit } from './inverted-dynamic-unit.js';
 // export { RoundedDynamicUnit } from './rounded-dynamic-unit.js';
 // export { FlooredDynamicUnit } from './floored-dynamic-unit.js';
-// export { DynamicNumber } from './dynamic-number.js';
-// export { DynamicVector } from './dynamic-vector.js';
-// export { DynamicBezier } from './dynamic-bezier.js';
-// export { DynamicPosition } from './dynamic-position.js';
-// export { DynamicInteger } from './dynamic-integer.js';
+export { DynamicNumber } from './dynamic-number.js';
+export { DynamicVector } from './dynamic-vector.js';
+export { DynamicQuadraticBezier } from './dynamic-quadratic-bezier.js';
+export { DynamicPosition } from './dynamic-position.js';
+export { DynamicString } from './dynamic-string.js';

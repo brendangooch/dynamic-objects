@@ -55,6 +55,9 @@ v3.0.0
         client can set duration and ease
         useful effect for a game console window
 
+    DynamicColor
+        a color in rgb() string format that can change over time
+        useful effect for game timer
     
 
     TESTED ALL FUNCTIONALITY VISUALLY + ALL JEST TESTS PASS
