@@ -50,7 +50,10 @@ v3.0.0
             changeToMin() - changes number to min value passed on instantiation
             changeToPrevious() - changes number to its previous current value
 
-    ...
+    DynamicString
+        a user-defined, changeable string that lengthens over time from empty to full string
+        client can set duration and ease
+        useful effect for a game console window
 
     
 
