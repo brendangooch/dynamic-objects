@@ -3,100 +3,95 @@
  */
 
 import * as Ease from '@brendangooch/ease';
-import { iDynamicUnit } from "./index.js";
-// import { clamp } from "@brendangooch/maths";
-import { AbstractDynamicObject } from './abstract-dynamic-object.js';
+import { BaseDynamicObject } from './base-dynamic-object.js';
+import { iDynamicUnit } from './index.js';
 
-type tDuration = { current: number; next: number };
-
-export class DynamicUnit extends AbstractDynamicObject implements iDynamicUnit {
+export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
 
     private elapsed: number = 0;
-    private _current: number = 0;
-    private _duration: tDuration = { current: 0, next: 0 };
-    private easeOption: Ease.tEaseOption = 'noEase';
+    private currentValue: number = 0;
     private easeFn: Ease.tEaseFunction = Ease.load('noEase');
 
     public get isActive(): boolean {
-        return this.elapsed !== this._duration.current;
+        return this.elapsed !== this._duration;
     }
 
-    // cache current rather than calculate on each call
     public get current(): number {
-        return this._current;
+        return this.currentValue;
     }
 
-    public duration(ms: number): DynamicUnit {
+    public override duration(ms: number): DynamicUnit {
         if (!this.isActive && ms > 0) {
-            this._duration.next = ms;
+            super.duration(ms);
+            this.elapsed = ms; // so unit isn't 'activated'
         }
         return this;
     }
 
-    public ease(easeOption: Ease.tEaseOption): DynamicUnit {
-        if (!this.isActive) {
-            this.loadEase(easeOption);
-        }
+    public override ease(easeOption: Ease.tEaseOption): DynamicUnit {
+        super.ease(easeOption);
         return this;
     }
 
-    // activates and turns unit on IF not active and next duration > 0
+    public override save(): string {
+        return JSON.stringify({
+            parent: super.save(),
+            elapsed: this.elapsed,
+            currentValue: this.currentValue
+        });
+    }
+
+    public override load(json: string): boolean {
+        const state = JSON.parse(json);
+        if (state.parent === undefined) return false;
+        if (state.elapsed === undefined) return false;
+        if (state.currentValue === undefined) return false;
+        const parentLoaded = super.load(state.parent);
+        this.elapsed = state.elapsed;
+        this.currentValue = state.currentValue;
+        this.loadEase(this._ease); // correct this.easeOption should be loaded by prior super.load() call
+        return parentLoaded;
+    }
+
     public run(): boolean {
-        if (!this.isActive && this._duration.next > 0) {
-            this._duration.current = this._duration.next;
-            this.elapsed = 0;
+        if (!this.isActive && this._duration > 0) {
+            this.loadEase(this._ease);
+            this.elapsed = 0; // makes active
             this.turnOn();
+            return true;
         }
         return false;
     }
 
-    public load(json: string): boolean {
-        const state = JSON.parse(json);
-        if (state.elapsed === undefined) return false;
-        if (state.duration === undefined) return false;
-        if (state.easeOption === undefined) return false;
-        if (state.isOn === undefined) return false;
-        this.elapsed = state.elapsed;
-        this._duration = state.duration;
-        this.loadEase(state.easeOption);
-        this.isOn = state.isOn;
-        return true;
-    }
-
-    public save(): string {
-        return JSON.stringify({
-            elapsed: this.elapsed,
-            duration: this._duration,
-            easeOption: this.easeOption,
-            isOn: this.isOn
-        });
-    }
-
-    private get progress(): number {
-        return (this._duration.current === 0) ? 0 : this.elapsed / this._duration.current;
+    public clone(): DynamicUnit {
+        const unit = new DynamicUnit();
+        unit.duration(this._duration).ease(this._ease);
+        return unit;
     }
 
     protected increment(ms: number): void {
         this.elapsed += ms;
-        this.elapsed = Math.min(this.elapsed, this._duration.current);
+        this.elapsed = Math.min(this.elapsed, this._duration);
     }
 
-    // clamp prevents in/out and bounce ease effects
-    // client is responsible for clamping current value
     protected updateCurrent(): void {
-        // this._current = clamp(this.easeFn(this.progress), 0, 1);
-        this._current = this.easeFn(this.progress);
+        this.currentValue = this.easeFn(this.progress);
     }
 
     protected updateComplete(): void {
-        this._duration.next = 0;
-        this._current = 1;
+        this.currentValue = 1;
+        this._duration = 0;
+        this.elapsed = 0;
         this.loadEase('noEase');
         this.turnOff();
     }
 
+    private get progress(): number {
+        return (this._duration === 0) ? 0 : this.elapsed / this._duration;
+    }
+
     private loadEase(easeOption: Ease.tEaseOption): void {
-        this.easeOption = easeOption;
+        this._ease = easeOption;
         this.easeFn = Ease.load(easeOption);
     }
 

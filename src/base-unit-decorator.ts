@@ -6,7 +6,7 @@ import * as Ease from '@brendangooch/ease';
 import { DynamicUnit } from "./dynamic-unit.js";
 import { iDynamicUnit } from "./index.js";
 
-export abstract class BaseDynamicUnit implements iDynamicUnit {
+export abstract class BaseUnitDecorator implements iDynamicUnit {
 
     protected unit: DynamicUnit;
 
@@ -53,5 +53,7 @@ export abstract class BaseDynamicUnit implements iDynamicUnit {
     public save(): string {
         return this.unit.save();
     }
+
+    public abstract clone(): iDynamicUnit;
 
 }

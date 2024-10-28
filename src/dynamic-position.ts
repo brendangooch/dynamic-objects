@@ -1,23 +1,24 @@
 /**
  * aggregates vector and bezier into one class, choosing the most efficient option depending on curved or straight path required
- * 
+ *
  */
 
 import { tEaseOption } from "@brendangooch/ease";
-import { DynamicBezier } from "./dynamic-bezier.js";
+import { DynamicQuadraticBezier } from "./dynamic-quadratic-bezier.js";
 import { DynamicVector } from "./dynamic-vector.js";
 import { iDynamic } from "./index.js";
+import { Vector2D } from "@brendangooch/maths";
 
 export class DynamicPosition implements iDynamic {
 
-    private bezier: DynamicBezier;
+    private bezier: DynamicQuadraticBezier;
     private vector: DynamicVector;
-    private strategy: DynamicVector | DynamicBezier;
+    private strategy: DynamicVector | DynamicQuadraticBezier;
     private currentStrategy: 'vector' | 'bezier';
 
     public constructor(x: number = 0, y: number = 0) {
-        this.vector = new DynamicVector(x, y);
-        this.bezier = new DynamicBezier(x, y);
+        this.vector = new DynamicVector(new Vector2D(x, y));
+        this.bezier = new DynamicQuadraticBezier(new Vector2D(x, y));
         this.strategy = this.vector;
         this.currentStrategy = 'vector';
     }
@@ -27,11 +28,11 @@ export class DynamicPosition implements iDynamic {
     }
 
     public get x(): number {
-        return this.strategy.x;
+        return this.strategy.current.x;
     }
 
     public get y(): number {
-        return this.strategy.y;
+        return this.strategy.current.y;
     }
 
     public duration(ms: number): DynamicPosition {
@@ -59,28 +60,24 @@ export class DynamicPosition implements iDynamic {
     }
 
     // switch to vector
-    public moveTo(x: number, y: number): boolean {
+    public moveTo(x: number, y: number): number {
         if (!this.isActive) {
             if (!this.isVector) this.switchStrategy();
-            this.bezier = new DynamicBezier(x, y); // reloading resets duration/speed/ease
-            return this.strategy.moveTo(x, y);
+            this.bezier = new DynamicQuadraticBezier(new Vector2D(x, y)); // reloading resets duration/speed/ease
+            return this.strategy.changeTo(new Vector2D(x, y));
         }
-        return false;
-    }
-
-    public moveBy(x: number, y: number): boolean {
-        return this.moveTo(this.x + x, this.y + y);
+        return 0;
     }
 
     // switch to bezier
-    public curveTo(x: number, y: number, distance: number, angle: number): boolean {
+    public curveTo(x: number, y: number, distance: number, angle: number): number {
         if (!this.isActive) {
             if (this.isVector) this.switchStrategy();
-            this.bezier.control(distance, angle);
-            this.vector = new DynamicVector(x, y); // reloading resets duration/speed/ease
-            return this.strategy.moveTo(x, y);
+            this.bezier.controlPoint(distance, angle);
+            this.vector = new DynamicVector(new Vector2D(x, y)); // reloading resets duration/speed/ease
+            return this.strategy.changeTo(new Vector2D(x, y));
         }
-        return false;
+        return 0;
     }
 
     public turnOn(): void {

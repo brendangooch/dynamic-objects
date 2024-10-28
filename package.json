@@ -1,6 +1,6 @@
 {
   "name": "@brendangooch/dynamic-objects",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "",
   "author": "B Gooch <brendangooch@gmail.com>",
   "license": "MIT",
@@ -25,13 +25,10 @@
   },
   "types": "./lib/index.d.ts",
   "files": [
-    "/lib",
-    "!/lib/**/*.js.map",
-    "!/lib/*.js.map",
-    "!/lib/**/*.test.*",
-    "!/lib/**/*.spec.*"
+    "/lib"
   ],
   "devDependencies": {
+    "@brendangooch/jest-expect": "^1.0.0",
     "@types/jest": "^29.5.12",
     "jest": "^29.7.0",
     "typescript": "^5.4.5"
@@ -54,7 +51,7 @@
   ],
   "dependencies": {
     "@brendangooch/ease": "^1.2.1",
-    "@brendangooch/maths": "^3.0.0",
+    "@brendangooch/maths": "^4.0.0",
     "@brendangooch/simple-game-loop": "^3.0.0"
   }
 }

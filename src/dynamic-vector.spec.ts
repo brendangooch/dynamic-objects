@@ -2,963 +2,762 @@
  * 
  */
 
-import { Vector2D } from "@brendangooch/maths";
-import { DynamicUnit } from "./dynamic-unit.js";
-import { DynamicVector } from "./dynamic-vector.js";
-import * as Ease from '@brendangooch/ease';
+import * as EXPECT from '@brendangooch/jest-expect';
+import * as EASE from '@brendangooch/ease';
+import { DynamicVector } from './dynamic-vector.js';
+import { Vector2D } from '@brendangooch/maths';
+import { DynamicUnit } from './dynamic-unit.js';
+
+type tFullDurationTestParams = {
+    start: Vector2D;
+    end: Vector2D;
+    speed?: number;
+    duration?: number;
+    ease: EASE.tEaseOption;
+};
+
+let vector: DynamicVector;
+beforeEach(() => {
+    vector = new DynamicVector();
+});
 
 testAll();
 function testAll(): void {
     describe('DynamicVector', () => {
 
-        // public get isActive(): boolean
         testStartsInactive();
-        testDoesNotBecomeActiveOnceDurationIsSet();
-        testDoesNotBecomeActiveOnceSpeedIsSet();
-        testBecomesActiveOnceValidDurationIsSEtAndMoveToCalled();
-        testBecomesActiveOnceValidDurationIsSetAndMoveByIsCalled();
-        testBecomesActiveOnceValidSpeedIsSetAndMoveToIsCalled();
-        testBecomesActiveOnceValidSpeedIsSetAndMoveByIsCalled();
-        testBecomesInactiveOnceDurationHasElapsed();
-        testCanBeActiveWhetherOnOrOff();
-
-        // public get x() / get y(): number
-        testInitialCurrentXYValuesAre0IfNotSetOnInstantiation();
-        testInitialCurrentXYValuesAreValuesSetOnInstantiation();
-        testXYAreTheSameWhetherUnitIsOnOrOff();
-
-        // public duration(ms: number): DynamicNumber
-        testDurationCanOnlyBeSetIfNotActive();
-        testDurationMustBeGreaterThan0ToHaveAnEffect();
-
-        // public speed(units: number): DynamicVector
-        testSpeedCanOnlyBeSetIfNotActive();
-        testSpeedMustBeGreaterThan0ToHaveAnEffect();
-
-        // public ease(easeOption: tEaseOption): DynamicUnit
-        testEaseCanOnlyBeSetIfNotActive();
-        testEaseIsResetAfterDurationHasElapsed();
-
-        // public moveTo(x: number, y: number): boolean
-        testMoveToPositionCanOnlyBeChangedIfNotActive();
-        testMoveToDoesNothingIfSetToCurentXYValues();
-        testMoveToCANChangeIfXisDifferentAndYIsTheSame();
-        testMoveToCANChangeIfYisDifferentAndXIsTheSame();
-        testIfDurationIsNotSetMoveToChangesCurrentXYValuesImmediately();
-        testIfDurationIsSetMoveToMAkesVectorActiveAndChangesXYValuesDynamicallyOverTime();
-
-        // public moveBy(x: number, y: number): boolean
-        testMoveByPositionCanOnlyBeChangedIfNotActive();
-        testMoveByDoesNothingIfXAndYAre0();
-        testMoveByCanChangeXIfXIsNot0AndYIs0();
-        testMoveByCanChangeYIfYIsNot0AndXIs0();
-        testIfDurationIsNotSetMoveByChangesCurrentXYValuesImmediately();
-        testIfDurationIsSetMoveByMakesVectorActiveAndChangesXYValuesOverTime();
-        testMoveByChangesXYValuesBCorrectAmount();
-
-        // public turnOn(): void
-        // public turnOff(): void
-        testTurningOffAndOnStopsAndStartsUpdate();
-
-        // public update(ms: number): void
-        testDoesNotUpdateIfNotActive();
-        testDoesNotUpdateIfNotTurnedOn();
-        testUpdatesIfActiveAndTurnedOnAndDurationGreaterThan0();
-
-        // public load(json: string): boolean
-        // public save(): string
-        testCanBeSavedWhetherTurnedOnOrOff();
-        testBehavesTheSameAfterSaveAndLoad();
-        testLoadReturnsTrueOnValidLoad();
-        testLoadReturnsFalseIfUnitPropertyMissing();
-        testLoadReturnsFalseIfPreviousPropertyMissing();
-        testLoadReturnsFalseIfNextPropertyMissing();
-        testLoadReturnsFalseIfCurrentPropertyMissing();
-        testLoadReturnsFalseIfDifferencePropertyMissing();
-        testLoadReturnsFalseIfDurationPropertyMissing();
-        testLoadReturnsFalseIfSpeedPropertyMissing();
-        testLoadReturnsFalseIfIsOnPropertyMissing();
-
-        // general behaviour
-        testReturnsExpectdCurrentValuesDuringFullDuration();
-        testReturnsExpectdCurrentValuesDuringFullDurationWhenSpeedIsSet();
-        testReturnsExpectdCurrentValuesDuringFullDurationWithEaseApplied();
-        testWorksWithPositiveXToHigherX();
-        testWorksWithPositiveXToLowerX();
-        testWorksWithNegativeXToHigherX();
-        testWorksWithNegativeXToLowerX();
-        testWorksWithPositiveYToHigherY();
-        testWorksWithPositiveYToLowerY();
-        testWorksWithNegativeYToHigherY();
-        testWorksWithNegativeYToLowerY();
+        testInitialCurrentValuesAre00IfNotSetInConstructor();
+        testInitialCurrentValuesAreValuesSetInConstructor();
+        testCannotSetDurationIfVectorIsActive();
+        testCannotSetDurationOf0();
+        testCannotSetDurationOfLessThan0();
+        testSettingDurationDoesNotMakeTheVectorActive();
+        testDurationGoesBackTo0OnceDurationHasElapsed();
+        testCannotSetSpeedIfVectorIsActive();
+        testCannotSetSpeedOf0();
+        testCannotSetSpeedOfLessThan0();
+        testSettingSpeedDoesNotMakeTheVectorActive();
+        testSpeedGoesBackTo0OnceDurationHasElapsed();
+        testCannotSetEaseIfVectorIsActive();
+        testEaseReturnsToNoEaseOnceDurationHasElapsed();
+        testCannotChangeIfVectorIsActive();
+        testChangingToTheSamePositionDoesNothing();
+        testChangingWithoutSettingTheDurationChangesTheCurrentPositionsImmediately();
+        testValidLoadReturnsTrue();
+        testThrowsErrorIfMissingParentProperty();
+        testThrowsErrorIfMissingPreviousProperty();
+        testThrowsErrorIfMissingNextProperty();
+        testThrowsErrorIfMissingDistanceBetweenProperty();
+        testThrowsErrorIfMissingCurrentValueProperty();
+        testSaveThenLoadDoesNotChangeBehaviour();
+        testCanSaveWhetherVectorIsOnOrOff();
+        testCanStopAndStartUpdate();
+        testCanBeOffAndActive();
+        testCurrentValuesAreTheSameWhetherOnOrOff();
+        testReturnsExpectedCurrentValuesDuringFullDuration();
+        testReturnsExpectedCurrentValuesDuringFullDurationWithEaseApplied();
+        testReturnsExpectedCurrentValuesDuringFullDurationAfterSettingSpeed();
+        testReturnsExpectedCurrentValuesDuringFullDurationAfterSettingSpeedWithEaseApplied();
+        testWorksAsExpectedWithPositiveXToHigherX();
+        testWorksAsExpectedWithPositiveXToLowerX();
+        testWorksAsExpectedWithPositiveXToNegativeX();
+        testWorksAsExpectedWithNegativeXToHigherX();
+        testWorksAsExpectedWithNegativeXToLowerX();
+        testWorksAsExpectedWithNegativeXToNPositiveX();
+        testWorksAsExpectedWithPositiveYToHigherY();
+        testWorksAsExpectedWithPositiveYToLowerY();
+        testWorksAsExpectedWithPositiveYToNegativeY();
+        testWorksAsExpectedWithNegativeYToHigherY();
+        testWorksAsExpectedWithNegativeYToLowerY();
+        testWorksAsExpectedWithNegativeYToPositiveY();
 
     });
-
 }
-
 
 function testStartsInactive(): void {
     test('starts inactive', () => {
-        const v = new DynamicVector();
-        expect(v.isActive).not.toBeTruthy();
+        EXPECT.falsy(vector.isActive);
     });
 }
 
-function testDoesNotBecomeActiveOnceDurationIsSet(): void {
-    test('does not become active once duration is set', () => {
-        const v = new DynamicVector();
-        v.duration(1000);
-        expect(v.isActive).not.toBeTruthy();
+function testInitialCurrentValuesAre00IfNotSetInConstructor(): void {
+    test('initial current values are 0,0 if not set in constructor', () => {
+        EXPECT.toBe(vector.current.x, 0);
+        EXPECT.toBe(vector.current.y, 0);
     });
 }
 
-function testDoesNotBecomeActiveOnceSpeedIsSet(): void {
-    test('does not become active once speed is set', () => {
-        const v = new DynamicVector();
-        v.speed(1);
-        expect(v.isActive).not.toBeTruthy();
+function testInitialCurrentValuesAreValuesSetInConstructor(): void {
+    test('initial current values are values set in constructor', () => {
+        vector = new DynamicVector(new Vector2D(100, 200));
+        EXPECT.toBe(vector.current.x, 100);
+        EXPECT.toBe(vector.current.y, 200);
     });
 }
 
-function testBecomesActiveOnceValidDurationIsSEtAndMoveToCalled(): void {
-    test('becomes active once valid duration is set and moveTo() is called', () => {
-        const v = new DynamicVector();
-        v.duration(1000).moveTo(10, 20);
-        expect(v.isActive).toBeTruthy();
+function testCannotSetDurationIfVectorIsActive(): void {
+    test('cannot set duration if vector is active', () => {
+        EXPECT.toBe(vector.duration(1000).changeTo(new Vector2D(100, 200)), 1000);
+        EXPECT.truthy(vector.isActive);
+        EXPECT.toBe(vector.duration(2000).changeTo(new Vector2D(400, 500)), 0);
     });
 }
 
-function testBecomesActiveOnceValidDurationIsSetAndMoveByIsCalled(): void {
-    test('becomes active once valid duration is set and moveBy() is called', () => {
-        const v = new DynamicVector();
-        v.duration(1000).moveBy(10, 20);
-        expect(v.isActive).toBeTruthy();
+function testCannotSetDurationOf0(): void {
+    test('cannot set duration of 0', () => {
+        EXPECT.toBe(vector.duration(0).changeTo(new Vector2D(100, 200)), 0);
+        EXPECT.falsy(vector.isActive);
+        EXPECT.toBe(vector.current.x, 100);
+        EXPECT.toBe(vector.current.y, 200);
     });
 }
 
-function testBecomesActiveOnceValidSpeedIsSetAndMoveToIsCalled(): void {
-    test('becomes active once valid speed is set and moveTo() is called', () => {
-        const v = new DynamicVector();
-        v.speed(1).moveTo(10, 20);
-        expect(v.isActive).toBeTruthy();
+function testCannotSetDurationOfLessThan0(): void {
+    test('cannot set duration of less than 0', () => {
+        EXPECT.toBe(vector.duration(-100).changeTo(new Vector2D(100, 200)), 0);
+        EXPECT.falsy(vector.isActive);
+        EXPECT.toBe(vector.current.x, 100);
+        EXPECT.toBe(vector.current.y, 200);
     });
 }
 
-function testBecomesActiveOnceValidSpeedIsSetAndMoveByIsCalled(): void {
-    test('becomes active once valid speed is set and moveBy() is called', () => {
-        const v = new DynamicVector();
-        v.speed(1).moveBy(10, 20);
-        expect(v.isActive).toBeTruthy();
+function testSettingDurationDoesNotMakeTheVectorActive(): void {
+    test('setting duration does not make the vector active', () => {
+        vector.duration(1000);
+        EXPECT.falsy(vector.isActive);
     });
 }
 
-function testBecomesInactiveOnceDurationHasElapsed(): void {
-    test('becomes inactive once duration has elapsed', () => {
-        const v = new DynamicVector();
-        v.duration(1000).moveTo(10, 20);
-        expect(v.isActive).toBeTruthy();
-        v.update(200);
-        v.update(200);
-        v.update(200);
-        v.update(200);
-        v.update(200);
-        expect(v.isActive).not.toBeTruthy();
+function testDurationGoesBackTo0OnceDurationHasElapsed(): void {
+    test('duration goes back to 0 once duration has elapsed', () => {
+        vector.duration(1000).changeTo(new Vector2D(400, 600));
+        vector.update(200);
+        vector.update(200);
+        vector.update(200);
+        vector.update(200);
+        vector.update(200);
+        vector.changeTo(new Vector2D(600, -600));
+        EXPECT.toBe(vector.current.x, 600);
+        EXPECT.toBe(vector.current.y, -600);
     });
 }
 
-function testCanBeActiveWhetherOnOrOff(): void {
-    test('can be active whether on or off', () => {
-        const v = new DynamicVector();
-        v.duration(1000).moveTo(10, 400);
-        expect(v.isActive).toBeTruthy();
-        v.turnOff();
-        expect(v.isActive).toBeTruthy();
+function testCannotSetSpeedIfVectorIsActive(): void {
+    test('cannot set speed if vector is active', () => {
+        const start = new Vector2D(100, 100);
+        const end = new Vector2D(200, 400);
+        const distanceBetween = end.subtract(start);
+        vector = new DynamicVector(start);
+        vector.duration(1000).changeTo(end);
+        EXPECT.truthy(vector.isActive);
+        vector.speed(5); // <-- no effect
+        vector.update(100);
+        const current = start.add(distanceBetween.multiply(0.1));
+        EXPECT.toBeCloseTo(vector.current.x, current.x);
+        EXPECT.toBeCloseTo(vector.current.y, current.y);
     });
 }
 
-
-function testInitialCurrentXYValuesAre0IfNotSetOnInstantiation(): void {
-    test('initial current x y values are 0 if not set on instantiation', () => {
-        const v = new DynamicVector();
-        expect(v.x).toBe(0);
-        expect(v.y).toBe(0);
+function testCannotSetSpeedOf0(): void {
+    test('cannot set speed of 0', () => {
+        EXPECT.toBe(vector.speed(0).changeTo(new Vector2D(1000, -500)), 0);
+        EXPECT.falsy(vector.isActive);
     });
 }
 
-function testInitialCurrentXYValuesAreValuesSetOnInstantiation(): void {
-    test('initial current x y values are values set on instantiation', () => {
-        const v = new DynamicVector(100, 200);
-        expect(v.x).toBe(100);
-        expect(v.y).toBe(200);
+function testCannotSetSpeedOfLessThan0(): void {
+    test('cannot set speed of less than 0', () => {
+        EXPECT.toBe(vector.speed(-5).changeTo(new Vector2D(1000, -500)), 0);
+        EXPECT.falsy(vector.isActive);
     });
 }
 
-function testXYAreTheSameWhetherUnitIsOnOrOff(): void {
-    test('x y are the same value whether unit is on or off', () => {
-        const v = new DynamicVector(10, 20);
-        expect(v.x).toBe(10);
-        expect(v.y).toBe(20);
-        v.turnOff();
-        expect(v.x).toBe(10);
-        expect(v.y).toBe(20);
+function testSettingSpeedDoesNotMakeTheVectorActive(): void {
+    test('setting speed does not make the vector active', () => {
+        vector.speed(5);
+        EXPECT.falsy(vector.isActive);
     });
 }
 
-
-function testDurationCanOnlyBeSetIfNotActive(): void {
-    test('duration can only be set if not active', () => {
-        const v = new DynamicVector();
-        expect(v.isActive).not.toBeTruthy();
-        v.duration(1000).moveTo(500, 500);
-        expect(v.isActive).toBeTruthy();
-        v.duration(2000).moveTo(800, 800);
-        v.update(200);
-        expect(v.x).not.toBe(80);
-        expect(v.y).not.toBe(80);
-        expect(v.x).toBe(100);
-        expect(v.y).toBe(100);
+function testSpeedGoesBackTo0OnceDurationHasElapsed(): void {
+    test('speed goes back to 0 once duration has elapsed', () => {
+        const start = new Vector2D(100, 200);
+        const end = new Vector2D(500, 600);
+        const diff = end.subtract(start);
+        const distance = diff.length;
+        const speed = 2;
+        const duration = distance / speed;
+        vector = new DynamicVector(start);
+        EXPECT.toBeCloseTo(vector.speed(2).changeTo(end), duration);
+        vector.update(duration / 5);
+        vector.update(duration / 5);
+        vector.update(duration / 5);
+        vector.update(duration / 5);
+        vector.update((duration / 5) + 1); // for rounding errors
+        EXPECT.falsy(vector.isActive);
+        EXPECT.toBe(vector.changeTo(new Vector2D(1000, -1000)), 0);
+        EXPECT.falsy(vector.isActive);
+        EXPECT.toBe(vector.current.x, 1000);
+        EXPECT.toBe(vector.current.y, -1000);
     });
 }
 
-function testDurationMustBeGreaterThan0ToHaveAnEffect(): void {
-    test('duration must be greater than 0 to have an effect', () => {
-        const v = new DynamicVector();
-        v.duration(0).moveTo(10, 10);
-        expect(v.isActive).not.toBeTruthy();
-        v.duration(-1).moveTo(20, 20);
-        expect(v.isActive).not.toBeTruthy();
-    });
-}
-
-
-function testSpeedCanOnlyBeSetIfNotActive(): void {
-    test('speed can only be set if not active', () => {
-        const v = new DynamicVector();
-        expect(v.isActive).not.toBeTruthy();
-        v.speed(1).moveTo(300, 400); // distance = 500; duration = 500
-        expect(v.isActive).toBeTruthy();
-        v.speed(2); // ineffective
-        v.update(100); // 20%
-        expect(v.x).toBeCloseTo(60);
-        expect(v.y).toBeCloseTo(80);
-    });
-}
-
-function testSpeedMustBeGreaterThan0ToHaveAnEffect(): void {
-    test('speed must be greater than 0 to have an effect', () => {
-        const v = new DynamicVector();
-        v.speed(0).moveTo(200, 200);
-        expect(v.isActive).not.toBeTruthy();
-        v.speed(-10).moveTo(400, 400);
-        expect(v.isActive).not.toBeTruthy();
-    });
-}
-
-
-function testEaseCanOnlyBeSetIfNotActive(): void {
-    test('ease can only be set if not active', () => {
-        const v = new DynamicVector();
-        expect(v.isActive).not.toBeTruthy();
-        v.duration(1000).ease('easeInQuad').moveTo(1000, 1000);
-        expect(v.isActive).toBeTruthy();
-        v.ease('easeInCubic'); // ineffective
-        v.update(200) // 20%
-        expect(v.x).not.toBeCloseTo((1000 * Math.pow(0.2, 3)));
-        expect(v.y).not.toBeCloseTo((1000 * Math.pow(0.2, 3)));
-        expect(v.x).toBeCloseTo((1000 * Math.pow(0.2, 2)));
-        expect(v.y).toBeCloseTo((1000 * Math.pow(0.2, 2)));
-    });
-}
-
-function testEaseIsResetAfterDurationHasElapsed(): void {
-    test('ease is reset after duration has elapsed', () => {
-        const v = new DynamicVector();
-        v.duration(1000).ease('easeInQuad').moveTo(500, 500);
-        v.update(200);
-        v.update(200);
-        v.update(200);
-        v.update(200);
-        v.update(200);
-        v.duration(1000).moveTo(1000, 1000);
-        v.update(200);
-        expect(v.x).not.toBeCloseTo(500 * Math.pow(0.2, 2));
-        expect(v.y).not.toBeCloseTo(500 * Math.pow(0.2, 2));
-        expect(v.x).toBeCloseTo(600);
-        expect(v.y).toBeCloseTo(600);
-    });
-}
-
-
-function testMoveToPositionCanOnlyBeChangedIfNotActive(): void {
-    test('moveTo() position can only be changed if not active', () => {
-        const v = new DynamicVector();
-        expect(v.isActive).not.toBeTruthy();
-        v.duration(1000).moveTo(100, 200);
-        expect(v.isActive).toBeTruthy();
-        v.moveTo(-100, -200);
-        expect(v.x).not.toBe(-100);
-        expect(v.y).not.toBe(-200);
-    });
-}
-
-function testMoveToDoesNothingIfSetToCurentXYValues(): void {
-    test('moveTo() does nothing if set to current x/y values', () => {
-        const v = new DynamicVector(100, 200);
-        v.duration(1000).moveTo(100, 200);
-        v.update(200);
-        expect(v.x).toBe(100);
-        expect(v.y).toBe(200);
-    });
-}
-
-function testMoveToCANChangeIfXisDifferentAndYIsTheSame(): void {
-    test('moveTo() CAN change if x is different and y is the same', () => {
-        const v = new DynamicVector(10, 20);
-        v.moveTo(20, 20);
-        expect(v.x).toBe(20);
-        expect(v.y).toBe(20);
-    });
-}
-
-function testMoveToCANChangeIfYisDifferentAndXIsTheSame(): void {
-    test('changeTo() CAN change if y is different and x is the same', () => {
-        const v = new DynamicVector(20, 10);
-        v.moveTo(20, 20);
-        expect(v.x).toBe(20);
-        expect(v.y).toBe(20);
-    });
-}
-
-function testIfDurationIsNotSetMoveToChangesCurrentXYValuesImmediately(): void {
-    test('if duration is not set, moveTo() changes current x/y values immediately', () => {
-        const v = new DynamicVector();
-        v.moveTo(50, 60);
-        expect(v.isActive).not.toBeTruthy();
-        expect(v.x).toBe(50);
-        expect(v.y).toBe(60);
-    });
-}
-
-function testIfDurationIsSetMoveToMAkesVectorActiveAndChangesXYValuesDynamicallyOverTime(): void {
-    test('if duration is set, changeTo makes vector active and changes x/y values dynamically over time', () => {
-        const v = new DynamicVector(10, 20);
-        v.duration(1000).moveTo(50, 60);
-        expect(v.isActive).toBeTruthy();
-        expect(v.x).toBe(10);
-        expect(v.y).toBe(20);
-        v.update(200);
-        expect(v.x).toBeCloseTo(18);
-        expect(v.y).toBeCloseTo(28);
-    });
-}
-
-
-function testMoveByPositionCanOnlyBeChangedIfNotActive(): void {
-    test('moveBy() position can only be changed if not active', () => {
-        const v = new DynamicVector(50, 100);
-        expect(v.isActive).not.toBeTruthy();
-        v.duration(1000).moveBy(100, 200);
-        expect(v.isActive).toBeTruthy();
-        v.moveBy(200, 400);
-        expect(v.x).toBe(50);
-        expect(v.y).toBe(100);
-        v.update(200);
-        expect(v.x).toBeCloseTo(70);
-        expect(v.y).toBeCloseTo(140);
-    });
-}
-
-function testMoveByDoesNothingIfXAndYAre0(): void {
-    test('moveBy() does nothing if x & y are 0', () => {
-        const v = new DynamicVector(10, 20);
-        v.duration(1000).moveBy(0, 0);
-        expect(v.isActive).not.toBeTruthy();
+function testCannotSetEaseIfVectorIsActive(): void {
+    test('cannot set ease if vector is active', () => {
+        const start = new Vector2D(100, 100);
+        const end = new Vector2D(200, 400);
+        const distanceBetween = end.subtract(start);
+        vector = new DynamicVector(start);
+        vector.duration(1000).changeTo(end);
+        EXPECT.truthy(vector.isActive);
+        vector.ease('easeInElastic'); // <-- no effect
+        vector.update(200);
+        const current = start.add(distanceBetween.multiply(0.2));
+        EXPECT.toBeCloseTo(vector.current.x, current.x);
+        EXPECT.toBeCloseTo(vector.current.y, current.y);
 
     });
 }
 
-function testMoveByCanChangeXIfXIsNot0AndYIs0(): void {
-    test('moveBy() CAN change x if x is not 0 and y is 0', () => {
-        const v = new DynamicVector(10, 0);
-        v.moveBy(10, 0);
-        expect(v.x).toBe(20);
-        expect(v.y).toBe(0);
-    });
-}
+function testEaseReturnsToNoEaseOnceDurationHasElapsed(): void {
+    test('ease returns to "noEase" once duration has elapsed', () => {
 
-function testMoveByCanChangeYIfYIsNot0AndXIs0(): void {
-    test('moveBy() CAN change y if y is not 0 and x is 0', () => {
-        const v = new DynamicVector(0, 10);
-        v.moveBy(0, 10);
-        expect(v.x).toBe(0);
-        expect(v.y).toBe(20);
-    });
-}
+        const startA = new Vector2D(100, 100);
+        const endA = new Vector2D(200, 400);
+        const distanceBetweenA = endA.subtract(startA);
+        vector = new DynamicVector(startA);
+        vector.duration(1000).ease('easeInQuad').changeTo(endA);
+        EXPECT.truthy(vector.isActive);
+        vector.update(200);
+        const currentA = startA.add(distanceBetweenA.multiply(Math.pow(0.2, 2)));
+        EXPECT.toBeCloseTo(vector.current.x, currentA.x);
+        EXPECT.toBeCloseTo(vector.current.y, currentA.y);
+        vector.update(200);
+        vector.update(200);
+        vector.update(200);
+        vector.update(201);
+        EXPECT.falsy(vector.isActive);
 
-function testIfDurationIsNotSetMoveByChangesCurrentXYValuesImmediately(): void {
-    test('if duration is not set, moveBy()  changes current x/y values immediately', () => {
-        const v = new DynamicVector(200, 100);
-        v.moveBy(200, 100);
-        expect(v.x).toBe(400);
-        expect(v.y).toBe(200);
-    });
-}
-
-function testIfDurationIsSetMoveByMakesVectorActiveAndChangesXYValuesOverTime(): void {
-    test('if duration is set, moveBy() makes vector active and changes x/y values dynamically over time', () => {
-        const v = new DynamicVector(200, 100);
-        v.duration(1000).moveBy(100, 200);
-        v.update(200);
-        expect(v.x).toBeCloseTo(220);
-        expect(v.y).toBeCloseTo(140);
-    });
-}
-
-function testMoveByChangesXYValuesBCorrectAmount(): void {
-    test('changeBy() changes x y values by correct amount', () => {
-        const v = new DynamicVector(100, 500);
-        v.moveBy(200, 1000);
-        expect(v.x).toBe(300);
-        expect(v.y).toBe(1500);
-    });
-}
-
-
-function testTurningOffAndOnStopsAndStartsUpdate(): void {
-    test('turning off and on stops and starts update', () => {
-        const v = new DynamicVector();
-        v.duration(1000).moveTo(500, 600);
-        v.update(200);
-        expect(v.x).toBeCloseTo(100);
-        expect(v.y).toBeCloseTo(120);
-        v.turnOff();
-        v.update(200);
-        expect(v.x).toBeCloseTo(100);
-        expect(v.y).toBeCloseTo(120);
-        v.turnOn();
-        v.update(200);
-        expect(v.x).toBeCloseTo(200);
-        expect(v.y).toBeCloseTo(240);
-    });
-}
-
-
-function testDoesNotUpdateIfNotActive(): void {
-    test('does not update if not active', () => {
-        const v = new DynamicVector(100, 200);
-
-        expect(v.isActive).not.toBeTruthy();
-        v.update(200);
-        expect(v.isActive).not.toBeTruthy();
-        expect(v.x).toBe(100);
-        expect(v.y).toBe(200);
-
-        v.moveTo(500, 600);
-        expect(v.isActive).not.toBeTruthy();
-        v.update(200);
-        expect(v.x).toBe(500);
-        expect(v.y).toBe(600);
-
-        v.duration(1000).moveTo(200, 300);
-        expect(v.isActive).toBeTruthy();
-        v.update(200);
-        expect(v.x).toBeCloseTo(440);
-        expect(v.y).toBeCloseTo(540);
-    });
-}
-
-function testDoesNotUpdateIfNotTurnedOn(): void {
-    test('does not update if turned off', () => {
-        const v = new DynamicVector(50, 100);
-        v.duration(1000).moveBy(100, 100);
-        v.turnOff();
-        v.update(200);
-        expect(v.x).toBe(50);
-        expect(v.y).toBe(100);
-    });
-}
-
-function testUpdatesIfActiveAndTurnedOnAndDurationGreaterThan0(): void {
-    test('updates if active and turned on and duration is greater than 0', () => {
-        const v = new DynamicVector();
-        v.duration(1000).moveTo(1000, 1000);
-        expect(v.x).toBe(0);
-        expect(v.y).toBe(0);
-        v.update(200);
-        expect(v.x).toBeCloseTo(200);
-        expect(v.y).toBeCloseTo(200);
-    });
-}
-
-
-function testCanBeSavedWhetherTurnedOnOrOff(): void {
-    test('can be saved whether turned on or off', () => {
-        const v = new DynamicVector();
-        v.speed(2).moveBy(1000, 1200);
-        v.update(300);
-        const beforeX = v.x;
-        const beforeY = v.y;
-        v.turnOff();
-        v.load(v.save()); // <--
-        expect(v.x).toBe(beforeX);
-        expect(v.y).toBe(beforeY);
-    });
-}
-
-function testBehavesTheSameAfterSaveAndLoad(): void {
-    test('behaves the same after save and load', () => {
-
-        let v: DynamicVector;
-
-        v = new DynamicVector(100, 100);
-        expect(v.isActive).not.toBeTruthy();
-        v.duration(1000).moveBy(500, 600);
-        expect(v.isActive).toBeTruthy();
-        v.update(200);
-        expect(v.x).toBeCloseTo(200);
-        expect(v.y).toBeCloseTo(220);
-        v.update(200);
-        expect(v.x).toBeCloseTo(300);
-        expect(v.y).toBeCloseTo(340);
-        v.update(200);
-        expect(v.x).toBeCloseTo(400);
-        expect(v.y).toBeCloseTo(460);
-        v.update(200);
-        expect(v.x).toBeCloseTo(500);
-        expect(v.y).toBeCloseTo(580);
-        v.update(200);
-        expect(v.x).toBe(600);
-        expect(v.y).toBeCloseTo(700);
-
-        v = new DynamicVector(100, 100);
-        v.load(v.save()); // <--
-        expect(v.isActive).not.toBeTruthy();
-        v.duration(1000).moveBy(500, 600);
-        v.load(v.save()); // <--
-        expect(v.isActive).toBeTruthy();
-        v.update(200);
-        v.load(v.save()); // <--
-        expect(v.x).toBeCloseTo(200);
-        expect(v.y).toBeCloseTo(220);
-        v.update(200);
-        v.load(v.save()); // <--
-        expect(v.x).toBeCloseTo(300);
-        expect(v.y).toBeCloseTo(340);
-        v.update(200);
-        v.load(v.save()); // <--
-        expect(v.x).toBeCloseTo(400);
-        expect(v.y).toBeCloseTo(460);
-        v.update(200);
-        v.load(v.save()); // <--
-        expect(v.x).toBeCloseTo(500);
-        expect(v.y).toBeCloseTo(580);
-        v.update(200);
-        v.load(v.save()); // <--
-        expect(v.x).toBe(600);
-        expect(v.y).toBeCloseTo(700);
+        const startB = new Vector2D().copy(endA);
+        const endB = new Vector2D(1200, 1400);
+        const distanceBetweenB = endB.subtract(startB);
+        vector.duration(1000).changeTo(endB);
+        EXPECT.truthy(vector.isActive);
+        vector.update(200);
+        const currentB = startB.add(distanceBetweenB.multiply(0.2));
+        EXPECT.toBeCloseTo(vector.current.x, currentB.x);
+        EXPECT.toBeCloseTo(vector.current.y, currentB.y);
 
     });
 }
 
-function testLoadReturnsTrueOnValidLoad(): void {
-    test('load returns true on valid load', () => {
+function testCannotChangeIfVectorIsActive(): void {
+    test('cannot change if vector is active', () => {
+        vector = new DynamicVector(new Vector2D(-100, -200));
+        EXPECT.falsy(vector.isActive);
+        EXPECT.toBe(vector.duration(500).changeTo(new Vector2D(400, 500)), 500);
+        EXPECT.truthy(vector.isActive);
+        EXPECT.toBe(vector.changeTo(new Vector2D(1000, 2000)), 0); // <--
+        EXPECT.toBe(vector.current.x, -100);
+        EXPECT.toBe(vector.current.y, -200);
+    });
+}
+
+function testChangingToTheSamePositionDoesNothing(): void {
+    test('changing to the same position does nothing', () => {
+        vector = new DynamicVector(new Vector2D(100, 200));
+        EXPECT.toBe(vector.duration(500).changeTo(new Vector2D(100, 200)), 0);
+        EXPECT.falsy(vector.isActive);
+    });
+}
+
+function testChangingWithoutSettingTheDurationChangesTheCurrentPositionsImmediately(): void {
+    test('changing without setting the duration changes the current position immediately', () => {
+        EXPECT.toBe(vector.changeTo(new Vector2D(200, 400)), 0);
+        EXPECT.falsy(vector.isActive);
+        EXPECT.toBe(vector.current.x, 200);
+        EXPECT.toBe(vector.current.y, 400);
+    });
+}
+
+function testValidLoadReturnsTrue(): void {
+    test('valid load returns true', () => {
+        const grandParent = JSON.stringify({
+            isOn: false,
+            duration: 0,
+            easeOption: 'noEase'
+        });
         const unit = new DynamicUnit();
+        const parent = JSON.stringify({
+            parent: grandParent,
+            unit: unit.save(),
+            speed: 0
+        });
         const previous = new Vector2D();
         const next = new Vector2D();
-        const current = new Vector2D();
-        const difference = new Vector2D();
-        const v = new DynamicVector();
-        expect(
-            v.load(
+        const distanceBetween = new Vector2D();
+        const currentValue = new Vector2D();
+        EXPECT.truthy(
+            vector.load(
                 JSON.stringify({
-                    unit: unit.save(),
+                    parent: parent,
                     previous: previous.save(),
                     next: next.save(),
-                    current: current.save(),
-                    difference: difference.save(),
-                    duration: 0,
-                    speed: 0,
-                    isOn: true
+                    distanceBetween: distanceBetween.save(),
+                    currentValue: currentValue.save()
                 })
             )
-        ).toBeTruthy();
+        );
     });
 }
 
-function testLoadReturnsFalseIfUnitPropertyMissing(): void {
-    test('load returns false if "unit" property missing', () => {
+function testThrowsErrorIfMissingParentProperty(): void {
+    test('throws error if missing "parent" property', () => {
+        // const grandParent = JSON.stringify({
+        //     isOn: false,
+        //     duration: 0,
+        //     easeOption: 'noEase'
+        // });
         // const unit = new DynamicUnit();
+        // const parent = JSON.stringify({
+        //     parent: grandParent,
+        //     unit: unit.save(),
+        //     speed: 0
+        // });
         const previous = new Vector2D();
         const next = new Vector2D();
-        const current = new Vector2D();
-        const difference = new Vector2D();
-        const v = new DynamicVector();
-        expect(
-            v.load(
+        const distanceBetween = new Vector2D();
+        const currentValue = new Vector2D();
+        EXPECT.falsy(
+            vector.load(
                 JSON.stringify({
-                    // unit: unit.save(),
+                    // parent: parent,
                     previous: previous.save(),
                     next: next.save(),
-                    current: current.save(),
-                    difference: difference.save(),
-                    duration: 0,
-                    speed: 0,
-                    isOn: true
+                    distanceBetween: distanceBetween.save(),
+                    currentValue: currentValue.save()
                 })
             )
-        ).not.toBeTruthy();
+        );
     });
 }
 
-function testLoadReturnsFalseIfPreviousPropertyMissing(): void {
-    test('load returns false if "previous" property missing', () => {
+function testThrowsErrorIfMissingPreviousProperty(): void {
+    test('throws error if missing "previous" property', () => {
+        const grandParent = JSON.stringify({
+            isOn: false,
+            duration: 0,
+            easeOption: 'noEase'
+        });
         const unit = new DynamicUnit();
+        const parent = JSON.stringify({
+            parent: grandParent,
+            unit: unit.save(),
+            speed: 0
+        });
         // const previous = new Vector2D();
         const next = new Vector2D();
-        const current = new Vector2D();
-        const difference = new Vector2D();
-        const v = new DynamicVector();
-        expect(
-            v.load(
+        const distanceBetween = new Vector2D();
+        const currentValue = new Vector2D();
+        EXPECT.falsy(
+            vector.load(
                 JSON.stringify({
-                    unit: unit.save(),
+                    parent: parent,
                     // previous: previous.save(),
                     next: next.save(),
-                    current: current.save(),
-                    difference: difference.save(),
-                    duration: 0,
-                    speed: 0,
-                    isOn: true
+                    distanceBetween: distanceBetween.save(),
+                    currentValue: currentValue.save()
                 })
             )
-        ).not.toBeTruthy();
+        );
     });
 }
 
-function testLoadReturnsFalseIfNextPropertyMissing(): void {
-    test('load returns false if "next" property missing', () => {
+function testThrowsErrorIfMissingNextProperty(): void {
+    test('throws error if missing "next" property', () => {
+        const grandParent = JSON.stringify({
+            isOn: false,
+            duration: 0,
+            easeOption: 'noEase'
+        });
         const unit = new DynamicUnit();
+        const parent = JSON.stringify({
+            parent: grandParent,
+            unit: unit.save(),
+            speed: 0
+        });
         const previous = new Vector2D();
         // const next = new Vector2D();
-        const current = new Vector2D();
-        const difference = new Vector2D();
-        const v = new DynamicVector();
-        expect(
-            v.load(
+        const distanceBetween = new Vector2D();
+        const currentValue = new Vector2D();
+        EXPECT.falsy(
+            vector.load(
                 JSON.stringify({
-                    unit: unit.save(),
+                    parent: parent,
                     previous: previous.save(),
                     // next: next.save(),
-                    current: current.save(),
-                    difference: difference.save(),
-                    duration: 0,
-                    speed: 0,
-                    isOn: true
+                    distanceBetween: distanceBetween.save(),
+                    currentValue: currentValue.save()
                 })
             )
-        ).not.toBeTruthy();
+        );
     });
 }
 
-function testLoadReturnsFalseIfCurrentPropertyMissing(): void {
-    test('load returns false if "current" property missing', () => {
+function testThrowsErrorIfMissingDistanceBetweenProperty(): void {
+    test('throws error if missing "distanceBetween" property', () => {
+        const grandParent = JSON.stringify({
+            isOn: false,
+            duration: 0,
+            easeOption: 'noEase'
+        });
         const unit = new DynamicUnit();
+        const parent = JSON.stringify({
+            parent: grandParent,
+            unit: unit.save(),
+            speed: 0
+        });
         const previous = new Vector2D();
         const next = new Vector2D();
-        // const current = new Vector2D();
-        const difference = new Vector2D();
-        const v = new DynamicVector();
-        expect(
-            v.load(
+        // const distanceBetween = new Vector2D();
+        const currentValue = new Vector2D();
+        EXPECT.falsy(
+            vector.load(
                 JSON.stringify({
-                    unit: unit.save(),
+                    parent: parent,
                     previous: previous.save(),
                     next: next.save(),
-                    // current: current.save(),
-                    difference: difference.save(),
-                    duration: 0,
-                    speed: 0,
-                    isOn: true
+                    // distanceBetween: distanceBetween.save(),
+                    currentValue: currentValue.save()
                 })
             )
-        ).not.toBeTruthy();
+        );
     });
 }
 
-function testLoadReturnsFalseIfDifferencePropertyMissing(): void {
-    test('load returns false if "difference" property missing', () => {
+function testThrowsErrorIfMissingCurrentValueProperty(): void {
+    test('throws error if missing "currentValue" property', () => {
+        const grandParent = JSON.stringify({
+            isOn: false,
+            duration: 0,
+            easeOption: 'noEase'
+        });
         const unit = new DynamicUnit();
+        const parent = JSON.stringify({
+            parent: grandParent,
+            unit: unit.save(),
+            speed: 0
+        });
         const previous = new Vector2D();
         const next = new Vector2D();
-        const current = new Vector2D();
-        // const difference = new Vector2D();
-        const v = new DynamicVector();
-        expect(
-            v.load(
+        const distanceBetween = new Vector2D();
+        // const currentValue = new Vector2D();
+        EXPECT.falsy(
+            vector.load(
                 JSON.stringify({
-                    unit: unit.save(),
+                    parent: parent,
                     previous: previous.save(),
                     next: next.save(),
-                    current: current.save(),
-                    // difference: difference.save(),
-                    duration: 0,
-                    speed: 0,
-                    isOn: true
+                    distanceBetween: distanceBetween.save(),
+                    // currentValue: currentValue.save()
                 })
             )
-        ).not.toBeTruthy();
+        );
     });
 }
 
-function testLoadReturnsFalseIfDurationPropertyMissing(): void {
-    test('load returns false if "duration" property missing', () => {
-        const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const current = new Vector2D();
-        const difference = new Vector2D();
-        const v = new DynamicVector();
-        expect(
-            v.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    current: current.save(),
-                    difference: difference.save(),
-                    // duration: 0,
-                    speed: 0,
-                    isOn: true
-                })
-            )
-        ).not.toBeTruthy();
+function testSaveThenLoadDoesNotChangeBehaviour(): void {
+    test('save then load does not change behaviour', () => {
+        EXPECT.toBe(vector.duration(1000).changeTo(new Vector2D(1000, 0)), 1000);
+        EXPECT.truthy(vector.isActive);
+        vector.load(vector.save()); // <--
+        EXPECT.truthy(vector.isActive);
+        for (let i = 0; i < 9; i++) {
+            vector.update(100);
+            vector.load(vector.save()); // <--
+            EXPECT.truthy(vector.isActive);
+            EXPECT.toBeCloseTo(vector.current.x, 100 + (i * 100));
+            EXPECT.toBe(vector.current.y, 0);
+        }
+
+        vector.update(101);
+        vector.load(vector.save()); // <--
+        EXPECT.falsy(vector.isActive);
+        EXPECT.toBe(vector.current.x, 1000);
+        EXPECT.toBe(vector.current.y, 0);
+
     });
 }
 
-function testLoadReturnsFalseIfSpeedPropertyMissing(): void {
-    test('load returns false if "speed" property missing', () => {
-        const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const current = new Vector2D();
-        const difference = new Vector2D();
-        const v = new DynamicVector();
-        expect(
-            v.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    current: current.save(),
-                    difference: difference.save(),
-                    duration: 0,
-                    // speed: 0,
-                    isOn: true
-                })
-            )
-        ).not.toBeTruthy();
+function testCanSaveWhetherVectorIsOnOrOff(): void {
+    test('can save whether vector is on or off', () => {
+        vector.duration(1000).changeTo(new Vector2D(500, 0));
+        vector.load(vector.save());
+        vector.update(100);
+        EXPECT.toBeCloseTo(vector.current.x, 50);
+        vector.turnOff();
+        vector.load(vector.save());
+        vector.turnOn();
+        vector.update(100);
+        EXPECT.toBeCloseTo(vector.current.x, 100);
     });
 }
 
-function testLoadReturnsFalseIfIsOnPropertyMissing(): void {
-    test('load returns false if "isOn" property missing', () => {
-        const unit = new DynamicUnit();
-        const previous = new Vector2D();
-        const next = new Vector2D();
-        const current = new Vector2D();
-        const difference = new Vector2D();
-        const v = new DynamicVector();
-        expect(
-            v.load(
-                JSON.stringify({
-                    unit: unit.save(),
-                    previous: previous.save(),
-                    next: next.save(),
-                    current: current.save(),
-                    difference: difference.save(),
-                    duration: 0,
-                    speed: 0,
-                    // isOn: true
-                })
-            )
-        ).not.toBeTruthy();
+function testCanStopAndStartUpdate(): void {
+    test('can stop and start update', () => {
+        vector.duration(1000).changeTo(new Vector2D(500, 0));
+        vector.update(100);
+        EXPECT.toBeCloseTo(vector.current.x, 50);
+        vector.turnOff();
+        vector.update(100);
+        EXPECT.toBeCloseTo(vector.current.x, 50);
+        vector.turnOn();
+        vector.update(100);
+        EXPECT.toBeCloseTo(vector.current.x, 100);
     });
 }
 
+function testCanBeOffAndActive(): void {
+    test('can be off and active', () => {
+        vector.duration(1000).changeTo(new Vector2D(500, -500));
+        EXPECT.truthy(vector.isActive);
+        vector.turnOff();
+        EXPECT.truthy(vector.isActive);
+    });
+}
 
-function testReturnsExpectdCurrentValuesDuringFullDuration(): void {
+function testCurrentValuesAreTheSameWhetherOnOrOff(): void {
+    test('current values are the same whether on or off', () => {
+        vector.duration(1000).changeTo(new Vector2D(500, 0));
+        vector.update(100);
+        EXPECT.toBeCloseTo(vector.current.x, 50);
+        vector.turnOff();
+        EXPECT.toBeCloseTo(vector.current.x, 50);
+        vector.turnOn();
+        vector.update(100);
+        EXPECT.toBeCloseTo(vector.current.x, 100);
+        vector.turnOff();
+        EXPECT.toBeCloseTo(vector.current.x, 100);
+    });
+}
+
+function testReturnsExpectedCurrentValuesDuringFullDuration(): void {
     test('returns expected current values during full duration', () => {
-        const v = new DynamicVector(100, 200);
-        v.duration(1000).moveTo(500, 800);
-        expect(v.x).toBe(100);
-        expect(v.y).toBe(200);
-        v.update(200);
-        expect(v.x).toBeCloseTo(180);
-        expect(v.y).toBeCloseTo(320);
-        v.update(200);
-        expect(v.x).toBeCloseTo(260);
-        expect(v.y).toBeCloseTo(440);
-        v.update(200);
-        expect(v.x).toBeCloseTo(340);
-        expect(v.y).toBeCloseTo(560);
-        v.update(200);
-        expect(v.x).toBeCloseTo(420);
-        expect(v.y).toBeCloseTo(680);
-        v.update(200);
-        expect(v.x).toBe(500);
-        expect(v.y).toBe(800);
+        testFullDuration({
+            start: new Vector2D(500, 200),
+            end: new Vector2D(1000, 1500),
+            duration: 1000,
+            ease: 'noEase'
+        });
     });
 }
 
-function testReturnsExpectdCurrentValuesDuringFullDurationWhenSpeedIsSet(): void {
-    test('returns expected current values during full duration when speed is set', () => {
-        const start = new Vector2D(100, 300);
-        const end = new Vector2D(2000, 3000);
-        const diff = end.subtract(start);
-        let current: Vector2D;
-        const distance = start.distanceTo(end);
-        const speed = 2.5;
-        const duration = distance / speed;
-        const step = duration / 5;
-        const v = new DynamicVector(start.x, start.y);
-        v.speed(speed).moveTo(end.x, end.y);
-        v.update(step); // 20%
-        current = start.add(diff.multiply(0.2));
-        expect(v.x).toBeCloseTo(current.x);
-        expect(v.y).toBeCloseTo(current.y);
-        v.update(step); // 40%
-        current = start.add(diff.multiply(0.4));
-        expect(v.x).toBeCloseTo(current.x);
-        expect(v.y).toBeCloseTo(current.y);
-        v.update(step); // 60%
-        current = start.add(diff.multiply(0.6));
-        expect(v.x).toBeCloseTo(current.x);
-        expect(v.y).toBeCloseTo(current.y);
-        v.update(step); // 80%
-        current = start.add(diff.multiply(0.8));
-        expect(v.x).toBeCloseTo(current.x);
-        expect(v.y).toBeCloseTo(current.y);
-        v.update(distance / 5); // 100%
-        expect(v.x).toBe(end.x);
-        expect(v.y).toBe(end.y);
-    });
-}
-
-function testReturnsExpectdCurrentValuesDuringFullDurationWithEaseApplied(): void {
+function testReturnsExpectedCurrentValuesDuringFullDurationWithEaseApplied(): void {
     test('returns expected current values during full duration with ease applied', () => {
-        const previous = new Vector2D(500, 600);
-        const next = new Vector2D(1000, 2000);
-        const diff = next.subtract(previous);
-        let current: Vector2D;
-        const easeOption: Ease.tEaseOption = 'easeInOutCirc';
-        const easeFn = Ease.load(easeOption);
-        const duration = 1000;
-        const step = duration / 5;
-        let progress: number;
-        const v = new DynamicVector(previous.x, previous.y);
-        v.duration(duration).ease(easeOption).moveTo(next.x, next.y);
-        v.update(step);
-        progress = easeFn(step / duration);
-        current = previous.add(diff.multiply(progress));
-        expect(v.x).toBeCloseTo(current.x);
-        expect(v.y).toBeCloseTo(current.y);
-        v.update(step);
-        progress = easeFn((step * 2) / duration);
-        current = previous.add(diff.multiply(progress));
-        expect(v.x).toBeCloseTo(current.x);
-        expect(v.y).toBeCloseTo(current.y);
-        v.update(step);
-        progress = easeFn((step * 3) / duration);
-        current = previous.add(diff.multiply(progress));
-        expect(v.x).toBeCloseTo(current.x);
-        expect(v.y).toBeCloseTo(current.y);
-        v.update(step);
-        progress = easeFn((step * 4) / duration);
-        current = previous.add(diff.multiply(progress));
-        expect(v.x).toBeCloseTo(current.x);
-        expect(v.y).toBeCloseTo(current.y);
-        v.update(step);
-        expect(v.x).toBe(next.x);
-        expect(v.y).toBe(next.y);
+        testFullDuration({
+            start: new Vector2D(500, 200),
+            end: new Vector2D(1000, 1500),
+            duration: 1000,
+            ease: 'easeInQuint'
+        });
     });
 }
 
-function testWorksWithPositiveXToHigherX(): void {
-    test('works with positive x to higher x', () => {
-        const v = new DynamicVector(100, 50);
-        v.duration(1000).moveTo(200, 50);
-        v.update(200);
-        expect(v.x).toBeCloseTo(120);
-        expect(v.y).toBeCloseTo(50);
+function testReturnsExpectedCurrentValuesDuringFullDurationAfterSettingSpeed(): void {
+    test('returns expected current values during full duration after setting speed', () => {
+        testFullDuration({
+            start: new Vector2D(500, 200),
+            end: new Vector2D(1000, 1500),
+            speed: 2,
+            ease: 'noEase'
+        });
     });
 }
 
-function testWorksWithPositiveXToLowerX(): void {
-    test('works with positive x to lower x', () => {
-        const v = new DynamicVector(100, 50);
-        v.duration(1000).moveTo(50, 50);
-        v.update(200);
-        expect(v.x).toBeCloseTo(90);
-        expect(v.y).toBeCloseTo(50);
+function testReturnsExpectedCurrentValuesDuringFullDurationAfterSettingSpeedWithEaseApplied(): void {
+    test('returns expected current values during full duration after setting speed with ease applied', () => {
+        testFullDuration({
+            start: new Vector2D(500, 200),
+            end: new Vector2D(1000, 1500),
+            speed: 2,
+            ease: 'easeOutBounce'
+        });
     });
 }
 
-function testWorksWithNegativeXToHigherX(): void {
-    test('works with negative x to higher x', () => {
-        const v = new DynamicVector(-100, 50);
-        v.duration(1000).moveTo(100, 50);
-        v.update(200);
-        expect(v.x).toBeCloseTo(-60);
-        expect(v.y).toBeCloseTo(50);
+function testWorksAsExpectedWithPositiveXToHigherX(): void {
+    test('works as expected with positive X to higher X', () => {
+        testFullDuration({
+            start: new Vector2D(500, 200),
+            end: new Vector2D(1000, 1500),
+            duration: 500,
+            ease: 'noEase'
+        });
     });
 }
 
-function testWorksWithNegativeXToLowerX(): void {
-    test('works with negative x to lower x', () => {
-        const v = new DynamicVector(-100, 50);
-        v.duration(1000).moveTo(-200, 50);
-        v.update(200);
-        expect(v.x).toBeCloseTo(-120);
-        expect(v.y).toBeCloseTo(50);
+function testWorksAsExpectedWithPositiveXToLowerX(): void {
+    test('works as expected with positive X to lower X', () => {
+        testFullDuration({
+            start: new Vector2D(500, 200),
+            end: new Vector2D(100, 1500),
+            duration: 500,
+            ease: 'noEase'
+        });
     });
 }
 
-function testWorksWithPositiveYToHigherY(): void {
-    test('works with positive y to higher y', () => {
-        const v = new DynamicVector(50, 50);
-        v.duration(1000).moveTo(50, 100);
-        v.update(200);
-        expect(v.x).toBeCloseTo(50);
-        expect(v.y).toBeCloseTo(60);
+function testWorksAsExpectedWithPositiveXToNegativeX(): void {
+    test('works as expected with positive X to negative X', () => {
+        testFullDuration({
+            start: new Vector2D(500, 200),
+            end: new Vector2D(-1000, 1500),
+            duration: 500,
+            ease: 'noEase'
+        });
     });
 }
 
-function testWorksWithPositiveYToLowerY(): void {
-    test('works with positive y to lower y', () => {
-        const v = new DynamicVector(50, 100);
-        v.duration(1000).moveTo(50, 50);
-        v.update(200);
-        expect(v.x).toBeCloseTo(50);
-        expect(v.y).toBeCloseTo(90);
+function testWorksAsExpectedWithNegativeXToHigherX(): void {
+    test('works as expected with negative X to higher X', () => {
+        testFullDuration({
+            start: new Vector2D(-500, 200),
+            end: new Vector2D(-100, 1500),
+            duration: 500,
+            ease: 'noEase'
+        });
     });
 }
 
-function testWorksWithNegativeYToHigherY(): void {
-    test('works with negative y to higher y', () => {
-        const v = new DynamicVector(50, -50);
-        v.duration(1000).moveTo(50, 50);
-        v.update(200);
-        expect(v.x).toBeCloseTo(50);
-        expect(v.y).toBeCloseTo(-30);
+function testWorksAsExpectedWithNegativeXToLowerX(): void {
+    test('works as expected with negative X to lower X', () => {
+        testFullDuration({
+            start: new Vector2D(-500, 200),
+            end: new Vector2D(-1000, 1500),
+            duration: 500,
+            ease: 'noEase'
+        });
     });
 }
 
-function testWorksWithNegativeYToLowerY(): void {
-    test('works with negative y to higher y', () => {
-        const v = new DynamicVector(50, -50);
-        v.duration(1000).moveTo(50, -100);
-        v.update(200);
-        expect(v.x).toBeCloseTo(50);
-        expect(v.y).toBeCloseTo(-60);
+function testWorksAsExpectedWithNegativeXToNPositiveX(): void {
+    test('works as expected with negative X to positive X', () => {
+        testFullDuration({
+            start: new Vector2D(-500, 200),
+            end: new Vector2D(1000, 1500),
+            duration: 500,
+            ease: 'noEase'
+        });
     });
+}
+
+function testWorksAsExpectedWithPositiveYToHigherY(): void {
+    test('works as expected with positive Y to higher Y', () => {
+        testFullDuration({
+            start: new Vector2D(500, 200),
+            end: new Vector2D(1000, 1500),
+            duration: 500,
+            ease: 'noEase'
+        });
+    });
+}
+
+function testWorksAsExpectedWithPositiveYToLowerY(): void {
+    test('works as expected with positive Y to lower Y', () => {
+        testFullDuration({
+            start: new Vector2D(500, 2000),
+            end: new Vector2D(1000, 1500),
+            duration: 500,
+            ease: 'noEase'
+        });
+    });
+}
+
+function testWorksAsExpectedWithPositiveYToNegativeY(): void {
+    test('works as expected with positive Y to negative Y', () => {
+        testFullDuration({
+            start: new Vector2D(500, 800),
+            end: new Vector2D(1000, -150),
+            duration: 500,
+            ease: 'noEase'
+        });
+    });
+}
+
+function testWorksAsExpectedWithNegativeYToHigherY(): void {
+    test('works as expected with negative Y to higher Y', () => {
+        testFullDuration({
+            start: new Vector2D(500, -800),
+            end: new Vector2D(1000, -150),
+            duration: 500,
+            ease: 'noEase'
+        });
+    });
+}
+
+function testWorksAsExpectedWithNegativeYToLowerY(): void {
+    test('works as expected with negative Y to lower Y', () => {
+        testFullDuration({
+            start: new Vector2D(500, -100),
+            end: new Vector2D(1000, -150),
+            duration: 500,
+            ease: 'noEase'
+        });
+    });
+}
+
+function testWorksAsExpectedWithNegativeYToPositiveY(): void {
+    test('works as expected with negative Y to positive Y', () => {
+        testFullDuration({
+            start: new Vector2D(500, -800),
+            end: new Vector2D(1000, 150),
+            duration: 500,
+            ease: 'noEase'
+        });
+    });
+}
+
+
+
+/**
+ * UTILITY FUNCTIONS
+ */
+
+function testFullDuration(params: tFullDurationTestParams): void {
+
+    const DEFAULT_DURATION = 1000;
+    const diff = params.end.subtract(params.start);
+    const distanceBetween = diff.length;
+    const speed = (params.speed !== undefined) ? params.speed : false;
+    const duration = (speed) ? distanceBetween / speed : (params.duration) ? params.duration : DEFAULT_DURATION;
+    const numSteps = 10;
+    const step = duration / numSteps;
+    let easeFn: EASE.tEaseFunction = EASE.load(params.ease);
+    let elapsed: number = 0;
+    let progress: number = 0;
+    let current = new Vector2D();
+
+    vector = new DynamicVector(params.start);
+    if (speed) vector.speed(speed);
+    else vector.duration(duration);
+    EXPECT.toBeCloseTo(vector.ease(params.ease).changeTo(params.end), duration);
+    EXPECT.truthy(vector.isActive);
+
+    // loop to 1 step before completion
+    for (let i = 0; i < numSteps - 1; i++) {
+        vector.update(step);
+        elapsed += step;
+        progress = easeFn(elapsed / duration);
+        current = params.start.add(diff.multiply(progress));
+        EXPECT.truthy(vector.isActive);
+        EXPECT.toBeCloseTo(vector.current.x, current.x);
+        EXPECT.toBeCloseTo(vector.current.y, current.y);
+    }
+
+    // final step (+ 1 for rounding errors)
+    vector.update(step + 1);
+    EXPECT.toBe(vector.current.x, params.end.x);
+    EXPECT.toBe(vector.current.y, params.end.y);
+    EXPECT.falsy(vector.isActive);
+
 }

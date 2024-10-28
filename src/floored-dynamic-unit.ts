@@ -3,13 +3,17 @@
  * seems counterintuitive but when combines with inverted unit and repeated it's possible to create a square wave effect
  */
 
-import { BaseDynamicUnit } from "./base-dynamic-unit.js";
+import { BaseUnitDecorator } from "./base-unit-decorator.js";
 import { iDynamicUnit } from "./index.js";
 
-export class FlooredDynamicUnit extends BaseDynamicUnit implements iDynamicUnit {
+export class FlooredDynamicUnit extends BaseUnitDecorator {
 
     public override get current(): number {
         return Math.floor(this.unit.current);
+    }
+
+    public clone(): iDynamicUnit {
+        return new FlooredDynamicUnit(this.unit.clone());
     }
 
 }

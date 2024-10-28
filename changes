@@ -22,38 +22,45 @@ v2.0.0 - completely refactored
 
 
 v3.0.0
+    
+    completely re-factored core DynamicObjects:
+        unit
+        number
+        vector
+        bezier
+    
+    implemented the Template Method Pattern to vastly reduce code duplication
+
+    added clone() method to DynamicUnit, BaseDynamicUnit & decorators
+        clone() returns a new iDynamicUnit object with the same ease and duration applied (but not internal state)
+    
+    changeTo() method now returns the set or calculated duration, which is very useful for the client
+
+    removed changeBy/moveBy() methods as easily implemented by client in any case and not many use cases in reality
+
+
+    added:
+
+    DynamicNumberExtended
+        accepts min and max params
+        provides get rounded(), get roundedUp(), get roundedDown() in addition to current()
+        provides useful additional methods, which work instantly or dynamically:
+            changeToOriginal() - changes number back to the initial value on instantiation
+            changeToMax() - changes number to max value passed on instantiation
+            changeToMin() - changes number to min value passed on instantiation
+            changeToPrevious() - changes number to its previous current value
+
     ...
 
-
-
-(future plans)
     
-    add:
-        DynamicString - for game console
-        DynamicSequence - for blink/flicker effect
-        DynamicColor
 
+    TESTED ALL FUNCTIONALITY VISUALLY + ALL JEST TESTS PASS
+
+
+
+future plans:
     look for a better way to persist objects without exposing internal properties - Memento pattern?    
-    
-    there is a more elegant solution using an abstract base class and the template method pattern
-        implement in future versions
+    there is a more elegant design using an abstract base class and the template method pattern
 
 
 
-other:
-
-    RepeatingDynamicUnit 
-        ideally implements iDynamicUnit
-        Repeater provides basic functionality to repeat a unit or series of units
-            continuous
-            n times
-            for n duration
-        would be awesome if this can also have ease applied to speed up / slow down repeating units
-            creates a  speed up / slow down effect
-                ideal for flashing on/off
-
-        takes an array of dynamic units
-            re-factor DynamicUnit to include setDuration(), setEase() & start() methods
-                equivalent of run(duration, ease)
-                this way, decorated units can be passed to repeater, which can set the duration of each unit
-        clamp the get current() return value (0, 1) - otherwise performance is seriously unpredictable
