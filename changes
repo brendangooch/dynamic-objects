@@ -59,6 +59,14 @@ v3.0.0
         a color in rgb() string format that can change over time
         useful effect for game timer
     
+    DynamicRotation
+        contains a dynamic number
+        client can rotateTo() a rotation, which behaves like changeTo() on DynamicNumber
+        OR spinTo(), passing in the number of spins (negative for anti-clockwise), which adds numSpins onto total rotation
+        the additional "spin" is then removed on update complete. 
+        Rotation.current appears the same but no longer unwinds the spin on next rotation.
+
+    //
 
     TESTED ALL FUNCTIONALITY VISUALLY + ALL JEST TESTS PASS
 
