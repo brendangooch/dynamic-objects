@@ -5,6 +5,7 @@
 import { tEaseOption } from "@brendangooch/ease";
 import { BaseDynamicObjectWithUnit } from "./base-dynamic-object-with-unit.js";
 import { Vector2D } from "@brendangooch/maths";
+import { tPosition } from "./index.js";
 
 export class DynamicVector extends BaseDynamicObjectWithUnit {
 
@@ -18,7 +19,7 @@ export class DynamicVector extends BaseDynamicObjectWithUnit {
         this.setAll(initial);
     }
 
-    public get current(): { x: number; y: number } {
+    public get current(): tPosition {
         return {
             x: this.currentValue.x,
             y: this.currentValue.y

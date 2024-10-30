@@ -43,6 +43,7 @@ function testAll(): void {
         testCannotChangeIfVectorIsActive();
         testChangingToTheSamePositionDoesNothing();
         testChangingWithoutSettingTheDurationChangesTheCurrentPositionsImmediately();
+        testChangingInstantlyResetsTheEase();
         testValidLoadReturnsTrue();
         testThrowsErrorIfMissingParentProperty();
         testThrowsErrorIfMissingPreviousProperty();
@@ -277,6 +278,19 @@ function testChangingWithoutSettingTheDurationChangesTheCurrentPositionsImmediat
         EXPECT.falsy(vector.isActive);
         EXPECT.toBe(vector.current.x, 200);
         EXPECT.toBe(vector.current.y, 400);
+    });
+}
+
+function testChangingInstantlyResetsTheEase(): void {
+    test('changing position instantly resets the ease', () => {
+        vector.ease('easeOutQuint');
+        EXPECT.toBe(vector.changeTo(new Vector2D(200, 400)), 0);
+        EXPECT.falsy(vector.isActive);
+        EXPECT.toBe(vector.current.x, 200);
+        EXPECT.toBe(vector.current.y, 400);
+        vector.duration(1000).changeTo(new Vector2D(100, 200));
+        vector.update(100);
+        EXPECT.toBeCloseTo(vector.current.x, 190);
     });
 }
 
