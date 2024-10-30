@@ -6,6 +6,19 @@ import { tEaseOption } from '@brendangooch/ease';
 import { iUpdateable } from '@brendangooch/simple-game-loop';
 import { DynamicUnit } from './dynamic-unit.js';
 
+export type tPosition = { x: number; y: number };
+export type tDynamicRectangleCurrentValue = {
+    x: number;
+    y: number;
+    rotation: number;
+    opacity: number;
+    scale: number;
+    width: number;
+    height: number;
+};
+
+export type tCurrentValue = number | tPosition | string | boolean | tDynamicRectangleCurrentValue;
+
 export interface iDynamic extends iUpdateable {
     get isActive(): boolean;
     save(): string;
