@@ -5,7 +5,7 @@
 import * as EXPECT from '@brendangooch/jest-expect';
 import * as EASE from '@brendangooch/ease';
 import { DynamicColor } from './dynamic-color.js';
-import { DynamicNumberExtended } from './dynamic-number-extended.js';
+import { DynamicNumber } from './dynamic-number.js';
 
 let color: DynamicColor;
 beforeEach(() => {
@@ -200,9 +200,9 @@ function testLoadReturnsTrueOnValidLoad(): void {
             duration: 0,
             easeOption: 'noEase'
         });
-        const r = new DynamicNumberExtended(0, 0, 255);
-        const g = new DynamicNumberExtended(0, 0, 255);
-        const b = new DynamicNumberExtended(0, 0, 255);
+        const r = new DynamicNumber();
+        const g = new DynamicNumber();
+        const b = new DynamicNumber();
         EXPECT.truthy(
             color.load(
                 JSON.stringify({
@@ -224,9 +224,9 @@ function testLoadReturnsFalseIfMissingParentProperty(): void {
         //     duration: 0,
         //     easeOption: 'noEase'
         // });
-        const r = new DynamicNumberExtended(0, 0, 255);
-        const g = new DynamicNumberExtended(0, 0, 255);
-        const b = new DynamicNumberExtended(0, 0, 255);
+        const r = new DynamicNumber();
+        const g = new DynamicNumber();
+        const b = new DynamicNumber();
         EXPECT.falsy(
             color.load(
                 JSON.stringify({
@@ -249,8 +249,8 @@ function testLoadReturnsFalseIfMissingRProperty(): void {
             easeOption: 'noEase'
         });
         // const r = new DynamicNumberExtended(0, 0, 255);
-        const g = new DynamicNumberExtended(0, 0, 255);
-        const b = new DynamicNumberExtended(0, 0, 255);
+        const g = new DynamicNumber();
+        const b = new DynamicNumber();
         EXPECT.falsy(
             color.load(
                 JSON.stringify({
@@ -272,9 +272,10 @@ function testLoadReturnsFalseIfMissingGProperty(): void {
             duration: 0,
             easeOption: 'noEase'
         });
-        const r = new DynamicNumberExtended(0, 0, 255);
-        // const g = new DynamicNumberExtended(0, 0, 255);
-        const b = new DynamicNumberExtended(0, 0, 255);
+        const r = new DynamicNumber();
+        // const g = new DynamicNumber();
+        const b = new DynamicNumber();
+
         EXPECT.falsy(
             color.load(
                 JSON.stringify({
@@ -296,9 +297,9 @@ function testLoadReturnsFalseIfMissingBProperty(): void {
             duration: 0,
             easeOption: 'noEase'
         });
-        const r = new DynamicNumberExtended(0, 0, 255);
-        const g = new DynamicNumberExtended(0, 0, 255);
-        // const b = new DynamicNumberExtended(0, 0, 255);
+        const r = new DynamicNumber();
+        const g = new DynamicNumber();
+        // const b = new DynamicNumber();
         EXPECT.falsy(
             color.load(
                 JSON.stringify({
@@ -320,9 +321,9 @@ function testLoadReturnsFalseIfMissingCurrentValueProperty(): void {
             duration: 0,
             easeOption: 'noEase'
         });
-        const r = new DynamicNumberExtended(0, 0, 255);
-        const g = new DynamicNumberExtended(0, 0, 255);
-        const b = new DynamicNumberExtended(0, 0, 255);
+        const r = new DynamicNumber();
+        const g = new DynamicNumber();
+        const b = new DynamicNumber();
         EXPECT.falsy(
             color.load(
                 JSON.stringify({
@@ -365,9 +366,9 @@ function testBehavesAsExpectedDuringFullDurationWithEase(): void {
 
         color.changeTo(40, 40, 40);
 
-        const r = new DynamicNumberExtended(40, 0, 255);
-        const g = new DynamicNumberExtended(40, 0, 255);
-        const b = new DynamicNumberExtended(40, 0, 255);
+        const r = new DynamicNumber(40);
+        const g = new DynamicNumber(40);
+        const b = new DynamicNumber(40);
 
         EXPECT.toBe(color.duration(duration).ease(ease).changeTo(50, 100, 200), duration);
         EXPECT.truthy(color.isActive);
@@ -401,9 +402,9 @@ function testSaveThenLoadContinuesToBehaveAsExpected(): void {
         color.changeTo(40, 40, 40);
         color.load(color.save()); // <--
 
-        const r = new DynamicNumberExtended(40, 0, 255);
-        const g = new DynamicNumberExtended(40, 0, 255);
-        const b = new DynamicNumberExtended(40, 0, 255);
+        const r = new DynamicNumber(40);
+        const g = new DynamicNumber(40);
+        const b = new DynamicNumber(40);
 
         EXPECT.toBe(color.duration(duration).ease(ease).changeTo(50, 100, 200), duration);
         color.load(color.save()); // <--

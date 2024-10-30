@@ -23,32 +23,40 @@ function testAll(): void {
         testInitialCurrentValueIsValueSetInTheConstructor();
         testRotationStartsInactive();
         testDurationCannotBeSetIfRotationIsActive();
-        testDurationMustBeGreateThan0ToHaveAnEffect();
+        testDurationMustBeGreaterThan0ToHaveAnEffect();
         testSettingDurationDoesNotMakeTheRotationActive();
         testDurationIsResetTo0OnceUpdateComplete();
+        testSpeedCannotBeSetIfRotationIsActive();
+        testSpeedMustBeGreaterThan0ToHaveAnEffect();
+        testSettingSpeedDoesNotMakeTheRotationActive();
+        testSpeedIsResetTo0OnceUpdateComplete();
         testEaseCannotBeSetIfRotationIsActive();
+        testEaseIsResetToNoEaseOnceUpdateComplete();
+        testEaseIsResetToNoEaseOnInstantChange();
         testSettingEaseDoesNotMakeTheRotationActive();
         testEaseIsResetToNoEaseOnceUpdateComplete();
         testCannotRotateIfRotationIsActive();
         testRotatingToTheCurrentValueDoesNothing();
         testRotateToWithNoDurationSetImmediatelyChangesTheCurrentValue();
         testCannotSpinToIfRotationIsActive();
+        testCannotSpinToIfNoDurationOrSpeedSet();
         testNumSpinsMustBeAnInteger();
-        testNumSpinsCanBeNegative();
         testDurationMUSTBeSetForSpinToToChangeTheCurrentValue();
         testLoadReturnsTrueOnValidLoad();
         testLoadReturnsFalseIfMissingParentProperty();
         testLoadReturnsFalseIfMissingRotationProperty();
         testLoadReturnsFalseIfMissingSpinProperty();
+        testLoadReturnsFalseIfMissingSpeedProperty();
         testRotateToBehavesAsExpectedDuringFullDuration();
+        testRotateToBehavesAsExpectedDuringFullDurationWithSpeedSet();
         testRotateToBehavesAsExpectedDuringFullDurationWithEase();
         testSpinToBehavesAsExpectedDuringFullDuration();
+        testSpinToBehavesAsExpectedDuringFullDurationWithSpeedSet();
         testSpinToBehavesAsExpectedDuringFullDurationWithEase();
         testNegativeSpinToBehavesAsExpectedDuringFullDuration();
         testSpinToThenRotateToReturnsCorrectCurrentValues();
         testRotateToBehavesAsExpectedAfterSaveAndLoad();
         testSpinToBehavesAsExpectedAfterSaveAndLoad();
-
 
     });
 }
@@ -83,7 +91,7 @@ function testDurationCannotBeSetIfRotationIsActive(): void {
     });
 }
 
-function testDurationMustBeGreateThan0ToHaveAnEffect(): void {
+function testDurationMustBeGreaterThan0ToHaveAnEffect(): void {
     test('duration must be greater than 0 to have an effect', () => {
         EXPECT.toBe(rotation.duration(0).rotateTo(HALF_PI), 0);
         EXPECT.falsy(rotation.isActive);
@@ -114,6 +122,46 @@ function testDurationIsResetTo0OnceUpdateComplete(): void {
     });
 }
 
+function testSpeedCannotBeSetIfRotationIsActive(): void {
+    test('speed cannot be set if rotation is active', () => {
+        rotation.speed(0.1).rotateTo(PI);
+        EXPECT.truthy(rotation.isActive);
+        rotation.speed(1);
+        rotation.update(PI * 9);
+        EXPECT.truthy(rotation.isActive);
+    });
+}
+
+function testSpeedMustBeGreaterThan0ToHaveAnEffect(): void {
+    test('speed must be greater than 0 to have an effect', () => {
+        EXPECT.toBe(rotation.speed(0).rotateTo(HALF_PI), 0);
+        EXPECT.falsy(rotation.isActive);
+        EXPECT.toBe(rotation.current, HALF_PI);
+        EXPECT.toBe(rotation.speed(-5).rotateTo(-HALF_PI), 0);
+        EXPECT.falsy(rotation.isActive);
+        EXPECT.toBe(rotation.current, -HALF_PI);
+
+    });
+}
+
+function testSettingSpeedDoesNotMakeTheRotationActive(): void {
+    test('setting speed does not make the rotation active', () => {
+        rotation.speed(2);
+        EXPECT.falsy(rotation.isActive);
+    });
+}
+
+function testSpeedIsResetTo0OnceUpdateComplete(): void {
+    test('speed is reset to 0 once update complete', () => {
+        rotation.speed(0.1).rotateTo(PI);
+        EXPECT.truthy(rotation.isActive);
+        rotation.update(PI * 10);
+        EXPECT.falsy(rotation.isActive);
+        rotation.rotateTo(-PI);
+        EXPECT.toBe(rotation.current, -PI)
+    });
+}
+
 function testEaseCannotBeSetIfRotationIsActive(): void {
     test('ease cannot be set if rotation is active', () => {
         rotation.duration(1000).rotateTo(-HALF_PI);
@@ -141,6 +189,17 @@ function testEaseIsResetToNoEaseOnceUpdateComplete(): void {
         rotation.duration(1000).rotateTo(PI);
         rotation.update(100);
         EXPECT.toBeCloseTo(rotation.current, HALF_PI + (HALF_PI * 0.1));
+    });
+}
+
+function testEaseIsResetToNoEaseOnInstantChange(): void {
+    test('ease is reset to no ease on instant change', () => {
+        rotation.ease('easeInOutSine');
+        rotation.rotateTo(-HALF_PI);
+        EXPECT.falsy(rotation.isActive);
+        rotation.duration(1000).rotateTo(HALF_PI);
+        rotation.update(100);
+        EXPECT.toBeCloseTo(rotation.current, -HALF_PI + (PI * 0.1));
     });
 }
 
@@ -180,6 +239,13 @@ function testCannotSpinToIfRotationIsActive(): void {
     });
 }
 
+function testCannotSpinToIfNoDurationOrSpeedSet(): void {
+    test('cannot spinTo() if duration or speed not set', () => {
+        rotation.spinTo(2, HALF_PI);
+        EXPECT.toBe(rotation.current, 0);
+    });
+}
+
 function testNumSpinsMustBeAnInteger(): void {
     test('numSpins must be an integer', () => {
         EXPECT.toBe(rotation.duration(1000).spinTo(0.5, HALF_PI), 0);
@@ -216,7 +282,8 @@ function testLoadReturnsTrueOnValidLoad(): void {
                 JSON.stringify({
                     parent: parent,
                     rotation: rotationObj.save(),
-                    spin: 0
+                    spin: 0,
+                    speed: 0
                 })
             )
         )
@@ -236,7 +303,8 @@ function testLoadReturnsFalseIfMissingParentProperty(): void {
                 JSON.stringify({
                     // parent: parent,
                     rotation: rotationObj.save(),
-                    spin: 0
+                    spin: 0,
+                    speed: 0
                 })
             )
         )
@@ -256,7 +324,8 @@ function testLoadReturnsFalseIfMissingRotationProperty(): void {
                 JSON.stringify({
                     parent: parent,
                     // rotation: rotationObj.save(),
-                    spin: 0
+                    spin: 0,
+                    speed: 0
                 })
             )
         )
@@ -277,6 +346,28 @@ function testLoadReturnsFalseIfMissingSpinProperty(): void {
                     parent: parent,
                     rotation: rotationObj.save(),
                     // spin: 0
+                    speed: 0
+                })
+            )
+        )
+    });
+}
+
+function testLoadReturnsFalseIfMissingSpeedProperty(): void {
+    test('load returns false if missing "spin" property', () => {
+        const parent = JSON.stringify({
+            isOn: false,
+            duration: 0,
+            easeOption: 'noEase'
+        });
+        const rotationObj = new DynamicNumber();
+        EXPECT.falsy(
+            rotation.load(
+                JSON.stringify({
+                    parent: parent,
+                    rotation: rotationObj.save(),
+                    spin: 0,
+                    // speed: 0
                 })
             )
         )
@@ -306,6 +397,34 @@ function testRotateToBehavesAsExpectedDuringFullDuration(): void {
         rotation.update(100);
         EXPECT.toBeCloseTo(rotation.current, -HALF_PI * 0.9);
         rotation.update(100);
+        EXPECT.falsy(rotation.isActive);
+        EXPECT.toBe(rotation.current, -HALF_PI);
+    });
+}
+
+function testRotateToBehavesAsExpectedDuringFullDurationWithSpeedSet(): void {
+    test('rotateTo() behaves as expected during full duration with speed set', () => {
+        EXPECT.toBeCloseTo(rotation.speed(0.01).rotateTo(-HALF_PI), HALF_PI * 100);
+        EXPECT.truthy(rotation.isActive);
+        rotation.update(HALF_PI * 10);
+        EXPECT.toBeCloseTo(rotation.current, -HALF_PI * 0.1);
+        rotation.update(HALF_PI * 10);
+        EXPECT.toBeCloseTo(rotation.current, -HALF_PI * 0.2);
+        rotation.update(HALF_PI * 10);
+        EXPECT.toBeCloseTo(rotation.current, -HALF_PI * 0.3);
+        rotation.update(HALF_PI * 10);
+        EXPECT.toBeCloseTo(rotation.current, -HALF_PI * 0.4);
+        rotation.update(HALF_PI * 10);
+        EXPECT.toBeCloseTo(rotation.current, -HALF_PI * 0.5);
+        rotation.update(HALF_PI * 10);
+        EXPECT.toBeCloseTo(rotation.current, -HALF_PI * 0.6);
+        rotation.update(HALF_PI * 10);
+        EXPECT.toBeCloseTo(rotation.current, -HALF_PI * 0.7);
+        rotation.update(HALF_PI * 10);
+        EXPECT.toBeCloseTo(rotation.current, -HALF_PI * 0.8);
+        rotation.update(HALF_PI * 10);
+        EXPECT.toBeCloseTo(rotation.current, -HALF_PI * 0.9);
+        rotation.update(HALF_PI * 10);
         EXPECT.falsy(rotation.isActive);
         EXPECT.toBe(rotation.current, -HALF_PI);
     });
@@ -363,6 +482,34 @@ function testSpinToBehavesAsExpectedDuringFullDuration(): void {
         rotation.update(50);
         EXPECT.toBeCloseTo(rotation.current, (HALF_PI + TAU) * 0.9);
         rotation.update(50);
+        EXPECT.falsy(rotation.isActive);
+        EXPECT.toBe(rotation.current, HALF_PI); // <-- spin removed
+    });
+}
+
+function testSpinToBehavesAsExpectedDuringFullDurationWithSpeedSet(): void {
+    test('spinTo() behaves as expected during full duration with speed set', () => {
+        EXPECT.toBeCloseTo(rotation.speed(0.1).spinTo(1, HALF_PI), (HALF_PI + TAU) * 10);
+        EXPECT.truthy(rotation.isActive);
+        rotation.update(HALF_PI + TAU);
+        EXPECT.toBeCloseTo(rotation.current, (HALF_PI + TAU) * 0.1);
+        rotation.update(HALF_PI + TAU);
+        EXPECT.toBeCloseTo(rotation.current, (HALF_PI + TAU) * 0.2);
+        rotation.update(HALF_PI + TAU);
+        EXPECT.toBeCloseTo(rotation.current, (HALF_PI + TAU) * 0.3);
+        rotation.update(HALF_PI + TAU);
+        EXPECT.toBeCloseTo(rotation.current, (HALF_PI + TAU) * 0.4);
+        rotation.update(HALF_PI + TAU);
+        EXPECT.toBeCloseTo(rotation.current, (HALF_PI + TAU) * 0.5);
+        rotation.update(HALF_PI + TAU);
+        EXPECT.toBeCloseTo(rotation.current, (HALF_PI + TAU) * 0.6);
+        rotation.update(HALF_PI + TAU);
+        EXPECT.toBeCloseTo(rotation.current, (HALF_PI + TAU) * 0.7);
+        rotation.update(HALF_PI + TAU);
+        EXPECT.toBeCloseTo(rotation.current, (HALF_PI + TAU) * 0.8);
+        rotation.update(HALF_PI + TAU);
+        EXPECT.toBeCloseTo(rotation.current, (HALF_PI + TAU) * 0.9);
+        rotation.update(HALF_PI + TAU);
         EXPECT.falsy(rotation.isActive);
         EXPECT.toBe(rotation.current, HALF_PI); // <-- spin removed
     });

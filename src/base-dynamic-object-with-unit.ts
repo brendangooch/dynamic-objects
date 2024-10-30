@@ -78,13 +78,14 @@ export abstract class BaseDynamicObjectWithUnit extends BaseDynamicObject {
 
     protected instantChange(): void {
         this.setAllToNext();
+        this.reset();
     }
 
     // preDynamicChangeHook for Bezier child
     protected dynamicChange(): void {
         this.preDynamicChangeHook();
         this.turnOn();
-        this.unit.duration(this._duration).ease(this._ease).run();
+        this.unit.duration(this._duration).ease(this.easeOption).run();
     }
 
     // for Bezier child to configure internal bezier curve
@@ -101,7 +102,7 @@ export abstract class BaseDynamicObjectWithUnit extends BaseDynamicObject {
     protected reset(): void {
         this._speed = 0;
         this._duration = 0;
-        this._ease = 'noEase';
+        this.easeOption = 'noEase';
     }
 
 }

@@ -13,6 +13,7 @@ export class DynamicRotation extends BaseDynamicObject {
 
     private rotation: DynamicNumber;
     private spin: number = 0;
+    private _speed: number = 0;
 
     public constructor(initial: number = 0) {
         super();
@@ -29,11 +30,20 @@ export class DynamicRotation extends BaseDynamicObject {
 
     public override duration(ms: number): DynamicRotation {
         super.duration(ms);
+        this._speed = 0;
         return this;
     }
 
     public override ease(easeOption: tEaseOption): DynamicRotation {
         super.ease(easeOption);
+        return this;
+    }
+
+    public speed(unitsPerMs: number): DynamicRotation {
+        if (!this.isActive && unitsPerMs > 0) {
+            this._speed = unitsPerMs;
+            this._duration = 0;
+        }
         return this;
     }
 
@@ -45,7 +55,7 @@ export class DynamicRotation extends BaseDynamicObject {
     // numSpins must be a positive or negative integer
     // no point doing an instant change with spin!
     public spinTo(numSpins: number, radians: number): number {
-        if (this._duration > 0 && Number.isInteger(numSpins)) {
+        if ((this._duration > 0 || this._speed > 0) && Number.isInteger(numSpins)) {
             this.addSpin(numSpins);
             return this.rotateTo(radians + this.spin);
         }
@@ -57,9 +67,11 @@ export class DynamicRotation extends BaseDynamicObject {
         if (state.parent === undefined) return false;
         if (state.rotation === undefined) return false;
         if (state.spin === undefined) return false;
+        if (state.speed === undefined) return false;
         const parentLoaded = super.load(state.parent);
         this.rotation.load(state.rotation);
         this.spin = state.spin;
+        this._speed = state.speed;
         return parentLoaded;
     }
 
@@ -67,7 +79,8 @@ export class DynamicRotation extends BaseDynamicObject {
         return JSON.stringify({
             parent: super.save(),
             rotation: this.rotation.save(),
-            spin: this.spin
+            spin: this.spin,
+            speed: this._speed
         })
     }
 
@@ -90,22 +103,28 @@ export class DynamicRotation extends BaseDynamicObject {
     }
 
     private doChange(radians: number): number {
-        (this._duration > 0) ? this.dynamicChange(radians) : this.instantChange(radians);
-        return this._duration;
+        if (this._duration > 0 || this._speed > 0) return this.dynamicChange(radians);
+        else this.instantChange(radians);
+        return 0;
     }
 
     private instantChange(radians: number): void {
         this.rotation.changeTo(radians);
+        this.reset();
     }
 
-    private dynamicChange(radians: number): void {
-        this.rotation.duration(this._duration).ease(this._ease).changeTo(radians);
+    private dynamicChange(radians: number): number {
+        if (this._duration > 0) this.rotation.duration(this._duration);
+        if (this._speed > 0) this.rotation.speed(this._speed);
+        if (this.easeOption) this.rotation.ease(this.easeOption);
         this.turnOn();
+        return this.rotation.changeTo(radians);
     }
 
     private reset(): void {
         this._duration = 0;
-        this._ease = 'noEase';
+        this._speed = 0;
+        this.easeOption = 'noEase';
     }
 
     private addSpin(numSpins: number): void {

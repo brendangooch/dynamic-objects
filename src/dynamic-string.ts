@@ -5,7 +5,7 @@
 
 import { tEaseOption } from "@brendangooch/ease";
 import { BaseDynamicObject } from "./base-dynamic-object.js";
-import { DynamicNumberExtended } from "./dynamic-number-extended.js";
+import { DynamicNumber } from "./dynamic-number.js";
 
 export class DynamicString extends BaseDynamicObject {
 
@@ -13,7 +13,7 @@ export class DynamicString extends BaseDynamicObject {
 
     private string: string = '';
     private currentValue: string = '';
-    private index: DynamicNumberExtended = new DynamicNumberExtended(0, 0, DynamicString.MAX_CHARS);
+    private index: DynamicNumber = new DynamicNumber();
 
     public get isActive(): boolean {
         return this.index.isActive;
@@ -91,14 +91,14 @@ export class DynamicString extends BaseDynamicObject {
 
     private dynamicChange(): void {
         this.currentValue = '';
-        this.index.duration(this._duration).ease(this._ease).changeTo(this.string.length);
+        this.index.duration(this._duration).ease(this.easeOption).changeTo(this.string.length);
         this.turnOn();
     }
 
     private reset(): void {
         this.index.changeTo(0);
         this._duration = 0;
-        this._ease = 'noEase';
+        this.easeOption = 'noEase';
     }
 
 }

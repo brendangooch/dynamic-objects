@@ -6,20 +6,21 @@
 
 import { tEaseOption } from "@brendangooch/ease";
 import { BaseDynamicObject } from "./base-dynamic-object.js";
-import { DynamicNumberExtended } from "./dynamic-number-extended.js";
+import { DynamicNumber } from "./dynamic-number.js";
+import { clamp } from "@brendangooch/maths";
 
 export class DynamicColor extends BaseDynamicObject {
 
-    private r: DynamicNumberExtended;
-    private g: DynamicNumberExtended;
-    private b: DynamicNumberExtended;
+    private r: DynamicNumber;
+    private g: DynamicNumber;
+    private b: DynamicNumber;
     private currentValue: string = '';
 
     public constructor(r: number, g: number, b: number) {
         super();
-        this.r = new DynamicNumberExtended(r, 0, 255);
-        this.g = new DynamicNumberExtended(g, 0, 255);
-        this.b = new DynamicNumberExtended(b, 0, 255);
+        this.r = new DynamicNumber(r);
+        this.g = new DynamicNumber(g);
+        this.b = new DynamicNumber(b);
         this.updateCurrent();
     }
 
@@ -42,6 +43,9 @@ export class DynamicColor extends BaseDynamicObject {
     }
 
     public changeTo(r: number, g: number, b: number): number {
+        r = clamp(r, 0, 255);
+        g = clamp(g, 0, 255);
+        b = clamp(b, 0, 255);
         if (this.canChange(r, g, b)) return this.doChange(r, g, b);
         return 0;
     }
@@ -78,7 +82,7 @@ export class DynamicColor extends BaseDynamicObject {
     }
 
     protected updateCurrent(): void {
-        this.currentValue = `rgb(${this.r.rounded},${this.g.rounded},${this.b.rounded})`;
+        this.currentValue = `rgb(${this.red},${this.green},${this.blue})`;
     }
 
     protected updateComplete(): void {
@@ -104,15 +108,27 @@ export class DynamicColor extends BaseDynamicObject {
     }
 
     private dynamicChange(r: number, g: number, b: number): void {
-        this.r.duration(this._duration).ease(this._ease).changeTo(r);
-        this.g.duration(this._duration).ease(this._ease).changeTo(g);
-        this.b.duration(this._duration).ease(this._ease).changeTo(b);
+        this.r.duration(this._duration).ease(this.easeOption).changeTo(r);
+        this.g.duration(this._duration).ease(this.easeOption).changeTo(g);
+        this.b.duration(this._duration).ease(this.easeOption).changeTo(b);
         this.turnOn();
     }
 
     private reset(): void {
         this._duration = 0;
-        this._ease = 'noEase';
+        this.easeOption = 'noEase';
+    }
+
+    private get red(): number {
+        return this.r.rounded;
+    }
+
+    private get green(): number {
+        return this.g.rounded;
+    }
+
+    private get blue(): number {
+        return this.b.rounded;
     }
 
 }

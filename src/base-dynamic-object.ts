@@ -4,25 +4,24 @@
  */
 
 import { tEaseOption } from "@brendangooch/ease";
-import { iDynamic } from "./index.js";
+import { iDynamic, tCurrentValue } from "./index.js";
 
 export abstract class BaseDynamicObject implements iDynamic {
 
-    protected isOn: boolean = false;
     protected _duration: number = 0;
-    protected _ease: tEaseOption = 'noEase';
+    protected easeOption: tEaseOption = 'noEase';
+    protected isOn: boolean = false;
 
     public abstract get isActive(): boolean;
 
-    // might need to remove this if client code complains about the type
-    public abstract get current(): number | { x: number; y: number } | string;
+    public abstract get current(): tCurrentValue;
 
     public duration(ms: number): void {
         if (!this.isActive && ms > 0) this._duration = ms;
     }
 
     public ease(easeOption: tEaseOption): void {
-        if (!this.isActive) this._ease = easeOption;
+        if (!this.isActive) this.easeOption = easeOption;
     }
 
     public turnOn(): void {
@@ -45,7 +44,7 @@ export abstract class BaseDynamicObject implements iDynamic {
         return JSON.stringify({
             isOn: this.isOn,
             duration: this._duration,
-            easeOption: this._ease
+            easeOption: this.easeOption
         });
     }
 
@@ -56,7 +55,7 @@ export abstract class BaseDynamicObject implements iDynamic {
         if (state.easeOption === undefined) return false;
         this.isOn = state.isOn;
         this._duration = state.duration;
-        this._ease = state.easeOption;
+        this.easeOption = state.easeOption;
         return true;
     }
 
