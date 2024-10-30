@@ -27,6 +27,9 @@ function testAll(): void {
         testStartsInactive();
         testInitialCurrentValueIs0IfNotSetInConstructor();
         testInitialCurrentValusIsValueSetInConstructor();
+        testInitialRoundedValueIs0IfNotSetInConstructor();
+        testInitialRoundedValusIsValueSetInConstructorRounded();
+        testGetRoundedReturnsExpectedValues();
         testCannotSetDurationIfNumberIsActive();
         testCannotSetDurationOf0();
         testCannotSetDurationOfLessThan0();
@@ -43,6 +46,7 @@ function testAll(): void {
         testCannotChangeIfNumberIsActive();
         testChangingToTheSameNumberDoesNothing();
         testChangingWithoutSettingTheDurationChangesTheCurrentValueImmediately();
+        testChangingInstantlyResetsTheEase();
         testValidLoadReturnsTrue();
         testThrowsErrorIfMissingParentProperty();
         testThrowsErrorIfMissingPreviousProperty();
@@ -57,6 +61,7 @@ function testAll(): void {
         testReturnsExpectedCurrentValuesDuringFullDuration();
         testReturnsExpectedCurrentValuesDuringFullDurationWithEaseApplied();
         testReturnsExpectedCurrentValuesDuringFullDurationAfterSettingSpeed();
+        testReturnsExpectedCurrentValuesDuringFullDurationAfterSettingSpeedAndANegativeNumber();
         testReturnsExpectedCurrentValuesDuringFullDurationAfterSettingSpeedWithEaseApplied();
         testWorksCorrectlyPositiveToHigherNumber();
         testWorksCorrectlyPositiveToLowerNumber();
@@ -87,6 +92,34 @@ function testInitialCurrentValusIsValueSetInConstructor(): void {
         EXPECT.toBe(number.current, 10);
     });
 }
+
+function testInitialRoundedValueIs0IfNotSetInConstructor(): void {
+    test('initial rounded value is 0 if not set in constructor', () => {
+        EXPECT.toBe(number.rounded, 0);
+    });
+}
+
+function testInitialRoundedValusIsValueSetInConstructorRounded(): void {
+    test('initial rounded value is value set in constructor - rounded', () => {
+        number = new DynamicNumber(10.4);
+        EXPECT.toBe(number.rounded, 10);
+        number = new DynamicNumber(0.6);
+        EXPECT.toBe(number.rounded, 1);
+        number = new DynamicNumber(-99.7);
+        EXPECT.toBe(number.rounded, -100);
+    });
+}
+
+function testGetRoundedReturnsExpectedValues(): void {
+    test('get rounded() returns expected values', () => {
+        number.duration(1000).changeTo(95.6);
+        for (let i = 1; i < 20; i++) {
+            number.update(50);
+            EXPECT.toBe(number.rounded, Math.round(95.6 * i * 0.05));
+        }
+    });
+}
+
 
 function testCannotSetDurationIfNumberIsActive(): void {
     test('cannot set duration if number is active', () => {
@@ -236,6 +269,19 @@ function testChangingWithoutSettingTheDurationChangesTheCurrentValueImmediately(
         EXPECT.toBe(number.changeTo(100), 0);
         EXPECT.falsy(number.isActive);
         EXPECT.toBe(number.current, 100);
+    });
+}
+
+// otherwise, ease will be applied the next time the numebr is changed dynamically
+function testChangingInstantlyResetsTheEase(): void {
+    test('changing instantly resets the ease', () => {
+        number.ease('easeInCubic');
+        EXPECT.toBe(number.changeTo(100), 0);
+        EXPECT.falsy(number.isActive);
+        EXPECT.toBe(number.current, 100);
+        number.duration(1000).changeTo(200);
+        number.update(100);
+        EXPECT.toBeCloseTo(number.current, 110);
     });
 }
 
@@ -514,6 +560,15 @@ function testReturnsExpectedCurrentValuesDuringFullDurationAfterSettingSpeed(): 
             speed: 3,
             ease: 'noEase'
         });
+    });
+}
+
+function testReturnsExpectedCurrentValuesDuringFullDurationAfterSettingSpeedAndANegativeNumber(): void {
+    testFullDuration({
+        start: 0,
+        end: -500,
+        speed: 2,
+        ease: 'noEase'
     });
 }
 

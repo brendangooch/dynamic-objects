@@ -21,6 +21,10 @@ export class DynamicNumber extends BaseDynamicObjectWithUnit {
         return this.currentValue;
     }
 
+    public get rounded(): number {
+        return Math.round(this.current);
+    }
+
     public override duration(ms: number): DynamicNumber {
         super.duration(ms);
         return this;
@@ -87,7 +91,7 @@ export class DynamicNumber extends BaseDynamicObjectWithUnit {
     }
 
     protected get distance(): number {
-        return this.distanceBetween;
+        return Math.abs(this.distanceBetween);
     }
 
 
