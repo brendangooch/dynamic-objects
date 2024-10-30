@@ -49,13 +49,13 @@ export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
         const parentLoaded = super.load(state.parent);
         this.elapsed = state.elapsed;
         this.currentValue = state.currentValue;
-        this.loadEase(this._ease); // correct this.easeOption should be loaded by prior super.load() call
+        this.loadEase(this.easeOption); // correct this.easeOption should be loaded by prior super.load() call
         return parentLoaded;
     }
 
     public run(): boolean {
         if (!this.isActive && this._duration > 0) {
-            this.loadEase(this._ease);
+            this.loadEase(this.easeOption);
             this.elapsed = 0; // makes active
             this.turnOn();
             return true;
@@ -65,7 +65,7 @@ export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
 
     public clone(): DynamicUnit {
         const unit = new DynamicUnit();
-        unit.duration(this._duration).ease(this._ease);
+        unit.duration(this._duration).ease(this.easeOption);
         return unit;
     }
 
@@ -91,7 +91,7 @@ export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
     }
 
     private loadEase(easeOption: Ease.tEaseOption): void {
-        this._ease = easeOption;
+        this.easeOption = easeOption;
         this.easeFn = Ease.load(easeOption);
     }
 
