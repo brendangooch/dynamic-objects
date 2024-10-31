@@ -80,9 +80,7 @@ export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
 
     protected updateComplete(): void {
         this.currentValue = 1;
-        this._duration = 0;
-        this.elapsed = 0;
-        this.loadEase('noEase');
+        this.reset();
         this.turnOff();
     }
 
@@ -93,6 +91,12 @@ export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
     private loadEase(easeOption: Ease.tEaseOption): void {
         this.easeOption = easeOption;
         this.easeFn = Ease.load(easeOption);
+    }
+
+    private reset(): void {
+        this._duration = 0;
+        this.elapsed = 0;
+        this.loadEase('noEase');
     }
 
 }
