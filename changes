@@ -42,7 +42,6 @@ v3.0.0
 
     removed changeBy/moveBy() methods as easily implemented by client in any case and not many use cases in reality
 
-
     added:
 
     DynamicString
@@ -75,15 +74,11 @@ v3.0.0
             visible
 
 
-
-
     TESTED ALL FUNCTIONALITY VISUALLY + ALL JEST TESTS PASS
 
 
 
 future plans:
     look for a better way to persist objects without exposing internal properties - Memento pattern?    
-    there is a more elegant design using an abstract base class and the template method pattern
-
-
-
+    need to implement a boolean value that toggles on and off for blinking effects
+        needs to be persistable so state can be saved and reloaded

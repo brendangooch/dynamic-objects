@@ -35,6 +35,9 @@ export interface iDynamicUnit extends iDynamic {
     clone(): iDynamicUnit;
 }
 
+export { BaseDynamicObject } from './base-dynamic-object.js';
+export { BaseDynamicObjectWithUnit } from './base-dynamic-object-with-unit.js';
+export { BaseUnitDecorator } from './base-unit-decorator.js';
 export { DynamicUnit };
 export { InvertedDynamicUnit } from './inverted-dynamic-unit.js';
 export { RoundedDynamicUnit } from './rounded-dynamic-unit.js';
@@ -43,6 +46,7 @@ export { DynamicNumber } from './dynamic-number.js';
 export { DynamicVector } from './dynamic-vector.js';
 export { DynamicQuadraticBezier } from './dynamic-quadratic-bezier.js';
 export { DynamicPosition } from './dynamic-position.js';
+export { DynamicRotation } from './dynamic-rotation.js';
 export { DynamicString } from './dynamic-string.js';
 export { DynamicColor } from './dynamic-color.js';
 export { DynamicRectangle } from './dynamic-rectangle.js';
