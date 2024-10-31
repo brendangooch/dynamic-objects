@@ -51,10 +51,6 @@ function testAll(): void {
         testThrowsErrorIfMissingDistanceBetweenProperty();
         testThrowsErrorIfMissingCurrentValueProperty();
         testSaveThenLoadDoesNotChangeBehaviour();
-        testCanSaveWhetherVectorIsOnOrOff();
-        testCanStopAndStartUpdate();
-        testCanBeOffAndActive();
-        testCurrentValuesAreTheSameWhetherOnOrOff();
         testReturnsExpectedCurrentValuesDuringFullDuration();
         testReturnsExpectedCurrentValuesDuringFullDurationWithEaseApplied();
         testReturnsExpectedCurrentValuesDuringFullDurationAfterSettingSpeed();
@@ -503,57 +499,6 @@ function testSaveThenLoadDoesNotChangeBehaviour(): void {
     });
 }
 
-function testCanSaveWhetherVectorIsOnOrOff(): void {
-    test('can save whether vector is on or off', () => {
-        vector.duration(1000).changeTo(new Vector2D(500, 0));
-        vector.load(vector.save());
-        vector.update(100);
-        EXPECT.toBeCloseTo(vector.current.x, 50);
-        vector.turnOff();
-        vector.load(vector.save());
-        vector.turnOn();
-        vector.update(100);
-        EXPECT.toBeCloseTo(vector.current.x, 100);
-    });
-}
-
-function testCanStopAndStartUpdate(): void {
-    test('can stop and start update', () => {
-        vector.duration(1000).changeTo(new Vector2D(500, 0));
-        vector.update(100);
-        EXPECT.toBeCloseTo(vector.current.x, 50);
-        vector.turnOff();
-        vector.update(100);
-        EXPECT.toBeCloseTo(vector.current.x, 50);
-        vector.turnOn();
-        vector.update(100);
-        EXPECT.toBeCloseTo(vector.current.x, 100);
-    });
-}
-
-function testCanBeOffAndActive(): void {
-    test('can be off and active', () => {
-        vector.duration(1000).changeTo(new Vector2D(500, -500));
-        EXPECT.truthy(vector.isActive);
-        vector.turnOff();
-        EXPECT.truthy(vector.isActive);
-    });
-}
-
-function testCurrentValuesAreTheSameWhetherOnOrOff(): void {
-    test('current values are the same whether on or off', () => {
-        vector.duration(1000).changeTo(new Vector2D(500, 0));
-        vector.update(100);
-        EXPECT.toBeCloseTo(vector.current.x, 50);
-        vector.turnOff();
-        EXPECT.toBeCloseTo(vector.current.x, 50);
-        vector.turnOn();
-        vector.update(100);
-        EXPECT.toBeCloseTo(vector.current.x, 100);
-        vector.turnOff();
-        EXPECT.toBeCloseTo(vector.current.x, 100);
-    });
-}
 
 function testReturnsExpectedCurrentValuesDuringFullDuration(): void {
     test('returns expected current values during full duration', () => {

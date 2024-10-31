@@ -49,7 +49,6 @@ function testAll(): void {
         testReturnsExpectedValuesDuringFullUpdateCycleUsingCurveToNoEase();
         testReturnsExpectedValuesDuringFullUpdateCycleUsingCurveToWithEase();
         testReturnsExpectedValuesDuringFullUpdateCycleUsingCurveToWithEaseSetBySpeed();
-        testTurnOffAndOnStopsAndStartsUpdate();
         testCurveToThenMoveToBehavesAsExpected();
         testMoveToThenCurveToBehavesAsExpected();
 
@@ -130,23 +129,7 @@ function testCallCurveToIfPositionNotActive(): void {
     });
 }
 
-function testTurnOffAndOnStopsAndStartsUpdate(): void {
-    test('turn off and on stops and starts update', () => {
-        p = new DynamicPosition(100, 100);
-        EXPECT.toBe(p.duration(1000).moveTo(200, 200), 1000);
-        p.update(200);
-        EXPECT.toBeCloseTo(p.x, 120);
-        EXPECT.toBeCloseTo(p.y, 120);
-        p.turnOff();
-        p.update(200);
-        EXPECT.toBeCloseTo(p.x, 120);
-        EXPECT.toBeCloseTo(p.y, 120);
-        p.turnOn();
-        p.update(200);
-        EXPECT.toBeCloseTo(p.x, 140);
-        EXPECT.toBeCloseTo(p.y, 140);
-    });
-}
+
 
 
 function testReturnsExpectedValuesDuringFullUpdateCycleUsingMoveToNoEase(): void {

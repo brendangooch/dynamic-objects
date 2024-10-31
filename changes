@@ -22,7 +22,11 @@ v2.0.0 - completely refactored
 
 
 v3.0.0
-    
+
+    updated SimpleGameLoop package to v4.0.0 which removes turnOn and turnOff methods from iUpdateable interface
+    made turnOn/Off methods private in each class that implements iUpdateable
+    this behaviour should be used internally only
+
     completely re-factored core DynamicObjects:
         unit
         number
@@ -41,15 +45,6 @@ v3.0.0
 
     added:
 
-    DynamicNumberExtended
-        accepts min and max params
-        provides get rounded(), get roundedUp(), get roundedDown() in addition to current()
-        provides useful additional methods, which work instantly or dynamically:
-            changeToOriginal() - changes number back to the initial value on instantiation
-            changeToMax() - changes number to max value passed on instantiation
-            changeToMin() - changes number to min value passed on instantiation
-            changeToPrevious() - changes number to its previous current value
-
     DynamicString
         a user-defined, changeable string that lengthens over time from empty to full string
         client can set duration and ease
@@ -66,7 +61,21 @@ v3.0.0
         the additional "spin" is then removed on update complete. 
         Rotation.current appears the same but no longer unwinds the spin on next rotation.
 
-    //
+    DynamicRectangle
+        most of the package functionality in one composite class
+        consists of DymamicPosition, DynamicRotation and multiple DynamicNumbers
+        uses the same syntax and style as the other DynamicObjects
+        contains methods to set the following properties of a rectangle instantly or dynamically:
+            position
+            rotation
+            opacity
+            scale
+            width
+            height
+            visible
+
+
+
 
     TESTED ALL FUNCTIONALITY VISUALLY + ALL JEST TESTS PASS
 

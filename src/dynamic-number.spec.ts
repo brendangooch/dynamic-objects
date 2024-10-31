@@ -54,10 +54,6 @@ function testAll(): void {
         testThrowsErrorIfMissingDistanceBetweenProperty();
         testThrowsErrorIfMissingCurrentValueProperty();
         testSaveThenLoadDoesNotChangeBehaviour();
-        testCanSaveWhetherNumberIsOnOrOff();
-        testCanStopAndStartUpdate();
-        testCanBeOffAndActive();
-        testCurrentValueIsTheSameWhetherOnOrOff();
         testReturnsExpectedCurrentValuesDuringFullDuration();
         testReturnsExpectedCurrentValuesDuringFullDurationWithEaseApplied();
         testReturnsExpectedCurrentValuesDuringFullDurationAfterSettingSpeed();
@@ -474,59 +470,6 @@ function testSaveThenLoadDoesNotChangeBehaviour(): void {
         EXPECT.falsy(number.isActive);
         EXPECT.toBe(number.current, 500);
 
-    });
-}
-
-function testCanSaveWhetherNumberIsOnOrOff(): void {
-    test('can save whether number is on or off', () => {
-        number.duration(1000).ease('easeInBounce').changeTo(200);
-        number.update(100);
-        number.update(100);
-        number.turnOff();
-        EXPECT.truthy(number.isActive);
-        const before = number.current;
-        number.load(number.save());
-        number.turnOn();
-        number.load(number.save());
-        EXPECT.truthy(number.isActive);
-        EXPECT.toBe(number.current, before);
-    });
-}
-
-function testCanStopAndStartUpdate(): void {
-    test('can stop and start update', () => {
-        number.duration(1000).changeTo(500);
-        number.update(100);
-        EXPECT.toBe(number.current, 50);
-        number.turnOff();
-        number.update(100);
-        EXPECT.toBe(number.current, 50);
-        number.turnOn();
-        number.update(100);
-        EXPECT.toBe(number.current, 100);
-    });
-}
-
-function testCanBeOffAndActive(): void {
-    test('can be off and active', () => {
-        number.turnOff();
-        EXPECT.falsy(number.isActive);
-        number.duration(1000).changeTo(500);
-        EXPECT.truthy(number.isActive);
-        number.turnOff();
-        EXPECT.truthy(number.isActive);
-        number.turnOn();
-        EXPECT.truthy(number.isActive);
-    });
-}
-
-function testCurrentValueIsTheSameWhetherOnOrOff(): void {
-    test('current value is the same whether on or off', () => {
-        number.duration(1000).changeTo(500);
-        number.update(100);
-        EXPECT.toBe(number.current, 50);
-        number.turnOff();
-        EXPECT.toBe(number.current, 50);
     });
 }
 

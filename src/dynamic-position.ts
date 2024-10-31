@@ -80,14 +80,6 @@ export class DynamicPosition implements iDynamic {
         return 0;
     }
 
-    public turnOn(): void {
-        this.strategy.turnOn();
-    }
-
-    public turnOff(): void {
-        this.strategy.turnOff();
-    }
-
     public update(ms: number): void {
         this.strategy.update(ms);
     }

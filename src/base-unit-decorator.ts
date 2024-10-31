@@ -34,14 +34,6 @@ export abstract class BaseUnitDecorator implements iDynamicUnit {
         return this.unit.run();
     }
 
-    public turnOn(): void {
-        this.unit.turnOn();
-    }
-
-    public turnOff(): void {
-        this.unit.turnOff();
-    }
-
     public update(ms: number): void {
         this.unit.update(ms);
     }

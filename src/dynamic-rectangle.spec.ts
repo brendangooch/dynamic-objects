@@ -30,7 +30,6 @@ function testAll(): void {
         testInitialCurrentWidthValueIs100();
         testInitialCurrentHeightValueIs100();
         testRectangleIsInitiallyVisible();
-        testCanShowAndHideRectangleIfOnOrOff();
         testCanShowAndHideRectangleIfActiveOrNot();
         testDurationCANBeSetIfRectangleIsActive();
         testDurationCorrectlyAppliedOnNextChangeMethodCall();
@@ -177,22 +176,6 @@ function testRectangleIsInitiallyVisible(): void {
     });
 }
 
-function testCanShowAndHideRectangleIfOnOrOff(): void {
-    test('can show and hide rectangle if on or off', () => {
-        EXPECT.truthy(rectangle.isVisible);
-        rectangle.turnOff();
-        rectangle.hide();
-        EXPECT.falsy(rectangle.isVisible);
-        rectangle.show();
-        EXPECT.truthy(rectangle.isVisible);
-        rectangle.turnOn();
-        rectangle.hide();
-        EXPECT.falsy(rectangle.isVisible);
-        rectangle.show();
-        EXPECT.truthy(rectangle.isVisible);
-
-    });
-}
 
 function testCanShowAndHideRectangleIfActiveOrNot(): void {
     test('can show and hide rectangle if active or not', () => {

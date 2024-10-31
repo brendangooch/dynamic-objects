@@ -34,10 +34,6 @@ function testAll(): void {
         testLoadReturnsFalseIfMissingElapsedProperty();
         testLoadReturnsFalseIfMissingCurrentValueProperty();
         testSaveThenLoadDoesNotChangeBehaviour();
-        testCanSaveWhetherOnOrOff();
-        testCanStopAndStartUpdate();
-        testCanBeOffAndActive();
-        testCurrentValueIsTheSameWhetherOnOrOff();
         testReturnsExpectedCurrentValuesDuringFullDuration();
         testReturnsExpectedCurrentValuesDuringFullDurationWithEaseApplied();
 
@@ -270,53 +266,7 @@ function testSaveThenLoadDoesNotChangeBehaviour(): void {
     });
 }
 
-function testCanSaveWhetherOnOrOff(): void {
-    test('can save whether unit is on or off', () => {
-        unit.duration(1000).run();
-        unit.turnOff();
-        unit.load(unit.save());
-        unit.turnOn();
-        unit.update(100);
-        EXPECT.toBe(unit.current, 0.1);
-    });
-}
 
-function testCanStopAndStartUpdate(): void {
-    test('can stop and start update', () => {
-        unit.duration(1000).run();
-        unit.update(200);
-        EXPECT.toBe(unit.current, 0.2);
-        unit.turnOff();
-        unit.update(200);
-        EXPECT.toBe(unit.current, 0.2);
-        unit.turnOn();
-        unit.update(200);
-        EXPECT.toBe(unit.current, 0.4);
-    });
-}
-
-function testCanBeOffAndActive(): void {
-    test('can be off and active', () => {
-        unit.duration(1000).run();
-        EXPECT.truthy(unit.isActive);
-        unit.turnOff();
-        EXPECT.truthy(unit.isActive);
-    });
-}
-
-function testCurrentValueIsTheSameWhetherOnOrOff(): void {
-    test('current value is the same whether on or off', () => {
-        unit.duration(1000).run();
-        EXPECT.toBe(unit.current, 0);
-        unit.turnOff();
-        EXPECT.toBe(unit.current, 0);
-        unit.turnOn();
-        unit.update(200);
-        EXPECT.toBe(unit.current, 0.2);
-        unit.turnOff();
-        EXPECT.toBe(unit.current, 0.2);
-    });
-}
 
 function testReturnsExpectedCurrentValuesDuringFullDuration(): void {
     test('returns expected current values during full duration', () => {

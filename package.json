@@ -52,6 +52,6 @@
   "dependencies": {
     "@brendangooch/ease": "^1.2.1",
     "@brendangooch/maths": "^4.0.0",
-    "@brendangooch/simple-game-loop": "^3.0.0"
+    "@brendangooch/simple-game-loop": "^4.0.0"
   }
 }

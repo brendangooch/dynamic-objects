@@ -24,11 +24,11 @@ export abstract class BaseDynamicObject implements iDynamic {
         if (!this.isActive) this.easeOption = easeOption;
     }
 
-    public turnOn(): void {
+    protected turnOn(): void {
         this.isOn = true;
     }
 
-    public turnOff(): void {
+    protected turnOff(): void {
         this.isOn = false;
     }
 
