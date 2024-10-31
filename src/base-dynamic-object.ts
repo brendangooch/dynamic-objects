@@ -24,14 +24,6 @@ export abstract class BaseDynamicObject implements iDynamic {
         if (!this.isActive) this.easeOption = easeOption;
     }
 
-    protected turnOn(): void {
-        this.isOn = true;
-    }
-
-    protected turnOff(): void {
-        this.isOn = false;
-    }
-
     public update(ms: number): void {
         if (this.isOn && this.isActive) {
             this.increment(ms);
@@ -57,6 +49,14 @@ export abstract class BaseDynamicObject implements iDynamic {
         this._duration = state.duration;
         this.easeOption = state.easeOption;
         return true;
+    }
+
+    protected turnOn(): void {
+        this.isOn = true;
+    }
+
+    protected turnOff(): void {
+        this.isOn = false;
     }
 
     protected abstract increment(ms: number): void;
