@@ -77,6 +77,9 @@ v3.0.0
     TESTED ALL FUNCTIONALITY VISUALLY + ALL JEST TESTS PASS
 
 
+v4.0.0
+    ...
+
 
 future plans:
     look for a better way to persist objects without exposing internal properties - Memento pattern?    
