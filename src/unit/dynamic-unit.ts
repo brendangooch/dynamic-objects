@@ -2,27 +2,18 @@
  * represents a unit of 0 - 1 changing over time
  */
 
-import type { iDynamic, tStopOption } from '../index.js';
-import { type tEaseOption, type tEaseFunction, load as loadEase } from '@brendangooch/ease';
-import { BaseDynamicObject } from '../base-dynamic-object.js';
-
-export interface iDynamicUnit extends iDynamic {
-    get current(): number;
-    duration(ms: number): iDynamicUnit;
-    ease(easeOption: tEaseOption): iDynamicUnit;
-    stop(option: tStopOption): void;
-    run(): boolean;
-    clone(): iDynamicUnit;
-}
+import { type tEaseFunction, type tEaseOption, load as loadEase } from "@brendangooch/ease";
+import type { iDynamicUnit } from "../types/i-dynamic-unit.js";
+import { BaseDynamicObject } from "../base-dynamic-object.js";
 
 export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
 
     private elapsed: number = 0;
     private currentValue: number = 0;
-    private easeFn: tEaseFunction = loadEase('noEase');
+    private easeFn: tEaseFunction = loadEase(this.properties.ease);
 
     public get isActive(): boolean {
-        return this.elapsed !== this._duration;
+        return this.elapsed !== this.properties.duration;
     }
 
     public get current(): number {
@@ -37,71 +28,63 @@ export class DynamicUnit extends BaseDynamicObject implements iDynamicUnit {
         });
     }
 
-    public override load(json: string): boolean {
+    public override load(json: string): void {
         const state = JSON.parse(json);
-        if (state.parent === undefined) return false;
-        if (state.elapsed === undefined) return false;
-        if (state.currentValue === undefined) return false;
-        const parentLoaded = super.load(state.parent);
+        super.load(state.parent);
         this.elapsed = state.elapsed;
         this.currentValue = state.currentValue;
-        this.loadEase(this._easeOption); // correct this.easeOption should be loaded by prior super.load() call
-        return parentLoaded;
+        this.easeFn = loadEase(this.properties.ease);
     }
 
     public override duration(ms: number): iDynamicUnit {
         if (!this.isActive && ms > 0) {
             super.duration(ms);
-            this.elapsed = ms; // so unit isn't 'activated'
+            this.elapsed = ms;
         }
         return this;
     }
 
     public override ease(easeOption: tEaseOption): iDynamicUnit {
-        super.ease(easeOption);
+        if (!this.isActive) {
+            super.ease(easeOption);
+            this.easeFn = loadEase(easeOption);
+        }
         return this;
     }
 
-    public run(): boolean {
-        if (!this.isActive && this._duration > 0) {
-            this.loadEase(this._easeOption);
-            this.elapsed = 0; // makes active
-            this.turnOn();
-            return true;
+    public start(): void {
+        if (!this.isActive && this.properties.duration > 0) {
+            this.currentValue = 0;
+            this.elapsed = 0;
         }
-        return false;
+    }
+
+    public stop(): void {
+        this.reset();
     }
 
     public clone(): iDynamicUnit {
-        const unit = new DynamicUnit();
-        unit.duration(this._duration).ease(this._easeOption);
-        return unit;
+        const clone = new DynamicUnit();
+        clone.duration(this.properties.duration).ease(this.properties.ease);
+        return clone;
     }
 
     protected increment(ms: number): void {
         this.elapsed += ms;
-        this.elapsed = Math.min(this.elapsed, this._duration);
+        this.elapsed = Math.min(this.elapsed, this.properties.duration);
+        this.updateCurrent();
     }
 
     protected updateCurrent(): void {
-        this.currentValue = this.easeFn(this.progress);
+        this.currentValue = (this.elapsed === 0) ? 0 : this.easeFn(this.elapsed / this.properties.duration);
     }
 
-    protected override stopHook(): void {
-        this.currentValue = 0;
+    protected override postUpdateComplete(): void {
+        this.currentValue = 1;
+    }
+
+    protected override postReset(): void {
         this.elapsed = 0;
-    }
-
-    protected override resetHook(): void {
-        this.elapsed = 0;
-    }
-
-    private get progress(): number {
-        return (this._duration === 0) ? 0 : this.elapsed / this._duration;
-    }
-
-    private loadEase(easeOption: tEaseOption): void {
-        this.easeFn = loadEase(easeOption);
     }
 
 }

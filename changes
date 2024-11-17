@@ -77,31 +77,15 @@ v3.0.0
     TESTED ALL FUNCTIONALITY VISUALLY + ALL JEST TESTS PASS
 
 
-v4.0.0
-    re-organised src folder to make it less dautning to look at
-    added "verbatimModuleSyntax": true to tsconfig.json
-    added "strictPropertyInitialization": false to tsconfig.json
-    added type keyword to all type and interface imports
+v4.0.0 - scrapped
 
-    BaseDynamicObject
-        added speed() method
-        added stop() method so that client can stop an update cycle
-        added reset() and updateComplete() implementation
-        added resetHook() and updateCompleteHook() so child class can patch in to reset and updateComplete methods
-        added stopHook() so child can patch in to stop() method
+v5.0.0
 
-    //
-
-    added:
-        ...
-
-    updated ALL objects according to minor changes and additions to BaseDynamicObject
+    package completely re-written
+    added: ...
     ALL objects pass their updated jest tests
     tested all new functionality visually in browser
 
 
 
-future plans:
-    look for a better way to persist objects without exposing internal properties - Memento pattern?    
-    need to implement a boolean value that toggles on and off for blinking effects
-        needs to be persistable so state can be saved and reloaded
+
