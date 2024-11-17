@@ -1,6 +1,6 @@
 {
   "name": "@brendangooch/dynamic-objects",
-  "version": "3.0.0",
+  "version": "5.0.0",
   "description": "",
   "author": "B Gooch <brendangooch@gmail.com>",
   "license": "MIT",
@@ -28,7 +28,7 @@
     "/lib"
   ],
   "devDependencies": {
-    "@brendangooch/jest-expect": "^1.0.0",
+    "@brendangooch/jest-expect": "^2.0.0",
     "@types/jest": "^29.5.12",
     "jest": "^29.7.0",
     "typescript": "^5.4.5"

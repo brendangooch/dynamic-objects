@@ -2,14 +2,15 @@
  * 
  */
 
-import * as EXPECT from '@brendangooch/jest-expect';
-import * as EASE from '@brendangooch/ease';
+import { JestExpect } from '@brendangooch/jest-expect';
 import { DynamicRotation } from './dynamic-rotation.js';
-import { DynamicNumber } from './dynamic-number.js';
+import { DynamicNumber } from '../number/dynamic-number.js';
 
 const PI = Math.PI;
 const TAU = PI * 2;
 const HALF_PI = PI / 2;
+
+const EXPECT = new JestExpect();
 let rotation: DynamicRotation;
 beforeEach(() => {
     rotation = new DynamicRotation();
@@ -41,12 +42,12 @@ function testAll(): void {
         testCannotSpinToIfRotationIsActive();
         testCannotSpinToIfNoDurationOrSpeedSet();
         testNumSpinsMustBeAnInteger();
+        testNumSpinsCanBeNegative();
         testDurationMUSTBeSetForSpinToToChangeTheCurrentValue();
         testLoadReturnsTrueOnValidLoad();
         testLoadReturnsFalseIfMissingParentProperty();
         testLoadReturnsFalseIfMissingRotationProperty();
         testLoadReturnsFalseIfMissingSpinProperty();
-        testLoadReturnsFalseIfMissingSpeedProperty();
         testRotateToBehavesAsExpectedDuringFullDuration();
         testRotateToBehavesAsExpectedDuringFullDurationWithSpeedSet();
         testRotateToBehavesAsExpectedDuringFullDurationWithEase();
@@ -274,6 +275,7 @@ function testLoadReturnsTrueOnValidLoad(): void {
         const parent = JSON.stringify({
             isOn: false,
             duration: 0,
+            speed: 0,
             easeOption: 'noEase'
         });
         const rotationObj = new DynamicNumber();
@@ -283,7 +285,6 @@ function testLoadReturnsTrueOnValidLoad(): void {
                     parent: parent,
                     rotation: rotationObj.save(),
                     spin: 0,
-                    speed: 0
                 })
             )
         )
@@ -304,7 +305,6 @@ function testLoadReturnsFalseIfMissingParentProperty(): void {
                     // parent: parent,
                     rotation: rotationObj.save(),
                     spin: 0,
-                    speed: 0
                 })
             )
         )
@@ -316,6 +316,7 @@ function testLoadReturnsFalseIfMissingRotationProperty(): void {
         const parent = JSON.stringify({
             isOn: false,
             duration: 0,
+            speed: 0,
             easeOption: 'noEase'
         });
         // const rotationObj = new DynamicNumber();
@@ -325,7 +326,6 @@ function testLoadReturnsFalseIfMissingRotationProperty(): void {
                     parent: parent,
                     // rotation: rotationObj.save(),
                     spin: 0,
-                    speed: 0
                 })
             )
         )
@@ -337,6 +337,7 @@ function testLoadReturnsFalseIfMissingSpinProperty(): void {
         const parent = JSON.stringify({
             isOn: false,
             duration: 0,
+            speed: 0,
             easeOption: 'noEase'
         });
         const rotationObj = new DynamicNumber();
@@ -346,33 +347,12 @@ function testLoadReturnsFalseIfMissingSpinProperty(): void {
                     parent: parent,
                     rotation: rotationObj.save(),
                     // spin: 0
-                    speed: 0
                 })
             )
         )
     });
 }
 
-function testLoadReturnsFalseIfMissingSpeedProperty(): void {
-    test('load returns false if missing "spin" property', () => {
-        const parent = JSON.stringify({
-            isOn: false,
-            duration: 0,
-            easeOption: 'noEase'
-        });
-        const rotationObj = new DynamicNumber();
-        EXPECT.falsy(
-            rotation.load(
-                JSON.stringify({
-                    parent: parent,
-                    rotation: rotationObj.save(),
-                    spin: 0,
-                    // speed: 0
-                })
-            )
-        )
-    });
-}
 
 function testRotateToBehavesAsExpectedDuringFullDuration(): void {
     test('rotateTo() behaves as expected during full duration', () => {

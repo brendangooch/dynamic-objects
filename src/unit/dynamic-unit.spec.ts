@@ -2,9 +2,10 @@
  * 
  */
 
-import * as EXPECT from '@brendangooch/jest-expect';
+import { JestExpect } from '@brendangooch/jest-expect';
 import { DynamicUnit } from "./dynamic-unit.js";
 
+const EXPECT = new JestExpect();
 let unit: DynamicUnit
 beforeEach(() => {
     unit = new DynamicUnit();
@@ -22,13 +23,19 @@ function testAll(): void {
         testCannotSetDurationLessThan0();
         testSettingDurationDoesNotMakeTheUnitActive();
         testDurationGoesBackTo0OnceDurationHasElapsed();
+        testSettingSpeedDoesNothing();
         testCannotSetEaseIfUnitIsActive();
         testEaseReturnsToNoEaseOnceDurationHasElapsed();
+        testStopDoesNothingIfUnitIsInactive();
+        testCallingStopMakesUnitInactive();
+        testCallingStopSetsCurrentValueBackTo0();
+        testUnitRunsAgainFromTheBeginningAfterCallingStop();
         testRunDoesNothingIFAlreadyActive();
         testRunDoesNothingIfDurationIs0OrLess();
         testRunStartsTheUnitIDurationSetAndNotActive();
         testClonedObjectIsNotTheSameObjectAsOriginator();
         testClonedObjectHasTheSameEaseAndDurationOfOriginator();
+        testClonedUnitIsReadyToRun();
         testValidLoadReturnsTrue();
         testLoadReturnsFalseIfMissingParentProperty();
         testLoadReturnsFalseIfMissingElapsedProperty();
@@ -94,6 +101,14 @@ function testDurationGoesBackTo0OnceDurationHasElapsed(): void {
     });
 }
 
+function testSettingSpeedDoesNothing(): void {
+    test('setting speed does nothing', () => {
+        unit.speed(1);
+        EXPECT.falsy(unit.isActive);
+        EXPECT.falsy(unit.run());
+    });
+}
+
 function testCannotSetEaseIfUnitIsActive(): void {
     test('cannot set ease if unit is active', () => {
         unit.duration(1000).run();
@@ -115,7 +130,57 @@ function testEaseReturnsToNoEaseOnceDurationHasElapsed(): void {
         unit.update(100);
         EXPECT.toBe(unit.current, 0.1); // no ease
     });
+
 }
+
+function testStopDoesNothingIfUnitIsInactive(): void {
+    test('stop() does nothing if unit is inactive', () => {
+        unit.duration(1000);
+        unit.stop();
+        EXPECT.truthy(unit.run());
+        EXPECT.truthy(unit.isActive);
+        unit.stop();
+        EXPECT.falsy(unit.isActive);
+    });
+}
+
+function testCallingStopMakesUnitInactive(): void {
+    test('calling stop() makes unit inactive', () => {
+        EXPECT.truthy(unit.duration(1000).run());
+        EXPECT.truthy(unit.isActive);
+        unit.update(100);
+        EXPECT.toBe(unit.current, 0.1);
+        unit.stop();
+        EXPECT.falsy(unit.isActive);
+    });
+}
+
+function testCallingStopSetsCurrentValueBackTo0(): void {
+    test('calling stop() sets current value back to 0', () => {
+        EXPECT.truthy(unit.duration(1000).run());
+        EXPECT.truthy(unit.isActive);
+        unit.update(100);
+        EXPECT.toBe(unit.current, 0.1);
+        unit.stop();
+        EXPECT.toBe(unit.current, 0);
+    });
+}
+
+function testUnitRunsAgainFromTheBeginningAfterCallingStop(): void {
+    test('unit runs again from the beginning after calling stop()', () => {
+        EXPECT.truthy(unit.duration(1000).run());
+        EXPECT.truthy(unit.isActive);
+        unit.update(100);
+        EXPECT.toBe(unit.current, 0.1);
+        unit.stop();
+        EXPECT.truthy(unit.duration(1000).run());
+        EXPECT.truthy(unit.isActive);
+        unit.update(100);
+        EXPECT.toBe(unit.current, 0.1);
+    });
+}
+
+
 
 function testRunDoesNothingIFAlreadyActive(): void {
     test('run() does nothing if already active', () => {
@@ -161,11 +226,20 @@ function testClonedObjectHasTheSameEaseAndDurationOfOriginator(): void {
     });
 }
 
+function testClonedUnitIsReadyToRun(): void {
+    test('cloned unit is ready to run', () => {
+        unit.duration(1000).ease('noEase');
+        const clone = unit.clone();
+        EXPECT.truthy(clone.run());
+    });
+}
+
 function testValidLoadReturnsTrue(): void {
     test('valid load returns true', () => {
         const parent = JSON.stringify({
             isOn: false,
             duration: 0,
+            speed: 0,
             easeOption: 'noEase'
         });
         EXPECT.truthy(
@@ -185,6 +259,7 @@ function testLoadReturnsFalseIfMissingParentProperty(): void {
         // const parent = JSON.stringify({
         //     isOn: false,
         //     duration: 0,
+        //     speed: 0,
         //     easeOption: 'noEase'
         // });
         EXPECT.falsy(
@@ -204,6 +279,7 @@ function testLoadReturnsFalseIfMissingElapsedProperty(): void {
         const parent = JSON.stringify({
             isOn: false,
             duration: 0,
+            speed: 0,
             easeOption: 'noEase'
         });
         EXPECT.falsy(
@@ -223,6 +299,7 @@ function testLoadReturnsFalseIfMissingCurrentValueProperty(): void {
         const parent = JSON.stringify({
             isOn: false,
             duration: 0,
+            speed: 0,
             easeOption: 'noEase'
         });
         EXPECT.falsy(
@@ -265,7 +342,6 @@ function testSaveThenLoadDoesNotChangeBehaviour(): void {
         EXPECT.toBe(unit.current, 1);
     });
 }
-
 
 
 function testReturnsExpectedCurrentValuesDuringFullDuration(): void {

@@ -3,9 +3,10 @@
  * used by DynamicRectangle to set its rotation
  */
 
-import { tEaseOption } from "@brendangooch/ease";
-import { BaseDynamicObject } from "./base-dynamic-object.js";
-import { DynamicNumber } from "./dynamic-number.js";
+import type { tEaseOption } from "@brendangooch/ease";
+import { BaseDynamicObject } from "../base-dynamic-object.js";
+import { DynamicNumber } from "../number/dynamic-number.js";
+import type { tStopOption } from "../index.js";
 
 export class DynamicRotation extends BaseDynamicObject {
 
@@ -13,7 +14,6 @@ export class DynamicRotation extends BaseDynamicObject {
 
     private rotation: DynamicNumber;
     private spin: number = 0;
-    private _speed: number = 0;
 
     public constructor(initial: number = 0) {
         super();
@@ -28,9 +28,29 @@ export class DynamicRotation extends BaseDynamicObject {
         return this.rotation.current;
     }
 
+    public override save(): string {
+        return JSON.stringify({
+            parent: super.save(),
+            rotation: this.rotation.save(),
+            spin: this.spin,
+            speed: this._speed
+        })
+    }
+
+    public override load(json: string): boolean {
+        const state = JSON.parse(json);
+        if (state.parent === undefined) return false;
+        if (state.rotation === undefined) return false;
+        if (state.spin === undefined) return false;
+        const parentLoaded = super.load(state.parent);
+        this.rotation.load(state.rotation);
+        this.spin = state.spin;
+        return parentLoaded;
+    }
+
     public override duration(ms: number): DynamicRotation {
         super.duration(ms);
-        this._speed = 0;
+        // this._speed = 0;
         return this;
     }
 
@@ -39,49 +59,26 @@ export class DynamicRotation extends BaseDynamicObject {
         return this;
     }
 
-    public speed(unitsPerMs: number): DynamicRotation {
-        if (!this.isActive && unitsPerMs > 0) {
-            this._speed = unitsPerMs;
-            this._duration = 0;
-        }
+    public override speed(unitsPerMs: number): DynamicRotation {
+        super.speed(unitsPerMs);
         return this;
     }
 
-    public rotateTo(radians: number): number {
+    // stop
+
+    public rotateTo(radians: number): number | false {
         if (this.canChange(radians)) return this.doChange(radians);
         return 0;
     }
 
     // numSpins must be a positive or negative integer
     // no point doing an instant change with spin!
-    public spinTo(numSpins: number, radians: number): number {
+    public spinTo(numSpins: number, radians: number): number | false {
         if ((this._duration > 0 || this._speed > 0) && Number.isInteger(numSpins)) {
             this.addSpin(numSpins);
             return this.rotateTo(radians + this.spin);
         }
         return 0;
-    }
-
-    public override load(json: string): boolean {
-        const state = JSON.parse(json);
-        if (state.parent === undefined) return false;
-        if (state.rotation === undefined) return false;
-        if (state.spin === undefined) return false;
-        if (state.speed === undefined) return false;
-        const parentLoaded = super.load(state.parent);
-        this.rotation.load(state.rotation);
-        this.spin = state.spin;
-        this._speed = state.speed;
-        return parentLoaded;
-    }
-
-    public override save(): string {
-        return JSON.stringify({
-            parent: super.save(),
-            rotation: this.rotation.save(),
-            spin: this.spin,
-            speed: this._speed
-        })
     }
 
     protected increment(ms: number): void {
@@ -92,17 +89,19 @@ export class DynamicRotation extends BaseDynamicObject {
     protected updateCurrent(): void { }
 
     // remove spin after each dynamic rotation complete
-    protected updateComplete(): void {
+    protected override updateCompleteHook(): void {
         this.removeSpin();
-        this.reset();
-        this.turnOff();
+    }
+
+    protected override stopHook(option: tStopOption): void {
+        this.rotation.stop(option);
     }
 
     private canChange(radians: number): boolean {
         return !this.isActive && radians !== this.current;
     }
 
-    private doChange(radians: number): number {
+    private doChange(radians: number): number | false {
         if (this._duration > 0 || this._speed > 0) return this.dynamicChange(radians);
         else this.instantChange(radians);
         return 0;
@@ -113,18 +112,12 @@ export class DynamicRotation extends BaseDynamicObject {
         this.reset();
     }
 
-    private dynamicChange(radians: number): number {
+    private dynamicChange(radians: number): number | false {
         if (this._duration > 0) this.rotation.duration(this._duration);
         if (this._speed > 0) this.rotation.speed(this._speed);
-        if (this.easeOption) this.rotation.ease(this.easeOption);
+        if (this._easeOption) this.rotation.ease(this._easeOption);
         this.turnOn();
         return this.rotation.changeTo(radians);
-    }
-
-    private reset(): void {
-        this._duration = 0;
-        this._speed = 0;
-        this.easeOption = 'noEase';
     }
 
     private addSpin(numSpins: number): void {
