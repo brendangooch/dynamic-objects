@@ -3,6 +3,28 @@
  * used by DynamicRectangle to set its rotation
  */
 
+import { BaseDynamicObject } from "../base-dynamic-object.js";
+
+export class DynamicRotation extends BaseDynamicObject {
+
+    public get isActive(): boolean {
+        return false;
+    }
+
+    public get current(): boolean {
+        return false;
+    }
+
+    public complete(): void { }
+    public stop(): void { }
+    public rewind(): void { }
+
+    protected increment(ms: number): void {
+        //
+    }
+
+}
+
 // import type { tEaseOption } from "@brendangooch/ease";
 // import { DynamicNumber } from "../number/dynamic-number.js";
 

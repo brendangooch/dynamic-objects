@@ -60,11 +60,6 @@ export class DynamicNumber extends BaseDynamicObject {
     // 
     public stop(): void { }
 
-    // 
-    public rewind(): void { }
-
-    // 
-    public complete(): void { }
 
     // abstract parent methods
     protected override increment(ms: number): void {

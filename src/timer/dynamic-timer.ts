@@ -1,5 +1,8 @@
 /**
  * a timer that can be persisted
+ * contains a single callback function that is called when the duration has finished
+ * callback persists throughout object life time
+ * can be turned on/off and state (time elapsed) can be saved
  */
 
 import { BaseDynamicObject } from "../base-dynamic-object.js";
@@ -33,9 +36,7 @@ export class DynamicTimer extends BaseDynamicObject {
     }
 
     public override duration(ms: number): DynamicTimer {
-        if (!this.isActive && ms > 0) {
-            super.duration(ms);
-        }
+        super.duration(ms);
         return this;
     }
 
@@ -60,15 +61,17 @@ export class DynamicTimer extends BaseDynamicObject {
 // timer.update(100);
 // timer.update(100);
 // timer.update(100);
-// timer.off();
+
 // // quit game
+// timer.off();
 // const state = timer.save();
 // // ..
 // // return to game
 // timer.load(state);
 // timer.on();
+
 // timer.update(100);
 // timer.update(100);
 // // ..
 // // ..
-// // > timer is up!
+// // > time is up!
