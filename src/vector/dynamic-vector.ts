@@ -10,8 +10,8 @@ import { Vector2D } from "@brendangooch/maths";
 
 export class DynamicVector extends BaseDynamicObject {
 
-    private unit: DynamicUnit = new DynamicUnit();
-    private state = { current: new Vector2D, previous: new Vector2D, next: new Vector2D };
+    protected unit: DynamicUnit = new DynamicUnit();
+    protected state = { current: new Vector2D, previous: new Vector2D, next: new Vector2D };
 
     public constructor(x: number = 0, y: number = 0) {
         super();
@@ -95,7 +95,7 @@ export class DynamicVector extends BaseDynamicObject {
     }
 
     // private methods
-    private updateCurrent(): void {
+    protected updateCurrent(): void {
         this.state.current = this.state.previous.add(this.state.next.subtract(this.state.previous).multiply(this.unit.current));
     }
 
@@ -133,7 +133,10 @@ export class DynamicVector extends BaseDynamicObject {
     }
 
     private dynamicChange(): void {
+        this.preDynamicChangeHook();
         this.unit.duration(this.getDuration()).ease(this.properties.ease).start();
     }
+
+    protected preDynamicChangeHook(): void { }
 
 }
