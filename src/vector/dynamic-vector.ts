@@ -2,70 +2,118 @@
  * a vector that changes its position over time
  */
 
-// import type { tEaseOption } from "@brendangooch/ease";
-// import { DynamicUnit } from "../unit/dynamic-unit.js";
+import type { tEaseOption } from "@brendangooch/ease";
+import { BaseDynamicObject } from "../base-dynamic-object.js";
+import { DynamicUnit } from "../unit/dynamic-unit.js";
+import type { Vector2D } from "@brendangooch/maths";
 
-// export class DynamicVector {
 
-//     protected unit: DynamicUnit;
+export class DynamicVector extends BaseDynamicObject {
 
-//     public get isActive(): boolean {
-//         return false;
-//     }
+    private unit: DynamicUnit;
+    private currentValue: Vector2D;
+    private previousValue: Vector2D;
+    private nextValue: Vector2D;
 
-//     public get x(): number {
-//         return 0;
-//     }
+    public constructor(x: number = 0, y: number = 0) {
+        super();
+        this.setAll(x, y);
+    }
 
-//     public get y(): number {
-//         return 0;
-//     }
+    public get isActive(): boolean {
+        return this.unit.isActive;
+    }
 
-//     public getDuration(): number {
-//         return 0;
-//     }
+    public get x(): number {
+        return this.currentValue.x;
+    }
 
-//     public update(ms: number): void { }
+    public get y(): number {
+        return this.currentValue.y;
+    }
 
-//     public save(): string {
-//         return '';
-//     }
+    public override save(): string {
+        return '';
+    }
 
-//     public load(json: string): void { }
+    public override load(json: string): void { }
 
-//     public duration(ms: number): DynamicVector {
-//         return this;
-//     }
+    public override duration(ms: number): DynamicVector {
+        super.duration(ms);
+        return this;
+    }
 
-//     public speed(unitsPerMS: number): DynamicVector {
-//         return this;
-//     }
+    public override speed(unitsPerMS: number): DynamicVector {
+        super.speed(unitsPerMS);
+        return this;
+    }
 
-//     public ease(easeOption: tEaseOption): DynamicVector {
-//         return this;
-//     }
+    public override ease(easeOption: tEaseOption): DynamicVector {
+        super.ease(easeOption);
+        return this;
+    }
 
-//     // set the next value but do not activate
-//     public next(x: number, y: number): DynamicVector {
-//         return this;
-//     }
+    // 
+    public next(x: number, y: number): DynamicVector {
+        //
+        return this;
+    }
 
-//     // change current value from previous to next
-//     public change(): void { }
+    // 
+    public move(): boolean {
+        return false;
+    }
 
-//     // end the current transition where it is
-//     public stop(): void { }
+    // stop unit, set all to current
+    public stop(): void { }
 
-//     // end the current transition and set current value to previous value
-//     public rewind(): void { }
 
-//     // end the current transition and set current value to next value
-//     public complete(): void { }
+    // abstract parent methods
+    protected override increment(ms: number): void {
+        this.unit.update(ms);
+        this.updateCurrent();
+    }
 
-//     // can update when on
-//     public on(): void { }
+    // hooks
+    protected override postUpdateComplete(): void {
 
-//     // cannot update when off
-//     public off(): void { }
+    }
 
-// }
+    protected override postReset(): void {
+
+    }
+
+    // private methods
+    private updateCurrent(): void {
+        //
+    }
+
+    private setAll(x: number, y: number): void {
+        //
+    }
+
+    private setAllToCurrent(): void {
+        //
+    }
+
+    private updateDistance(): void {
+        //
+    }
+
+    private canMove(): boolean {
+        return false;
+    }
+
+    private doMove(): void {
+        //
+    }
+
+    private instantMove(): void {
+        //
+    }
+
+    private dynamicMove(): void {
+        //
+    }
+
+}
