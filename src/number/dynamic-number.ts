@@ -90,7 +90,7 @@ export class DynamicNumber extends BaseDynamicObject {
 
     // private methods
     private updateCurrent(): void {
-        this.state.current = this.state.previous + (this.properties.distance * this.unit.current);
+        this.state.current = this.state.previous + ((this.state.next - this.state.previous) * this.unit.current);
     }
 
     private setAll(n: number): void {

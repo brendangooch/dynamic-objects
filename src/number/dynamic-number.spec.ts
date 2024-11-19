@@ -338,7 +338,7 @@ function fullTransitionTest(props: {
         number.update(stepSize!);
         elapsed += stepSize!;
         progress = easeFn(elapsed / duration!);
-        current = props.initial + (DISTANCE * progress);
+        current = props.initial + ((props.next - props.initial) * progress);
         EXPECT.toBeCloseTo(number.current, current);
     }
 
