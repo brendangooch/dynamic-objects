@@ -25,6 +25,8 @@ function testAll(): void {
         testSettingNoSpeedOrDurationChangesPositionInstantly();
         testCannotChangeIfVectorIsActive();
         testDoesNotChangeIfNextPositionIsCurrentPosition();
+        testDOESChangeIfNextXIsNotCurrentX();
+        testDOESChangeIfNextYIsNotCurrentY();
         testChangesInstantlyIfNoDurationOrSpeedProvided();
         testReturnsCorrectDurationWhenSpeedAndNextValueAreSet();
         testDynamicTransitionCanBeStopped();
@@ -94,7 +96,7 @@ function testCannotChangeIfVectorIsActive(): void {
 }
 
 function testDoesNotChangeIfNextPositionIsCurrentPosition(): void {
-    test('does not change if next position is current position', () => {
+    test('does NOT change if next position is current position', () => {
         vector.next(200, 400).change();
         EXPECT.toBe(vector.x, 200);
         EXPECT.toBe(vector.y, 400);
@@ -104,6 +106,25 @@ function testDoesNotChangeIfNextPositionIsCurrentPosition(): void {
         EXPECT.toBe(vector.y, 400);
     });
 }
+
+function testDOESChangeIfNextXIsNotCurrentX(): void {
+    test('DOES change if next x value is not current x value', () => {
+        vector = new DynamicVector(100, 200);
+        vector.next(200, 200).change();
+        EXPECT.toBe(vector.x, 200);
+        EXPECT.toBe(vector.y, 200);
+    });
+}
+
+function testDOESChangeIfNextYIsNotCurrentY(): void {
+    test('DOES change if next y value is not current y value', () => {
+        vector = new DynamicVector(100, 200);
+        vector.next(100, 100).change();
+        EXPECT.toBe(vector.x, 100);
+        EXPECT.toBe(vector.y, 100);
+    });
+}
+
 
 function testChangesInstantlyIfNoDurationOrSpeedProvided(): void {
     test('changes instantly if no duration or speed provided', () => {
@@ -268,7 +289,7 @@ function fullTransitionTest(props: {
     let easeFn: tEaseFunction = loadEase('noEase');
     let elapsed = 0;
     let progress = 0;
-    let current: Vector2D;
+    const current = new Vector2D();
 
     if (props.duration) {
         duration = props.duration;
@@ -294,7 +315,7 @@ function fullTransitionTest(props: {
         vector.update(stepSize!);
         elapsed += stepSize!;
         progress = easeFn(elapsed / duration!);
-        current = props.initial.add(props.next.subtract(props.initial).multiply(progress));
+        current.copy(props.initial.add(props.next.subtract(props.initial).multiply(progress)));
         EXPECT.toBeCloseTo(vector.x, current.x);
         EXPECT.toBeCloseTo(vector.y, current.y);
     }

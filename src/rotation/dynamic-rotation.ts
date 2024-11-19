@@ -3,24 +3,103 @@
  * used by DynamicRectangle to set its rotation
  */
 
+import type { tEaseOption } from "@brendangooch/ease";
 import { BaseDynamicObject } from "../base-dynamic-object.js";
+import { DynamicNumber } from "../number/dynamic-number.js";
 
 export class DynamicRotation extends BaseDynamicObject {
 
+    private static TAU: number = Math.PI * 2;
+
+    private rotation: DynamicNumber;
+    private spinAmount: number = 0;
+    private nextValue: number = 0;
+
+    public constructor(initial: number = 0) {
+        super();
+        this.rotation = new DynamicNumber(initial);
+    }
+
     public get isActive(): boolean {
-        return false;
+        return this.rotation.isActive;
     }
 
-    public get current(): boolean {
-        return false;
+    public get current(): number {
+        return this.rotation.current;
     }
 
-    public complete(): void { }
-    public stop(): void { }
-    public rewind(): void { }
+    public override save(): string {
+        return JSON.stringify({
+
+        });
+    }
+
+    public override load(json: string): void {
+        const state = JSON.parse(json);
+    }
+
+    public override duration(ms: number): DynamicRotation {
+        super.duration(ms);
+        return this;
+    }
+
+    public override speed(unitsPerMS: number): DynamicRotation {
+        super.speed(unitsPerMS);
+        return this;
+    }
+
+    public override ease(easeOption: tEaseOption): DynamicRotation {
+        super.ease(easeOption);
+        return this;
+    }
+
+    public spin(numSpins: number): DynamicRotation {
+        if (!this.isActive) {
+            this.spinAmount = numSpins * DynamicRotation.TAU;
+        }
+        return this;
+    }
+
+    public next(n: number): DynamicRotation {
+        this.rotation.next(n + this.spinAmount);
+        return this;
+    }
+
+    public rotate(): void {
+        if (!this.isActive) {
+            this.setDurationSpeedEase();
+            this.rotation.change();
+        }
+    }
+
+    public stop(): void {
+        this.rotation.stop();
+    }
 
     protected increment(ms: number): void {
-        //
+        this.rotation.update(ms);
+    }
+
+    protected override postUpdateComplete(): void {
+        this.removeSpin();
+    }
+
+    protected override postReset(): void {
+        this.nextValue = 0;
+    }
+
+    private setDurationSpeedEase(): void {
+        if (this.properties.speed > 0) this.rotation.speed(this.properties.speed);
+        if (this.properties.duration > 0) this.rotation.duration(this.properties.duration);
+        this.rotation.ease(this.properties.ease);
+    }
+
+    // remove any "spin" added to rotation during last change
+    private removeSpin(): void {
+        if (this.spinAmount !== 0) {
+            this.rotation.next(this.rotation.current - this.spinAmount).change();
+            this.spinAmount = 0;
+        }
     }
 
 }

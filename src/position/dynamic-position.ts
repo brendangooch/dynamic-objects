@@ -3,66 +3,136 @@
  *
  */
 
-import type { tEaseOption } from "@brendangooch/ease";
+// + updateDistance
+// + store nextValue
 
-export class DynamicPosition {
+import type { tEaseOption } from "@brendangooch/ease";
+import { BaseDynamicObject } from "../base-dynamic-object.js";
+import { DynamicVector } from "../vector/dynamic-vector.js";
+import { DynamicBezier } from "../bezier/dynamic-bezier.js";
+import { Vector2D } from "@brendangooch/maths";
+
+export class DynamicPosition extends BaseDynamicObject {
+
+    private vector: DynamicVector;
+    private bezier: DynamicBezier;
+    private strategy: DynamicVector | DynamicBezier;
+    private isVector: boolean;
+    private nextValue: Vector2D = new Vector2D();
+
+    public constructor(x: number = 0, y: number = 0) {
+        super();
+        this.vector = new DynamicVector(x, y);
+        this.bezier = new DynamicBezier(x, y);
+        this.strategy = this.vector;
+        this.isVector = true;
+    }
 
     public get isActive(): boolean {
-        return false;
+        return this.strategy.isActive;
     }
 
     public get x(): number {
-        return 0;
+        return Math.round(this.strategy.x);
     }
 
     public get y(): number {
-        return 0;
+        return Math.round(this.strategy.y);
     }
 
-    public getDuration(): number {
-        return 0;
+    public override save(): string {
+        return JSON.stringify({
+            parent: super.save(),
+            vector: this.vector.save(),
+            bezier: this.bezier.save(),
+            isVector: this.isVector,
+            next: this.nextValue.save()
+        });
     }
 
-    public update(ms: number): void { }
-
-    public save(): string {
-        return '';
+    public override load(json: string): void {
+        const state = JSON.parse(json);
+        super.load(state.parent);
+        this.vector.load(state.vector);
+        this.bezier.load(state.bezier);
+        this.isVector = state.isVector;
+        this.nextValue.load(state.next);
+        if (this.isVector) this.strategy = this.vector;
+        else this.strategy = this.bezier;
     }
 
-    public load(json: string): void { }
-
-    public duration(ms: number): DynamicPosition {
+    public override duration(ms: number): DynamicPosition {
+        super.duration(ms);
         return this;
     }
 
-    public speed(unitsPerMS: number): DynamicPosition {
+    public override speed(unitsPerMS: number): DynamicPosition {
+        super.speed(unitsPerMS);
         return this;
     }
 
-    public ease(easeOption: tEaseOption): DynamicPosition {
+    public override ease(easeOption: tEaseOption): DynamicPosition {
+        super.ease(easeOption);
         return this;
     }
 
     public next(x: number, y: number): DynamicPosition {
+        if (!this.isActive) {
+            this.nextValue.setXY(x, y);
+            this.updateDistance();
+        }
         return this;
     }
 
-    // change current value from previous to next
-    public change(): void { }
+    public move(): void {
+        if (!this.isActive) {
+            if (!this.isVector) this.switchToVector();
+            this.setDurationSpeedEase();
+            this.vector.next(this.nextValue.x, this.nextValue.y).change();
+        }
+    }
 
-    // end the current transition where it is
-    public stop(): void { }
+    public curveTo(distance: number, angle: number): void {
+        if (!this.isActive && (this.properties.duration > 0 || this.properties.speed > 0)) {
+            if (this.isVector) this.switchToBezier();
+            this.setDurationSpeedEase();
+            this.bezier.control(distance, angle).next(this.nextValue.x, this.nextValue.y).change();
+        }
+    }
 
-    // end the current transition and set current value to previous value
-    public rewind(): void { }
+    public stop(): void {
+        this.strategy.stop();
+    }
 
-    // end the current transition and set current value to next value
-    public complete(): void { }
+    protected increment(ms: number): void {
+        this.strategy.update(ms);
+    }
 
-    // can update when on
-    public on(): void { }
+    private updateDistance(): void {
+        this.properties.distance = this.nextValue.distanceTo(new Vector2D(this.x, this.y));
+    }
 
-    // cannot update when off
-    public off(): void { }
+    private switchToBezier(): void {
+        this.bezier.next(this.vector.x, this.vector.y).change();
+        this.strategy = this.bezier;
+        this.isVector = false;
+    }
+
+    private switchToVector(): void {
+        this.vector.next(this.bezier.x, this.bezier.y).change();
+        this.strategy = this.vector;
+        this.isVector = true;
+    }
+
+    private setDurationSpeedEase(): void {
+        if (this.properties.speed > 0) this.strategy.speed(this.properties.speed);
+        if (this.properties.duration > 0) this.strategy.duration(this.properties.duration);
+        this.strategy.ease(this.properties.ease);
+    }
 
 }
+
+const position = new DynamicPosition();
+position.speed(2).ease('easeInCubic').next(600, 800);
+const duration = position.getDuration();
+position.curveTo(1000, -2);
