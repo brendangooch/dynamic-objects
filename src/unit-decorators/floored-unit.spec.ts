@@ -16,7 +16,7 @@ beforeEach(() => {
 
 testAll();
 function testAll(): void {
-    describe('InvertedUnit', () => {
+    describe('FlooredUnit', () => {
 
         testCurrentValueAsExpectedDuringFullTransition();
         testCurrentValueAsExpectedDuringFullTransitionWithEaseApplied();

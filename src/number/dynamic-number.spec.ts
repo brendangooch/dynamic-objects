@@ -329,7 +329,9 @@ function fullTransitionTest(props: {
         number.ease(props.ease);
     }
 
-    number.next(props.next).change();
+    number.next(props.next);
+    EXPECT.toBe(number.getDuration(), duration!); // <-- test get duration
+    number.change();
     EXPECT.truthy(number.isActive);
 
     for (let i = 0; i < NUM_STEPS - 1; i++) {

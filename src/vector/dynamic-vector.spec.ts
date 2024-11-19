@@ -308,7 +308,9 @@ function fullTransitionTest(props: {
         vector.ease(props.ease);
     }
 
-    vector.next(props.next.x, props.next.y).change();
+    vector.next(props.next.x, props.next.y);
+    EXPECT.toBe(vector.getDuration(), duration!); // <-- test getDuration()
+    vector.change();
     EXPECT.truthy(vector.isActive);
 
     for (let i = 0; i < NUM_STEPS - 1; i++) {
