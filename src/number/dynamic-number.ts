@@ -74,6 +74,7 @@ export class DynamicNumber extends BaseDynamicObject {
     public stop(): void {
         this.unit.stop();
         this.setAllToCurrent();
+        this.reset();
     }
 
 

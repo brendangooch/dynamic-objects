@@ -102,6 +102,7 @@ export class DynamicPosition extends BaseDynamicObject {
 
     public stop(): void {
         this.strategy.stop();
+        this.reset();
     }
 
     protected increment(ms: number): void {
@@ -131,8 +132,3 @@ export class DynamicPosition extends BaseDynamicObject {
     }
 
 }
-
-const position = new DynamicPosition();
-position.speed(2).ease('easeInCubic').next(600, 800);
-const duration = position.getDuration();
-position.curveTo(1000, -2);

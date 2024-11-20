@@ -80,6 +80,7 @@ export class DynamicVector extends BaseDynamicObject {
     public stop(): void {
         this.unit.stop();
         this.setAllToCurrent();
+        this.reset();
     }
 
 
