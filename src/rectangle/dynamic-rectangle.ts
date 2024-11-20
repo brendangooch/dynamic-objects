@@ -1,16 +1,18 @@
 /**
- * aggregates DynamicPosition, DynamicRotation and a collection of DynamicNumbers into one convenient place
+ * aggregates all dynamic properties of a rectangle into one convenient place
  * DynamicRectangle is extended by ScreenEntity to keep the ScreenEntity class size to a minimum
  *
  */
 
 import { BaseDynamicObject } from "../base-dynamic-object.js";
-import { DynamicNumber } from "../number/dynamic-number.js";
+import { DynamicDimension } from "../dimension/dynamic-dimension.js";
+import { DynamicOpacity } from "../opacity/dynamic-opacity.js";
 import { DynamicPosition } from "../position/dynamic-position.js";
 import { DynamicRotation } from "../rotation/dynamic-rotation.js";
+import { DynamicScale } from "../scale/dynamic-scale.js";
 import { DynamicVisibility } from "../visibility/dynamic-visibility.js";
 
-type tComponent = DynamicPosition | DynamicRotation | DynamicNumber | DynamicVisibility;
+type tComponent = DynamicVisibility | DynamicPosition | DynamicRotation | DynamicOpacity | DynamicScale | DynamicDimension;
 
 export class DynamicRectangle extends BaseDynamicObject {
 
@@ -21,14 +23,14 @@ export class DynamicRectangle extends BaseDynamicObject {
         this.add('visibility', new DynamicVisibility());
         this.add('position', new DynamicPosition());
         this.add('rotation', new DynamicRotation());
-        this.add('opacity', new DynamicNumber());
-        this.add('scale', new DynamicNumber());
-        this.add('width', new DynamicNumber());
-        this.add('height', new DynamicNumber());
+        this.add('opacity', new DynamicOpacity());
+        this.add('scale', new DynamicScale());
+        this.add('width', new DynamicDimension());
+        this.add('height', new DynamicDimension());
     }
 
     public get isActive(): boolean {
-        return this.components.every(component => component.object.isActive);
+        return this.components.some(component => component.object.isActive);
     }
 
     public get visibility(): DynamicVisibility {
@@ -43,20 +45,20 @@ export class DynamicRectangle extends BaseDynamicObject {
         return <DynamicRotation>this.find('rotation');
     }
 
-    public get opacity(): DynamicNumber {
-        return <DynamicNumber>this.find('opacity');
+    public get opacity(): DynamicOpacity {
+        return <DynamicOpacity>this.find('opacity');
     }
 
-    public get scale(): DynamicNumber {
-        return <DynamicNumber>this.find('scale');
+    public get scale(): DynamicScale {
+        return <DynamicScale>this.find('scale');
     }
 
-    public get width(): DynamicNumber {
-        return <DynamicNumber>this.find('width');
+    public get width(): DynamicDimension {
+        return <DynamicDimension>this.find('width');
     }
 
-    public get height(): DynamicNumber {
-        return <DynamicNumber>this.find('height');
+    public get height(): DynamicDimension {
+        return <DynamicDimension>this.find('height');
     }
 
     public override save(): string {
@@ -82,6 +84,10 @@ export class DynamicRectangle extends BaseDynamicObject {
         this.find('scale')!.load(state.scale);
         this.find('width')!.load(state.width);
         this.find('height')!.load(state.height);
+    }
+
+    public stop(): void {
+        this.components.forEach(component => component.object.stop());
     }
 
     protected increment(ms: number): void {

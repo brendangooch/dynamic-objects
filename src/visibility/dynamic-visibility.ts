@@ -73,6 +73,11 @@ export class DynamicVisibility extends BaseDynamicObject {
         }
     }
 
+    public stop(): void {
+        this.stopBoth();
+        this.reset();
+    }
+
     protected increment(ms: number): void {
         this.unit.update(ms);
         this.wave.update(ms);
