@@ -10,7 +10,7 @@ import { DynamicUnit } from "../unit/dynamic-unit.js";
 
 export class DynamicTimer extends BaseDynamicObject {
 
-    private unit: DynamicUnit;
+    private unit: DynamicUnit = new DynamicUnit();
     private onComplete: Function;
 
     public constructor(onComplete: Function) {

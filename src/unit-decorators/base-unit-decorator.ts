@@ -4,7 +4,6 @@
 
 import type { tEaseOption } from "@brendangooch/ease";
 import type { iDynamicUnit } from "../types/i-dynamic-unit.js";
-import { DynamicUnit } from "../unit/dynamic-unit.js";
 
 export abstract class BaseUnitDecorator implements iDynamicUnit {
 

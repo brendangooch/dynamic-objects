@@ -1,47 +1,63 @@
 /**
- * a sequence of timed callback functions
- * once % progress is reached, the callback is executed
+ * a sequence of callback functions that fire at even intervals during sequence duration whilst running
  * 
  */
 
+import type { tEaseOption } from "@brendangooch/ease";
 import { BaseDynamicObject } from "../base-dynamic-object.js";
 import { DynamicUnit } from "../unit/dynamic-unit.js";
-import { clamp } from "@brendangooch/maths";
-
-type tAction = { at: number; fn: Function };
-type tAtOption = number | 'start' | 'end';
 
 export class DynamicSequence extends BaseDynamicObject {
 
+    // the buffer (in %) at the start and end of seuqnece
+    private static TIME_BUFFER: number = 0.05;
+
     protected unit: DynamicUnit = new DynamicUnit();
-    protected actions: tAction[] = [];
-    protected atStartFn: Function | null = null;
-    protected atEndFn: Function | null = null;
+    protected onStartFn: Function | null = null;
+    protected onCompleteFn: Function | null = null;
+    protected times: number[] = [];
+    protected callbacks: Function[] = [];
 
     public get isActive(): boolean {
         return this.unit.isActive;
     }
 
     public override duration(ms: number): DynamicSequence {
-        if (!this.isActive && ms > 0) {
-            super.duration(ms);
+        this.unit.duration(ms);
+        return this;
+    }
+
+    public override ease(easeOption: tEaseOption): DynamicSequence {
+        this.unit.ease(easeOption);
+        return this;
+    }
+
+    public onStart(fn: Function): DynamicSequence {
+        if (!this.isActive) {
+            this.onStartFn = fn;
         }
         return this;
     }
 
-    public at(at: tAtOption, fn: Function): DynamicSequence {
+    public onComplete(fn: Function): DynamicSequence {
         if (!this.isActive) {
-            if (at === 'start') this.atStartFn = fn;
-            if (at === 'end') this.atEndFn = fn;
-            if (typeof at === 'number') this.actions.push({ at: clamp(at, 0.01, 0.99), fn: fn });
+            this.onCompleteFn = fn;
         }
         return this;
     }
 
-    public start(): void {
+    public add(fn: Function): DynamicSequence {
         if (!this.isActive) {
-            if (this.atStartFn) this.atStartFn();
-            this.unit.duration(this.properties.duration).start();
+            this.callbacks.push(fn);
+            this.updateTimes();
+        }
+        return this;
+    }
+
+    public run(): void {
+        if (!this.isActive) {
+            if (this.onStartFn) this.onStartFn();
+            this.unit.start();
         }
     }
 
@@ -51,46 +67,38 @@ export class DynamicSequence extends BaseDynamicObject {
     }
 
     protected fire(): void {
-        const toFire = this.actions.filter(action => action.at >= this.unit.current).sort((a, b) => (a.at < b.at) ? 1 : -1)[0];
-        if (toFire) toFire.fn();
+        if (this.times[0] !== undefined && this.times[0] <= this.unit.current) {
+            this.times.shift();
+            this.callbacks.shift()!();
+        }
     }
 
     protected override postUpdateComplete(): void {
-        if (this.atEndFn) this.atEndFn();
+        if (this.onCompleteFn) this.onCompleteFn();
+        // this should be in postReset() but method is called before postUpdateComplete() in parent
+        this.times.length = 0;
+        this.callbacks.length = 0;
+        this.onCompleteFn = null;
+        this.onStartFn = null;
     }
 
-    protected override postReset(): void {
-        this.actions.length = 0;
-        this.atStartFn = null;
-        this.atEndFn = null;
+    private get numCallbacks(): number {
+        return this.callbacks.length;
+    }
+
+    private get availableTime(): number {
+        return 1 - (2 * DynamicSequence.TIME_BUFFER);
+    }
+
+    private get spaceBetween(): number {
+        return this.availableTime / (this.numCallbacks + 1);
+    }
+
+    private updateTimes(): void {
+        this.times.length = 0;
+        for (let i = 1; i <= this.numCallbacks; i++) {
+            this.times.push(DynamicSequence.TIME_BUFFER + (i * this.spaceBetween));
+        }
     }
 
 }
-
-// const sequence = new DynamicSequence();
-// sequence
-//     .at('start', () => console.log('0%'))
-//     .at(0.2, () => console.log('20%'))
-//     .at(0.4, () => console.log('40%'))
-//     .at(0.6, () => console.log('60%'))
-//     .at(0.8, () => console.log('80%'))
-//     .at('end', () => console.log('100%'))
-//     .duration(1000)
-//     .start();
-
-// // > 0%
-// sequence.update(100);
-// sequence.update(100);
-// // > 20%
-// sequence.update(100);
-// sequence.update(100);
-// // > 40%
-// sequence.update(100);
-// sequence.update(100);
-// // > 60%
-// sequence.update(100);
-// sequence.update(100);
-// // > 80%
-// sequence.update(100);
-// sequence.update(100);
-// // > 100%
