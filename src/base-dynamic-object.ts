@@ -3,10 +3,11 @@
  */
 
 import type { tEaseOption } from "@brendangooch/ease";
+import type { iUpdateable } from "@brendangooch/simple-game-loop";
 
 type tProperties = { duration: number; speed: number; distance: number; ease: tEaseOption };
 
-export abstract class BaseDynamicObject {
+export abstract class BaseDynamicObject implements iUpdateable {
 
     private isOn: boolean = true;
     protected properties: tProperties = { duration: 0, speed: 0, distance: 0, ease: 'noEase' };
