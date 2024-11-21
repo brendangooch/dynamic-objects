@@ -82,10 +82,16 @@ v4.0.0 - scrapped
 v5.0.0
 
     package completely re-written
-    added: ...
+    
+    added:
+        DynamicDimension
+        DynamicOpacity
+        DynamicScale
+        DynamicSequence
+        DynamicText (replaces DynamicString)
+        DynamicTimer
+        DynamicVisibility
+        DynamicWaveForm
+    
     ALL objects pass their updated jest tests
     tested all new functionality visually in browser
-
-
-
-
