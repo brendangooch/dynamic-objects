@@ -95,3 +95,15 @@ v5.0.0
     
     ALL objects pass their updated jest tests
     tested all new functionality visually in browser
+
+v6.0.0
+
+    package completely re-written again
+    scrapped dynamic base object in favour of composition over inheritance
+
+    removed:
+        dynamic rectangle - functionality added directly to screen entity object
+        dynamic opacity, scale, dimension - functionality added to dynamic number class
+        dynamic visibility - behaviour added to dynamic waveform
+
+    ...
