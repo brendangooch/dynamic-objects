@@ -2,15 +2,35 @@
  * package barrel file
  */
 
-// export { DynamicBezier } from "./bezier/dynamic-bezier.js";
-// export { DynamicColor } from "./color/dynamic-color.js";
-// export { DynamicNumber } from "./number/dynamic-number.js";
-// export { DynamicPosition } from "./position/dynamic-position.js";
-// export { DynamicRectangle } from "./rectangle/dynamic-rectangle.js";
-// export { DynamicSequence } from "./sequence/dynamic-sequence.js";
-// export { DynamicText } from "./text/dynamic-text.js";
-// export { DynamicTimer } from "./timer/dynamic-timer.js";
-// export { DynamicVector } from "./vector/dynamic-vector.js";
-// export { DynamicWaveForm } from "./wave-form/dynamic-wave-form.js";
-// export { BaseDynamicObject } from "./base-dynamic-object.js";
-// export { DynamicUnit } from "./unit/dynamic-unit.js";
+import type { tEaseOption } from "@brendangooch/ease";
+
+export type tCurrentValue = number | { x: number; y: number } | string;
+export interface iDynamicObject {
+    get current(): tCurrentValue;
+    get isActive(): boolean;
+    get isComplete(): boolean;
+    get isRunning(): boolean;
+    get isOn(): boolean;
+    turnOn(): void;
+    turnOff(): void;
+    load(json: string): void;
+    save(): string;
+    start(): void;
+    stop(): void;
+    pause(): void;
+    duration(ms: number): iDynamicObject;
+    ease(ease: tEaseOption): iDynamicObject;
+    onComplete(fn: Function): iDynamicObject;
+    update(ms: number): void;
+    tick(): void;
+    stepForwards(): void;
+    stepBackwards(): void;
+    complete(): void;
+    rewind(): void;
+    runRate(speed: number): void;
+    speedUp(): void;
+    slowDown(): void;
+    normalSpeed(): void;
+};
+
+export { DynamicUnit } from "./unit/dynamic-unit.js";

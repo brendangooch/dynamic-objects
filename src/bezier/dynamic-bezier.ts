@@ -2,7 +2,9 @@
  * a point on a quadratic bezier curve that changes its position over time
  */
 
-export class DynamicBezier {
+import { DynamicVector } from "../vector/dynamic-vector.js";
+
+export class DynamicBezier extends DynamicVector {
 
     //
 

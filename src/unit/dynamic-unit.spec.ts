@@ -15,234 +15,161 @@ testAll();
 function testAll(): void {
     describe('DynamicUnit', () => {
 
-        test('dummy', () => { });
-
-        // testStartsInactive();
-        // testBecomesActiveOnceDurationSetAndStartCalled();
-        // testBecomesInActiveOnceTransitionComplete();
-        // testStartsWithCurrentValueOf0();
-        // testEndsWithCurrentValueOF1();
-        // testCannotSetADurationOf0();
-        // testCannotSetADurationLessThan0();
-        // testCannotStartWithoutSettingDuration();
-        // testCannotSetDurationWhilstActive();
-        // testCannotSetEaseWhilstActive();
-        // testStartDoesNothingIfAlreadyActive();
-        // testUnitCanBeStopped();
-        // testUnitCanBeStoppedAndRestarted();
-        // testClonedObjectHasTheSameDurationAndEaseAsOriginal();
-        // testClonedObjectNOTTheSameObject();
-        // testClonedObjectDoesNOTCopyCurrentValue();
-        // testFullTransitionBehavesAsExpected();
-        // testFullTransitionBehavesAsExpectedWithEaseApplied();
-        // testFullTransitionBehavesAsExpectedWithMultipleSaveThenLoad();
+        testCanTurnOnAndOff();
+        testCanStopAndStart();
+        testPauseTogglesBetweenOnAndOff();
+        testCanSetDuration();
+        testCanAddEase();
+        testCanUpdate();
+        testCanTickForwards();
+        testCanStepForwards();
+        testCanStepBackwards();
+        testCanCompleteUpodate();
+        testCanRewindToTheBeginning();
+        testCanFloorTheCurrentValue();
+        testCanInvertTheCurrentValue();
+        testCanFloorANDInvertTheCurrentValue();
+        testCanAdjustAmplitudeOfCurrentValue();
+        testCanAdjustRunRate();
+        testCanSpeedUp();
+        testCanSlowDown();
+        testCanReturnToNormalSpeed();
 
     });
 }
 
 
-// function testStartsInactive(): void {
-//     test('starts inactive', () => {
-//         EXPECT.falsy(unit.isActive);
-//     });
-// }
+function testCanTurnOnAndOff(): void {
+    test('can turn on an off', () => {
+        // EXPECT.truthy(unit.isOn);
+        // unit.turnOff();
+        // EXPECT.falsy(unit.isOn);
+        // unit.turnOn();
+        // EXPECT.truthy(unit.isOn);
+    });
+}
 
-// function testBecomesActiveOnceDurationSetAndStartCalled(): void {
-//     test('becomes active once duration set and start called', () => {
-//         unit.duration(1000).start();
-//         EXPECT.truthy(unit.isActive);
-//     });
-// }
+function testCanStopAndStart(): void {
+    test('can stop and start', () => {
+        // test no functionality when unit is off
+    });
+}
 
-// function testBecomesInActiveOnceTransitionComplete(): void {
-//     test('becomes inactive once transition complete', () => {
-//         unit.duration(1000).start();
-//         EXPECT.truthy(unit.isActive);
-//         unit.update(1000);
-//         EXPECT.falsy(unit.isActive);
-//     });
-// }
+function testPauseTogglesBetweenOnAndOff(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testStartsWithCurrentValueOf0(): void {
-//     test('starts with current value of 0', () => {
-//         EXPECT.toBe(unit.current, 0);
-//     });
-// }
+function testCanSetDuration(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testEndsWithCurrentValueOF1(): void {
-//     test('ends with current value of 1', () => {
-//         unit.duration(1000).start();
-//         unit.update(1000);
-//         EXPECT.toBe(unit.current, 1);
-//     });
-// }
+function testCanAddEase(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testCannotSetADurationOf0(): void {
-//     test('cannot set a duration of 0', () => {
-//         unit.duration(0).start();
-//         EXPECT.falsy(unit.isActive);
-//     });
-// }
+function testCanUpdate(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testCannotSetADurationLessThan0(): void {
-//     test('cannot set a duration less than 0', () => {
-//         unit.duration(-100).start();
-//         EXPECT.falsy(unit.isActive);
-//     });
-// }
+function testCanTickForwards(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testCannotStartWithoutSettingDuration(): void {
-//     test('cannot start without setting duration', () => {
-//         unit.start();
-//         EXPECT.falsy(unit.isActive);
-//     });
-// }
+function testCanStepForwards(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testCannotSetDurationWhilstActive(): void {
-//     test('cannot set duration whilst active', () => {
-//         unit.duration(1000).start();
-//         EXPECT.truthy(unit.isActive);
-//         unit.duration(2000);
-//         unit.update(100);
-//         EXPECT.toBeCloseTo(unit.current, 0.1);
-//     });
-// }
+function testCanStepBackwards(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testCannotSetEaseWhilstActive(): void {
-//     test('cannot set ease whilst active', () => {
-//         unit.duration(1000).start();
-//         EXPECT.truthy(unit.isActive);
-//         unit.ease('easeInCubic');
-//         unit.update(100);
-//         EXPECT.toBeCloseTo(unit.current, 0.1);
-//     });
-// }
+function testCanCompleteUpodate(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testStartDoesNothingIfAlreadyActive(): void {
-//     test('start does nothing if already active', () => {
-//         unit.duration(1000).start();
-//         EXPECT.truthy(unit.isActive);
-//         unit.update(100);
-//         EXPECT.toBeCloseTo(unit.current, 0.1);
-//         unit.start(); // <--
-//         unit.update(100);
-//         EXPECT.toBeCloseTo(unit.current, 0.2);
-//     });
-// }
+function testCanRewindToTheBeginning(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testUnitCanBeStopped(): void {
-//     test('unit can be stopped', () => {
-//         unit.duration(1000).start();
-//         EXPECT.truthy(unit.isActive);
-//         unit.stop(); // <--
-//         EXPECT.falsy(unit.isActive);
-//     });
-// }
+function testCanFloorTheCurrentValue(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testUnitCanBeStoppedAndRestarted(): void {
-//     test('unit can be stopped and restarted', () => {
-//         unit.duration(1000).start();
-//         EXPECT.truthy(unit.isActive);
-//         unit.stop(); // <--
-//         EXPECT.falsy(unit.isActive);
-//         unit.duration(1000).start();
-//         EXPECT.truthy(unit.isActive);
-//         unit.update(100);
-//         EXPECT.toBeCloseTo(unit.current, 0.1);
-//     });
-// }
+function testCanInvertTheCurrentValue(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testClonedObjectHasTheSameDurationAndEaseAsOriginal(): void {
-//     test('cloned object has same duration and ease as original', () => {
-//         unit.duration(1000).ease('easeInCubic');
-//         const clone = unit.clone();
-//         unit.start();
-//         clone.start();
-//         unit.update(100);
-//         clone.update(100);
-//         EXPECT.toBe(unit.current, clone.current);
-//     });
-// }
+function testCanFloorANDInvertTheCurrentValue(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testClonedObjectNOTTheSameObject(): void {
-//     test('cloned object NOT the same object', () => {
-//         unit.duration(1000).ease('easeInCubic');
-//         const clone = unit.clone();
-//         EXPECT.falsy(unit === clone);
-//     });
-// }
+function testCanAdjustAmplitudeOfCurrentValue(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testClonedObjectDoesNOTCopyCurrentValue(): void {
-//     test('cloned object does NOT copy current value', () => {
-//         unit.duration(1000).ease('easeInCubic').start();
-//         unit.update(100);
-//         const clone = unit.clone();
-//         clone.start();
-//         unit.update(100);
-//         clone.update(100);
-//         EXPECT.not.toBe(unit.current, clone.current);
-//     });
-// }
+function testCanAdjustRunRate(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testFullTransitionBehavesAsExpected(): void {
-//     test('full transition behaves as expected', () => {
-//         unit.duration(1000).start();
-//         EXPECT.truthy(unit.isActive);
-//         EXPECT.toBe(unit.current, 0);
-//         unit.update(200);
-//         EXPECT.toBeCloseTo(unit.current, 0.2);
-//         unit.update(200);
-//         EXPECT.toBeCloseTo(unit.current, 0.4);
-//         unit.update(200);
-//         EXPECT.toBeCloseTo(unit.current, 0.6);
-//         unit.update(200);
-//         EXPECT.toBeCloseTo(unit.current, 0.8);
-//         unit.update(200);
-//         EXPECT.toBe(unit.current, 1);
-//         EXPECT.falsy(unit.isActive);
-//     });
-// }
+function testCanSpeedUp(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testFullTransitionBehavesAsExpectedWithEaseApplied(): void {
-//     test('full transition behaves as expected with ease applied', () => {
-//         unit.duration(1000).ease('easeInCubic').start();
-//         EXPECT.truthy(unit.isActive);
-//         EXPECT.toBe(unit.current, 0);
-//         unit.update(200);
-//         EXPECT.toBeCloseTo(unit.current, Math.pow(0.2, 3));
-//         unit.update(200);
-//         EXPECT.toBeCloseTo(unit.current, Math.pow(0.4, 3));
-//         unit.update(200);
-//         EXPECT.toBeCloseTo(unit.current, Math.pow(0.6, 3));
-//         unit.update(200);
-//         EXPECT.toBeCloseTo(unit.current, Math.pow(0.8, 3));
-//         unit.update(200);
-//         EXPECT.toBe(unit.current, 1);
-//         EXPECT.falsy(unit.isActive);
-//     });
-// }
+function testCanSlowDown(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}
 
-// function testFullTransitionBehavesAsExpectedWithMultipleSaveThenLoad(): void {
-//     test('full transition behaves as expected with multiple save then load', () => {
-//         unit.duration(1000).start();
-//         unit.load(unit.save()); // <--
-//         EXPECT.truthy(unit.isActive);
-//         EXPECT.toBe(unit.current, 0);
-//         unit.update(200);
-//         unit.load(unit.save()); // <--
-//         EXPECT.toBeCloseTo(unit.current, 0.2);
-//         unit.update(200);
-//         unit.load(unit.save()); // <--
-//         EXPECT.toBeCloseTo(unit.current, 0.4);
-//         unit.update(200);
-//         unit.load(unit.save()); // <--
-//         EXPECT.toBeCloseTo(unit.current, 0.6);
-//         unit.update(200);
-//         unit.load(unit.save()); // <--
-//         EXPECT.toBeCloseTo(unit.current, 0.8);
-//         unit.update(200);
-//         unit.load(unit.save()); // <--
-//         EXPECT.toBe(unit.current, 1);
-//         EXPECT.falsy(unit.isActive);
-//     });
-// }
+function testCanReturnToNormalSpeed(): void {
+    test('', () => {
+        // test load then save
+        // test no functionality when unit is off
+    });
+}

@@ -5,23 +5,145 @@
  * 
  */
 
+import type { tEaseOption } from "@brendangooch/ease";
+import type { iDynamicObject } from "../index.js";
+
 export class DynamicColor {
 
-    //
+    public get current(): string {
+        return '';
+    }
+
+    public get isActive(): boolean {
+        return false;
+    }
+
+    public get isComplete(): boolean {
+        return false;
+    }
+
+    public get isRunning(): boolean {
+        return false;
+    }
+
+    public get isOn(): boolean {
+        return false;
+    }
+
+    public turnOn(): void {
+
+    }
+
+    public turnOff(): void {
+
+    }
+
+    public load(json: string): void {
+        if (!this.isOn) {
+            //
+        }
+    }
+
+    public save(): string {
+        if (!this.isOn) {
+            //
+        }
+        return '';
+    }
+
+    public start(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public stop(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public pause(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+
+    public duration(ms: number): DynamicColor {
+        return this;
+    }
+
+    public ease(ease: tEaseOption): DynamicColor {
+        return this;
+    }
+
+    public onComplete(fn: Function): DynamicColor {
+        return this;
+    }
+
+
+    public update(ms: number): void {
+        //
+    }
+
+    public tick(): void {
+        //
+    }
+
+    public stepForwards(): void {
+        //
+    }
+
+    public stepBackwards(): void {
+        //
+    }
+
+    public complete(): void {
+        //
+    }
+
+    public rewind(): void {
+        //
+    }
+
+    public runRate(speed: number): void {
+        if (this.isOn && !this.isRunning) {
+            //
+        }
+    }
+
+    public speedUp(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public slowDown(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public normalSpeed(): void {
+        if (this.isOn) {
+            //
+        }
+    }
 
 }
 
 // import type { tEaseOption } from "@brendangooch/ease";
 // import { BaseDynamicObject } from "../base-dynamic-object.js";
-// import { DynamicNumber } from "../number/dynamic-number.js";
+// import { DynamicColor } from "../number/dynamic-number.js";
 // import { clamp } from "@brendangooch/maths";
 
 // export class DynamicColor extends BaseDynamicObject {
 
-//     private red: DynamicNumber = new DynamicNumber();
-//     private green: DynamicNumber = new DynamicNumber();
-//     private blue: DynamicNumber = new DynamicNumber();
-//     private colors: DynamicNumber[] = [this.red, this.green, this.blue];
+//     private red: DynamicColor = new DynamicColor();
+//     private green: DynamicColor = new DynamicColor();
+//     private blue: DynamicColor = new DynamicColor();
+//     private colors: DynamicColor[] = [this.red, this.green, this.blue];
 //     private currentColor: string = '';
 
 //     public constructor(r: number, g: number, b: number) {

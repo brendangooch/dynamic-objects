@@ -2,9 +2,140 @@
  * a number that changes its value over time
  */
 
-export class DynamicNumber {
+import type { tEaseOption } from "@brendangooch/ease";
+import type { iDynamicObject } from "../index.js";
+import { DynamicUnit } from "../index.js";
 
+type tDynamicNummberProperties = {
     //
+};
+
+export class DynamicNumber implements iDynamicObject {
+
+    private properties: tDynamicNummberProperties = {
+        //
+    };
+
+    public get current(): number {
+        return 0;
+    }
+
+    public get isActive(): boolean {
+        return false;
+    }
+
+    public get isComplete(): boolean {
+        return false;
+    }
+
+    public get isRunning(): boolean {
+        return false;
+    }
+
+    public get isOn(): boolean {
+        return false;
+    }
+
+    public turnOn(): void {
+
+    }
+
+    public turnOff(): void {
+
+    }
+
+    public load(json: string): void {
+        if (!this.isOn) {
+            //
+        }
+    }
+
+    public save(): string {
+        if (!this.isOn) {
+            //
+        }
+        return '';
+    }
+
+    public start(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public stop(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public pause(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+
+    public duration(ms: number): DynamicNumber {
+        return this;
+    }
+
+    public ease(ease: tEaseOption): DynamicNumber {
+        return this;
+    }
+
+    public onComplete(fn: Function): DynamicNumber {
+        return this;
+    }
+
+
+    public update(ms: number): void {
+        //
+    }
+
+    public tick(): void {
+        //
+    }
+
+    public stepForwards(): void {
+        //
+    }
+
+    public stepBackwards(): void {
+        //
+    }
+
+    public complete(): void {
+        //
+    }
+
+    public rewind(): void {
+        //
+    }
+
+    public runRate(speed: number): void {
+        if (this.isOn && !this.isRunning) {
+            //
+        }
+    }
+
+    public speedUp(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public slowDown(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public normalSpeed(): void {
+        if (this.isOn) {
+            //
+        }
+    }
 
 }
 

@@ -2,9 +2,140 @@
  * a vector that changes its position over time
  */
 
-export class DynamicVector {
+import type { tEaseOption } from "@brendangooch/ease";
+import type { iDynamicObject } from "../index.js";
+import { DynamicUnit } from "../index.js";
 
+type tDynamicVectorProperties = {
     //
+};
+
+export class DynamicVector implements iDynamicObject {
+
+    private properties: tDynamicVectorProperties = {
+        //
+    };
+
+    public get current(): { x: number; y: number } {
+        return { x: 0, y: 0 };;
+    }
+
+    public get isActive(): boolean {
+        return false;
+    }
+
+    public get isComplete(): boolean {
+        return false;
+    }
+
+    public get isRunning(): boolean {
+        return false;
+    }
+
+    public get isOn(): boolean {
+        return false;
+    }
+
+    public turnOn(): void {
+
+    }
+
+    public turnOff(): void {
+
+    }
+
+    public load(json: string): void {
+        if (!this.isOn) {
+            //
+        }
+    }
+
+    public save(): string {
+        if (!this.isOn) {
+            //
+        }
+        return '';
+    }
+
+    public start(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public stop(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public pause(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+
+    public duration(ms: number): DynamicVector {
+        return this;
+    }
+
+    public ease(ease: tEaseOption): DynamicVector {
+        return this;
+    }
+
+    public onComplete(fn: Function): DynamicVector {
+        return this;
+    }
+
+
+    public update(ms: number): void {
+        //
+    }
+
+    public tick(): void {
+        //
+    }
+
+    public stepForwards(): void {
+        //
+    }
+
+    public stepBackwards(): void {
+        //
+    }
+
+    public complete(): void {
+        //
+    }
+
+    public rewind(): void {
+        //
+    }
+
+    public runRate(speed: number): void {
+        if (this.isOn && !this.isRunning) {
+            //
+        }
+    }
+
+    public speedUp(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public slowDown(): void {
+        if (this.isOn) {
+            //
+        }
+    }
+
+    public normalSpeed(): void {
+        if (this.isOn) {
+            //
+        }
+    }
 
 }
 
