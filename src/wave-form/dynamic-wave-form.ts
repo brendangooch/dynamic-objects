@@ -2,132 +2,135 @@
  * 
  */
 
-import type { tEaseOption } from "@brendangooch/ease";
-import type { iDynamicObject } from "../index.js";
+export class DynamicWaveForm { }
 
-export class DynamicWaveForm {
+// import type { tEaseOption } from "@brendangooch/ease";
+// import type { iDynamic } from "../index.js";
 
-    public get current(): number {
-        return 0;
-    }
+// export class DynamicWaveForm implements iDynamic {
 
-    public get isActive(): boolean {
-        return false;
-    }
+//     public get current(): number {
+//         return 0;
+//     }
 
-    public get isComplete(): boolean {
-        return false;
-    }
+//     public get isActive(): boolean {
+//         return false;
+//     }
 
-    public get isRunning(): boolean {
-        return false;
-    }
+//     public get isComplete(): boolean {
+//         return false;
+//     }
 
-    public get isOn(): boolean {
-        return false;
-    }
+//     public get isRunning(): boolean {
+//         return false;
+//     }
 
-    public turnOn(): void {
+//     public get isOn(): boolean {
+//         return false;
+//     }
 
-    }
+//     public turnOn(): void {
 
-    public turnOff(): void {
+//     }
 
-    }
+//     public turnOff(): void {
 
-    public load(json: string): void {
-        if (!this.isOn) {
-            //
-        }
-    }
+//     }
 
-    public save(): string {
-        if (!this.isOn) {
-            //
-        }
-        return '';
-    }
+//     public load(json: string): boolean {
+//         if (!this.isOn) {
+//             const state = JSON.parse(json);
+//             if (state.foo === undefined) return false;
+//         }
+//         return false;
+//     }
 
-    public start(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public save(): string {
+//         if (!this.isOn) {
+//             //
+//         }
+//         return '';
+//     }
 
-    public stop(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public start(): void {
+//         if (this.isOn) {
+//             //
+//         }
+//     }
 
-    public pause(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public stop(): void {
+//         if (this.isOn) {
+//             //
+//         }
+//     }
 
-    public duration(ms: number): DynamicWaveForm {
-        return this;
-    }
+//     public pause(): void {
+//         if (this.isOn) {
+//             //
+//         }
+//     }
 
-    public ease(ease: tEaseOption): DynamicWaveForm {
-        return this;
-    }
+//     public duration(ms: number): DynamicWaveForm {
+//         ms;
+//         return this;
+//     }
 
-    public onComplete(fn: Function): DynamicWaveForm {
-        return this;
-    }
+//     public ease(ease: tEaseOption): DynamicWaveForm {
+//         ease;
+//         return this;
+//     }
 
+//     public onComplete(fn: Function): DynamicWaveForm {
+//         fn;
+//         return this;
+//     }
 
-    public update(ms: number): void {
-        //
-    }
+//     public change(): boolean {
+//         return false;
+//     }
 
-    public tick(): void {
-        //
-    }
+//     public update(ms: number): void {
+//         ms;
+//         //
+//     }
 
-    public stepForwards(): void {
-        //
-    }
+//     public tick(): void {
+//         //
+//     }
 
-    public stepBackwards(): void {
-        //
-    }
+//     public stepForwards(): void {
+//         //
+//     }
 
-    public complete(): void {
-        //
-    }
+//     public stepBackwards(): void {
+//         //
+//     }
 
-    public rewind(): void {
-        //
-    }
+//     public complete(): void {
+//         //
+//     }
 
-    public runRate(speed: number): void {
-        if (this.isOn && !this.isRunning) {
-            //
-        }
-    }
+//     public rewind(): void {
+//         //
+//     }
 
-    public speedUp(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public runRate(speed: number): void {
+//         speed;
+//     }
 
-    public slowDown(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public speedUp(): void {
 
-    public normalSpeed(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     }
 
-}
+//     public slowDown(): void {
+
+//     }
+
+//     public normalSpeed(): void {
+
+//     }
+
+// }
 
 // import type { iDynamicUnit } from "../types/i-dynamic-unit.js";
 // import { BaseDynamicObject } from "../base-dynamic-object.js";

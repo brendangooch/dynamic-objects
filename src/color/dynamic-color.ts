@@ -5,133 +5,153 @@
  * 
  */
 
-import type { tEaseOption } from "@brendangooch/ease";
-import type { iDynamicObject } from "../index.js";
+export class DynamicColor { }
 
-export class DynamicColor {
+// import type { tEaseOption } from "@brendangooch/ease";
+// import type { iDynamic } from "../index.js";
+// import { DynamicNumber } from "../number/dynamic-number.js";
 
-    public get current(): string {
-        return '';
-    }
+// type tDynamicColorProperties = {
+//     red: DynamicNumber;
+//     green: DynamicNumber;
+//     blue: DynamicNumber;
+//     current: string;
+// };
 
-    public get isActive(): boolean {
-        return false;
-    }
+// export class DynamicColor implements iDynamic {
 
-    public get isComplete(): boolean {
-        return false;
-    }
+//     private properties: tDynamicColorProperties = {
+//         red: new DynamicNumber(),
+//         green: new DynamicNumber(),
+//         blue: new DynamicNumber(),
+//         current: ''
+//     };
 
-    public get isRunning(): boolean {
-        return false;
-    }
+//     private rgb: DynamicNumber[] = [this.properties.red, this.properties.green, this.properties.blue];
 
-    public get isOn(): boolean {
-        return false;
-    }
+//     public get current(): string {
+//         return this.properties.current;
+//     }
 
-    public turnOn(): void {
+//     public get isActive(): boolean {
+//         return false;
+//     }
 
-    }
+//     public get isComplete(): boolean {
+//         return false;
+//     }
 
-    public turnOff(): void {
+//     public get isRunning(): boolean {
+//         return false;
+//     }
 
-    }
+//     public get isOn(): boolean {
+//         return false;
+//     }
 
-    public load(json: string): void {
-        if (!this.isOn) {
-            //
-        }
-    }
+//     public turnOn(): void {
 
-    public save(): string {
-        if (!this.isOn) {
-            //
-        }
-        return '';
-    }
+//     }
 
-    public start(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public turnOff(): void {
 
-    public stop(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     }
 
-    public pause(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public load(json: string): boolean {
+//         if (!this.isOn) {
+//             const state = JSON.parse(json);
+//             if (state.foo === undefined) return false;
+//         }
+//         return false;
+//     }
 
+//     public save(): string {
+//         if (!this.isOn) {
+//             //
+//         }
+//         return '';
+//     }
 
-    public duration(ms: number): DynamicColor {
-        return this;
-    }
+//     public start(): void {
+//         if (this.isOn) {
+//             //
+//         }
+//     }
 
-    public ease(ease: tEaseOption): DynamicColor {
-        return this;
-    }
+//     public stop(): void {
+//         if (this.isOn) {
+//             //
+//         }
+//     }
 
-    public onComplete(fn: Function): DynamicColor {
-        return this;
-    }
+//     public pause(): void {
+//         if (this.isOn) {
+//             //
+//         }
+//     }
 
 
-    public update(ms: number): void {
-        //
-    }
+//     public duration(ms: number): DynamicColor {
+//         this.rgb.forEach(color => color.duration(ms));
+//         return this;
+//     }
 
-    public tick(): void {
-        //
-    }
+//     public ease(ease: tEaseOption): DynamicColor {
+//         this.rgb.forEach(color => color.ease(ease));
+//         return this;
+//     }
 
-    public stepForwards(): void {
-        //
-    }
+//     public onComplete(fn: Function): DynamicColor {
+//         this.rgb.forEach(color => color.onComplete(fn));
+//         return this;
+//     }
 
-    public stepBackwards(): void {
-        //
-    }
+//     public change(): boolean {
+//         this.rgb.forEach(color => color.change());
+//         return false;
+//     }
 
-    public complete(): void {
-        //
-    }
+//     public update(ms: number): void {
+//         this.rgb.forEach(color => color.update(ms));
+//     }
 
-    public rewind(): void {
-        //
-    }
+//     public tick(): void {
+//         this.rgb.forEach(color => color.tick());
+//     }
 
-    public runRate(speed: number): void {
-        if (this.isOn && !this.isRunning) {
-            //
-        }
-    }
+//     public stepForwards(): void {
+//         this.rgb.forEach(color => color.stepForwards());
+//     }
 
-    public speedUp(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public stepBackwards(): void {
+//         this.rgb.forEach(color => color.stepBackwards());
+//     }
 
-    public slowDown(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public complete(): void {
+//         this.rgb.forEach(color => color.complete());
+//     }
 
-    public normalSpeed(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public rewind(): void {
+//         this.rgb.forEach(color => color.rewind());
+//     }
 
-}
+//     public runRate(speed: number): void {
+//         this.rgb.forEach(color => color.runRate(speed));
+//     }
+
+//     public speedUp(): void {
+//         this.rgb.forEach(color => color.speedUp());
+//     }
+
+//     public slowDown(): void {
+//         this.rgb.forEach(color => color.slowDown());
+//     }
+
+//     public normalSpeed(): void {
+//         this.rgb.forEach(color => color.normalSpeed());
+//     }
+
+// }
 
 // import type { tEaseOption } from "@brendangooch/ease";
 // import { BaseDynamicObject } from "../base-dynamic-object.js";

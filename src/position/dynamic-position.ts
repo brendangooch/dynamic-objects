@@ -3,136 +3,132 @@
  *
  */
 
-import type { tEaseOption } from "@brendangooch/ease";
-import type { iDynamicObject } from "../index.js";
-import { DynamicUnit } from "../index.js";
+export class DynamicPosition { }
 
+// import type { tEaseOption } from "@brendangooch/ease";
+// import type { iDynamic } from "../index.js";
+// import { DynamicVector } from "../vector/dynamic-vector.js";
+// import { DynamicBezier } from "../bezier/dynamic-bezier.js";
 
-export class DynamicPosition implements iDynamicObject {
+// export class DynamicPosition implements iDynamic {
 
-    //
+//     private strategy: DynamicVector | DynamicBezier;
 
-    public get current(): { x: number; y: number } {
-        return { x: 0, y: 0 };;
-    }
+//     public get current(): { x: number; y: number } {
+//         return this.strategy.current;
+//     }
 
-    public get isActive(): boolean {
-        return false;
-    }
+//     public get isActive(): boolean {
+//         return this.strategy.isActive;
+//     }
 
-    public get isComplete(): boolean {
-        return false;
-    }
+//     public get isComplete(): boolean {
+//         return this.strategy.isComplete;
+//     }
 
-    public get isRunning(): boolean {
-        return false;
-    }
+//     public get isRunning(): boolean {
+//         return this.strategy.isRunning;
+//     }
 
-    public get isOn(): boolean {
-        return false;
-    }
+//     public get isOn(): boolean {
+//         return this.strategy.isOn;
+//     }
 
-    public turnOn(): void {
+//     public turnOn(): void {
+//         this.strategy.turnOn();
+//     }
 
-    }
+//     public turnOff(): void {
+//         this.strategy.turnOff();
+//     }
 
-    public turnOff(): void {
+//     public load(json: string): boolean {
+//         if (!this.isOn) {
+//             const state = JSON.parse(json);
+//             if (state.foo === undefined) return false;
+//         }
+//         return false;
+//     }
 
-    }
+//     public save(): string {
+//         if (!this.isOn) {
+//             //
+//         }
+//         return '';
+//     }
 
-    public load(json: string): void {
-        if (!this.isOn) {
-            //
-        }
-    }
+//     public start(): void {
+//         this.strategy.start();
+//     }
 
-    public save(): string {
-        if (!this.isOn) {
-            //
-        }
-        return '';
-    }
+//     public stop(): void {
+//         this.strategy.stop();
+//     }
 
-    public start(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public pause(): void {
+//         this.strategy.pause()
+//     }
 
-    public stop(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public duration(ms: number): DynamicPosition {
+//         this.strategy.duration(ms);
+//         return this;
+//     }
 
-    public pause(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public ease(ease: tEaseOption): DynamicPosition {
+//         this.strategy.ease(ease);
+//         return this;
+//     }
 
-    public duration(ms: number): DynamicPosition {
-        return this;
-    }
+//     public onComplete(fn: Function): DynamicPosition {
+//         this.strategy.onComplete(fn);
+//         return this;
+//     }
 
-    public ease(ease: tEaseOption): DynamicPosition {
-        return this;
-    }
+//     public change(): boolean {
+//         return this.strategy.change();
+//     }
 
-    public onComplete(fn: Function): DynamicPosition {
-        return this;
-    }
+//     public update(ms: number): void {
+//         this.strategy.update(ms);
+//     }
 
+//     public tick(): void {
+//         this.strategy.tick()
+//     }
 
-    public update(ms: number): void {
-        //
-    }
+//     public stepForwards(): void {
+//         this.strategy.stepForwards();
+//     }
 
-    public tick(): void {
-        //
-    }
+//     public stepBackwards(): void {
+//         this.strategy.stepBackwards();
+//     }
 
-    public stepForwards(): void {
-        //
-    }
+//     public complete(): void {
+//         this.strategy.complete();
+//     }
 
-    public stepBackwards(): void {
-        //
-    }
+//     public rewind(): void {
+//         this.strategy.rewind();
+//     }
 
-    public complete(): void {
-        //
-    }
+//     public runRate(speed: number): void {
+//         this.strategy.runRate(speed);
+//     }
 
-    public rewind(): void {
-        //
-    }
+//     public speedUp(): void {
+//         this.strategy.speedUp();
+//     }
 
-    public runRate(speed: number): void {
-        if (this.isOn && !this.isRunning) {
-            //
-        }
-    }
+//     public slowDown(): void {
+//         this.strategy.slowDown();
+//     }
 
-    public speedUp(): void {
-        if (this.isOn) {
-            //
-        }
-    }
+//     public normalSpeed(): void {
+//         this.strategy.normalSpeed();
+//     }
 
-    public slowDown(): void {
-        if (this.isOn) {
-            //
-        }
-    }
-
-    public normalSpeed(): void {
-        if (this.isOn) {
-            //
-        }
-    }
-
-}
+// }
 
 // + updateDistance
 // + store nextValue

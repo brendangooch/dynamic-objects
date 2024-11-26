@@ -111,11 +111,11 @@ v6.0.0
     added additional functionality to all dynamic objects
         object can be started and stopped
         all functionality can be turned on or off
-        client can step the object forwards or backwards by a fixed percent of duration
+        client can step the object forwards or backwards by a fixed percent
         all objects can call an optional callback function on complete
         objects can tick() forwards at a consistent rate instead of variable update() so can be used with a fixed timestep loop
         objects can be rewound to the beginning (previous state)
-        objects can be ended (next state)
+        current update cycle can be ended immediately
         the speed at which the object updates/ticks/steps can be altered
 
     added to unit:
@@ -124,13 +124,10 @@ v6.0.0
         adjust the scale (amplitude) of the current value
 
     added to Number/Vector/Bezier/Position:
-        get rounded()
+        round()
         toPlaces()
         max(...)
         min(...)
-    
-    added to Number:
-        positive() - 
     
     added to DynamicWaveForm:
         ...
