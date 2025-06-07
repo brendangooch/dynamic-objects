@@ -94,7 +94,6 @@ v5.0.0
         DynamicWaveForm
     
     ALL objects pass their updated jest tests
-<<<<<<< HEAD
     tested all new functionality visually in browser
 
 v6.0.0
@@ -103,6 +102,6 @@ objects have a different api and funciton differently
 client can now make deferred changes to each object and implement changes by calling next() Method
 tested all thoroughly manually in the browser
 will need to write unit tests before altering the objects any further
-=======
-    tested all new functionality visually in browser
->>>>>>> dd4e6f0a0dd1a24f11e10b54477de85beb0b064d
+
+v6.1.0
+imported latest GameEngine package (4.0.0) to avoid conflicts down the line

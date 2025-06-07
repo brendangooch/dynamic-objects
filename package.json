@@ -1,6 +1,6 @@
 {
   "name": "@brendangooch/dynamic-objects",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "description": "",
   "author": "B Gooch <brendangooch@gmail.com>",
   "license": "MIT",
@@ -53,7 +53,7 @@
     "@brendangooch/animation-command": "^1.0.0",
     "@brendangooch/bezier": "^1.0.0",
     "@brendangooch/ease": "^1.2.1",
-    "@brendangooch/game-engine": "^3.0.0",
+    "@brendangooch/game-engine": "^4.0.0",
     "@brendangooch/maths": "^4.0.1",
     "@brendangooch/vector": "^1.0.0"
   }
