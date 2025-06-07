@@ -44,4 +44,14 @@ export type tChangeWaveTo = tChangeTo & {
     square: boolean;
 };
 
-//
+export { DynamicUnit } from "./dynamic-unit.js";
+export { DynamicNumber } from "./dynamic-number.js";
+export { DynamicRotation } from "./dynamic-rotation.js";
+export { DynamicPosition } from "./dynamic-position.js";
+export { DynamicVector } from "./dynamic-vector.js";
+export { DynamicBezier } from "./dynamic-bezier.js";
+export { DynamicString } from "./dynamic-string.js";
+export { DynamicWave } from "./dynamic-wave.js";
+export { DynamicInterval } from "./dynamic-interval.js";
+export { DynamicTimer } from "./dynamic-timer.js";
+export { ChangeValueCommand } from "./change-value-command.js";
