@@ -105,3 +105,6 @@ will need to write unit tests before altering the objects any further
 
 v6.1.0
 imported latest GameEngine package (4.0.0) to avoid conflicts down the line
+
+v7.0.0
+imported updated bezier package, which sets control point RELATIVE to start and end point
