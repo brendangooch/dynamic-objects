@@ -108,3 +108,9 @@ imported latest GameEngine package (4.0.0) to avoid conflicts down the line
 
 v7.0.0
 imported updated bezier package, which sets control point RELATIVE to start and end point
+
+v8.0.0
+created new class: DynamicColor - an rgb color value that can change over time
+created new tChangeColorTo type for DynamicColor
+added complete() method to iDynamic interface
+added public complete method to DynamicString, DynamicRotation

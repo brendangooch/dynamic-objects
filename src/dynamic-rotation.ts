@@ -40,7 +40,7 @@ export class DynamicRotation implements iDynamic, iDeferrable {
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
-        this.rotation.complete();
+        this.complete();
         this.spinAmount = Math.PI * 2 * next.spin;
         this.rotation.addChange({
             value: next.value + this.spinAmount,
@@ -55,6 +55,10 @@ export class DynamicRotation implements iDynamic, iDeferrable {
             this.rotation.update(deltaTime);
             if (this.rotation.isComplete) this.removeSpin();
         }
+    }
+
+    public complete(): void {
+        this.rotation.complete();
     }
 
     private removeSpin(): void {

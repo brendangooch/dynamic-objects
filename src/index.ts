@@ -12,6 +12,7 @@ export interface iDeferrable {
 export interface iDynamic extends iUpdateable {
     get isActive(): boolean;
     get isComplete(): boolean;
+    complete(): void;
 }
 
 export type tChangeTo = {
@@ -38,6 +39,12 @@ export type tChangeStringTo = tChangeTo & {
     value: string;
 }
 
+export type tChangeColorTo = tChangeTo & {
+    red: number;
+    green: number;
+    blue: number;
+}
+
 export type tChangeWaveTo = tChangeTo & {
     numCycles: number;
     up: boolean;
@@ -51,6 +58,7 @@ export { DynamicPosition } from "./dynamic-position.js";
 export { DynamicVector } from "./dynamic-vector.js";
 export { DynamicBezier } from "./dynamic-bezier.js";
 export { DynamicString } from "./dynamic-string.js";
+export { DynamicColor } from "./dynamic-color.js";
 export { DynamicWave } from "./dynamic-wave.js";
 export { DynamicInterval } from "./dynamic-interval.js";
 export { DynamicTimer } from "./dynamic-timer.js";

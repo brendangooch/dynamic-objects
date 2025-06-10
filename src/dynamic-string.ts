@@ -32,7 +32,7 @@ export class DynamicString implements iDynamic, iDeferrable {
     }
 
     public setValue(value: string): void {
-        this.index.complete();
+        this.complete();
         this.properties.value = value;
     }
 
@@ -44,7 +44,7 @@ export class DynamicString implements iDynamic, iDeferrable {
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
-        this.index.complete();
+        this.complete();
         this.properties.fullString = next.value;
         this.properties.value = '';
         this.index.setValue(0);
@@ -61,6 +61,10 @@ export class DynamicString implements iDynamic, iDeferrable {
             this.index.update(deltaTime);
             this.updateValue();
         }
+    }
+
+    public complete(): void {
+        this.index.complete();
     }
 
     private updateValue(): void {
