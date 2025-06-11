@@ -38,17 +38,21 @@ export class DynamicNumber implements iDynamic, iDeferrable {
     }
 
     public addChange(props: tChangeNumberTo): void {
-        if (props.duration <= 0) throw new Error('duration must be greater than zero');
         this.changes.push(props);
     }
 
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
-        this.complete();
-        this.properties.previous = this.properties.value;
-        this.properties.distance = next.value - this.properties.previous;
-        this.unit.run(next.duration, next.ease);
+        if (next.value !== this.value) {
+            if (next.duration === 0) this.setValue(next.value);
+            else {
+                this.complete();
+                this.properties.previous = this.properties.value;
+                this.properties.distance = next.value - this.properties.previous;
+                this.unit.run(next.duration, next.ease);
+            }
+        }
     }
 
     public update(deltaTime: number): void {

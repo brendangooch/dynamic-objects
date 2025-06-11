@@ -42,17 +42,21 @@ export class DynamicVector implements iDynamic, iDeferrable {
     }
 
     public addChange(props: tChangePositionTo): void {
-        if (props.duration <= 0) throw new Error('duration must be greater than zero');
         this.changes.push(props);
     }
 
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
-        this.complete();
-        this.properties.previous.setXY(this.x, this.y);
-        this.properties.distance.copy(Vector.create(next.x, next.y).sub(this.properties.previous));
-        this.unit.run(next.duration, next.ease);
+        if (next.x !== this.x || next.y !== this.y) {
+            if (next.duration === 0) this.setValue(next.x, next.y);
+            else {
+                this.complete();
+                this.properties.previous.setXY(this.x, this.y);
+                this.properties.distance.copy(Vector.create(next.x, next.y).sub(this.properties.previous));
+                this.unit.run(next.duration, next.ease);
+            }
+        }
     }
 
     public update(deltaTime: number): void {

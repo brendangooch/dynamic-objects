@@ -1,6 +1,6 @@
 {
   "name": "@brendangooch/dynamic-objects",
-  "version": "8.0.0",
+  "version": "9.0.0",
   "description": "",
   "author": "B Gooch <brendangooch@gmail.com>",
   "license": "MIT",
@@ -50,7 +50,7 @@
     "updateable"
   ],
   "dependencies": {
-    "@brendangooch/animation-command": "^1.0.0",
+    "@brendangooch/animation-command": "^1.1.0",
     "@brendangooch/bezier": "^2.0.0",
     "@brendangooch/ease": "^1.2.1",
     "@brendangooch/game-engine": "^4.0.0",

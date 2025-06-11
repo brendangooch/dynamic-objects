@@ -33,21 +33,25 @@ export class DynamicRotation implements iDynamic, iDeferrable {
     }
 
     public addChange(props: tChangeRotationTo): void {
-        if (props.duration <= 0) throw new Error('duration must be greater than zero');
         this.changes.push(props);
     }
 
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
-        this.complete();
-        this.spinAmount = Math.PI * 2 * next.spin;
-        this.rotation.addChange({
-            value: next.value + this.spinAmount,
-            duration: next.duration,
-            ease: next.ease
-        });
-        this.rotation.next();
+        if (next.value !== this.value) {
+            if (next.duration === 0) this.setValue(next.value);
+            else {
+                this.complete();
+                this.spinAmount = Math.PI * 2 * next.spin;
+                this.rotation.addChange({
+                    value: next.value + this.spinAmount,
+                    duration: next.duration,
+                    ease: next.ease
+                });
+                this.rotation.next();
+            }
+        }
     }
 
     public update(deltaTime: number): void {

@@ -114,3 +114,6 @@ created new class: DynamicColor - an rgb color value that can change over time
 created new tChangeColorTo type for DynamicColor
 added complete() method to iDynamic interface
 added public complete method to DynamicString, DynamicRotation
+
+v9.0.0
+in ALL deferrable objects, made it acceptable to set a duration of 0 on next change.  IF duration is 0, value will be changes immediately, not dynamically.  Additionally, the change only occurs if next value is not current value.

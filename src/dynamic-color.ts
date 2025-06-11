@@ -42,32 +42,36 @@ export class DynamicColor implements iDynamic, iDeferrable {
     }
 
     public addChange(props: tChangeColorTo): void {
-        if (props.duration <= 0) throw new Error('duration must be greater than zero');
         this.changes.push(props);
     }
 
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
-        this.complete();
-        this.red.addChange({
-            duration: next.duration,
-            ease: next.ease,
-            value: this.clamp(next.red)
-        });
-        this.green.addChange({
-            duration: next.duration,
-            ease: next.ease,
-            value: this.clamp(next.green)
-        });
-        this.blue.addChange({
-            duration: next.duration,
-            ease: next.ease,
-            value: this.clamp(next.blue)
-        });
-        this.red.next();
-        this.green.next();
-        this.blue.next();
+        if (next.red !== this.red.value || next.green !== this.green.value || next.blue !== this.blue.value) {
+            if (next.duration === 0) this.setValue(next.red, next.green, next.blue);
+            else {
+                this.complete();
+                this.red.addChange({
+                    duration: next.duration,
+                    ease: next.ease,
+                    value: this.clamp(next.red)
+                });
+                this.green.addChange({
+                    duration: next.duration,
+                    ease: next.ease,
+                    value: this.clamp(next.green)
+                });
+                this.blue.addChange({
+                    duration: next.duration,
+                    ease: next.ease,
+                    value: this.clamp(next.blue)
+                });
+                this.red.next();
+                this.green.next();
+                this.blue.next();
+            }
+        }
     }
 
     public update(deltaTime: number): void {

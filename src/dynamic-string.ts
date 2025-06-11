@@ -37,23 +37,27 @@ export class DynamicString implements iDynamic, iDeferrable {
     }
 
     public addChange(props: tChangeStringTo): void {
-        if (props.duration <= 0) throw new Error('duration must be greater than zero');
         this.changes.push(props);
     }
 
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
-        this.complete();
-        this.properties.fullString = next.value;
-        this.properties.value = '';
-        this.index.setValue(0);
-        this.index.addChange({
-            value: next.value.length,
-            duration: next.duration,
-            ease: next.ease
-        });
-        this.index.next();
+        if (next.value !== this.value) {
+            if (next.duration === 0) this.setValue(next.value);
+            else {
+                this.complete();
+                this.properties.fullString = next.value;
+                this.properties.value = '';
+                this.index.setValue(0);
+                this.index.addChange({
+                    value: next.value.length,
+                    duration: next.duration,
+                    ease: next.ease
+                });
+                this.index.next();
+            }
+        }
     }
 
     public update(deltaTime: number): void {

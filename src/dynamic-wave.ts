@@ -5,6 +5,7 @@
 import type { tEaseOption } from "@brendangooch/ease";
 import type { iDeferrable, iDynamic, tChangeWaveTo } from "./index.js";
 import { DynamicUnit } from "./dynamic-unit.js";
+import { clamp } from "@brendangooch/maths";
 
 export class DynamicWave implements iDynamic, iDeferrable {
 
@@ -36,26 +37,28 @@ export class DynamicWave implements iDynamic, iDeferrable {
 
     public setValue(value: number): void {
         this.complete();
-        this.currentValue = value;
+        this.currentValue = clamp(value, 0, 1);
     }
 
     public addChange(props: tChangeWaveTo): void {
-        if (props.duration <= 0) throw new Error('duration must be greater than zero');
         this.changes.push(props);
     }
 
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
-        this.complete();
-        this.ease = next.ease;
-        this.numCycles = next.numCycles;
-        this.cycleDuration = next.duration / next.numCycles;
-        this.square = next.square;
-        this.up = next.up;
-        this.currentValue = (this.up) ? 0 : 1;
-        this.restartCycle();
-        this.completed = false;
+        if (next.duration === 0) (next.up) ? this.setValue(1) : this.setValue(0);
+        else {
+            this.complete();
+            this.ease = next.ease;
+            this.numCycles = next.numCycles;
+            this.cycleDuration = next.duration / next.numCycles;
+            this.square = next.square;
+            this.up = next.up;
+            this.currentValue = (this.up) ? 0 : 1;
+            this.restartCycle();
+            this.completed = false;
+        }
     }
 
     public update(deltaTime: number): void {

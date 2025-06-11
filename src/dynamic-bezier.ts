@@ -44,19 +44,23 @@ export class DynamicBezier implements iDynamic, iDeferrable {
     }
 
     public addChange(props: tChangePositionTo): void {
-        if (props.duration <= 0) throw new Error('duration must be greater than zero');
         this.changes.push(props);
     }
 
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
-        this.complete();
-        this.bezier.setStart(this.x, this.y);
-        this.bezier.setEnd(next.x, next.y);
-        if (next.angle && next.distance) this.bezier.setControlByAngleDistance(next.angle, next.distance);
-        else this.bezier.makeStraight();
-        this.unit.run(next.duration, next.ease);
+        if (next.x !== this.x || next.y !== this.y) {
+            if (next.duration === 0) this.setValue(next.x, next.y);
+            else {
+                this.complete();
+                this.bezier.setStart(this.x, this.y);
+                this.bezier.setEnd(next.x, next.y);
+                if (next.angle && next.distance) this.bezier.setControlByAngleDistance(next.angle, next.distance);
+                else this.bezier.makeStraight();
+                this.unit.run(next.duration, next.ease);
+            }
+        }
     }
 
     public update(deltaTime: number): void {
