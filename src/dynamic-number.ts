@@ -44,13 +44,15 @@ export class DynamicNumber implements iDynamic, iDeferrable {
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
+        if (next.duration === undefined && next.speed === undefined) throw new Error('you must set a speed or duration');
         if (next.value !== this.value) {
             if (next.duration === 0) this.setValue(next.value);
             else {
                 this.complete();
                 this.properties.previous = this.properties.value;
                 this.properties.distance = next.value - this.properties.previous;
-                this.unit.run(next.duration, next.ease);
+                if (!next.duration && next.speed) next.duration = Math.abs(this.properties.distance / next.speed);
+                this.unit.run(next.duration!, next.ease);
             }
         }
     }

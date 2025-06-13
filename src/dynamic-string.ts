@@ -43,6 +43,7 @@ export class DynamicString implements iDynamic, iDeferrable {
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
+        if (next.duration === undefined && next.speed === undefined) throw new Error('you must set a speed or duration');
         if (next.value !== this.value) {
             if (next.duration === 0) this.setValue(next.value);
             else {
@@ -50,11 +51,20 @@ export class DynamicString implements iDynamic, iDeferrable {
                 this.properties.fullString = next.value;
                 this.properties.value = '';
                 this.index.setValue(0);
-                this.index.addChange({
-                    value: next.value.length,
-                    duration: next.duration,
-                    ease: next.ease
-                });
+                if (next.duration) {
+                    this.index.addChange({
+                        value: next.value.length,
+                        duration: next.duration,
+                        ease: next.ease
+                    });
+                }
+                else {
+                    this.index.addChange({
+                        value: next.value.length,
+                        speed: next.speed!,
+                        ease: next.ease
+                    });
+                }
                 this.index.next();
             }
         }

@@ -39,9 +39,10 @@ export class DynamicRotation implements iDynamic, iDeferrable {
     public next(): void {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
+        if (next.duration === undefined && next.speed === undefined) throw new Error('you must set a speed or duration');
         if (next.value !== this.value) {
             if (next.duration === 0) this.setValue(next.value);
-            else {
+            else if (next.duration) {
                 this.complete();
                 this.spinAmount = Math.PI * 2 * next.spin;
                 this.rotation.addChange({

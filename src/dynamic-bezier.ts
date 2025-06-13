@@ -58,7 +58,11 @@ export class DynamicBezier implements iDynamic, iDeferrable {
                 this.bezier.setEnd(next.x, next.y);
                 if (next.angle && next.distance) this.bezier.setControlByAngleDistance(next.angle, next.distance);
                 else this.bezier.makeStraight();
-                this.unit.run(next.duration, next.ease);
+                if (!next.duration && next.speed) {
+                    this.bezier.refreshLookup();
+                    next.duration = Math.abs(this.bezier.length / next.speed);
+                }
+                this.unit.run(next.duration!, next.ease);
             }
         }
     }

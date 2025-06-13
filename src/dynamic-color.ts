@@ -50,7 +50,7 @@ export class DynamicColor implements iDynamic, iDeferrable {
         if (!next) throw new Error('no next value');
         if (next.red !== this.red.value || next.green !== this.green.value || next.blue !== this.blue.value) {
             if (next.duration === 0) this.setValue(next.red, next.green, next.blue);
-            else {
+            else if (next.duration) {
                 this.complete();
                 this.red.addChange({
                     duration: next.duration,

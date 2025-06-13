@@ -16,19 +16,21 @@ export interface iDynamic extends iUpdateable {
 }
 
 export type tChangeTo = {
-    duration: number;
+    duration?: number;
     ease: tEaseOption;
 };
 
 export type tChangeNumberTo = tChangeTo & {
+    speed?: number;
     value: number;
 };
 
 export type tChangePositionTo = tChangeTo & {
-    x: number,
-    y: number,
-    angle?: number,
-    distance?: number
+    speed?: number;
+    x: number;
+    y: number;
+    angle?: number;
+    distance?: number;
 };
 
 export type tChangeRotationTo = tChangeNumberTo & {
@@ -36,6 +38,7 @@ export type tChangeRotationTo = tChangeNumberTo & {
 }
 
 export type tChangeStringTo = tChangeTo & {
+    speed?: number;
     value: string;
 }
 

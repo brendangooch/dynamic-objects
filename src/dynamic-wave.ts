@@ -48,7 +48,7 @@ export class DynamicWave implements iDynamic, iDeferrable {
         const next = this.changes.shift();
         if (!next) throw new Error('no next value');
         if (next.duration === 0) (next.up) ? this.setValue(1) : this.setValue(0);
-        else {
+        else if (next.duration) {
             this.complete();
             this.ease = next.ease;
             this.numCycles = next.numCycles;

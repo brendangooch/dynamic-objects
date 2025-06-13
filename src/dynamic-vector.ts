@@ -54,7 +54,8 @@ export class DynamicVector implements iDynamic, iDeferrable {
                 this.complete();
                 this.properties.previous.setXY(this.x, this.y);
                 this.properties.distance.copy(Vector.create(next.x, next.y).sub(this.properties.previous));
-                this.unit.run(next.duration, next.ease);
+                if (!next.duration && next.speed) next.duration = Math.abs(this.properties.distance.magnitude / next.speed);
+                this.unit.run(next.duration!, next.ease);
             }
         }
     }
